@@ -10,30 +10,30 @@ import Login from './components/Login'
 import Register from './components/Register'
 
 function App() {
-  const [user, setUser] = useState(null);
-  useEffect(() => {
-  const unsubscribe=auth.onAuthStateChanged((user) => {
-    if (user) {
-      setUser(user)
-    } else {
-      setUser(null)
-    }
-  });
-  return () => {
-    unsubscribe();
-  }
+  // const [user, setUser] = useState(null);
+  // useEffect(() => {
+  // const unsubscribe=auth.onAuthStateChanged((user) => {
+  //   if (user) {
+  //     setUser(user)
+  //   } else {
+  //     setUser(null)
+  //   }
+  // });
+  // return () => {
+  //   unsubscribe();
+  // }
 
-  }, []);
+  // }, []);
 
 
-  console.log(user);
+  // console.log(user);
 
 
 
   return (
     <>
       <Router>
-        <Navbar user={user} />
+        <Navbar/>
         <Routes>
         <Route path="/" element={<HomePage/>} />
         <Route path="/login" element={<Login/>} />
