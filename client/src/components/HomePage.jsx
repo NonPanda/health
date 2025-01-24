@@ -4,26 +4,7 @@ import { Stethoscope, Search, Star, Calendar, Heart } from 'lucide-react';
 export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
-      <header className="px-4 lg:px-6 h-16 flex items-center bg-white border-b border-slate-200">
-        <Link className="flex items-center justify-center" to="/">
-          <Stethoscope className="h-8 w-8 text-blue-700" />
-          <span className="ml-2 text-2xl font-bold text-blue-700">DoctorWho</span>
-        </Link>
-        <nav className="ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-sm font-medium text-slate-700 hover:text-blue-700 transition-colors" to="/find-doctors">
-            Find Doctors
-          </Link>
-          <Link className="text-sm font-medium text-slate-700 hover:text-blue-700 transition-colors" to="/specialties">
-            Specialties
-          </Link>
-          <Link className="text-sm font-medium text-slate-700 hover:text-blue-700 transition-colors" to="/chat">
-            AI Chat Assistant
-          </Link>
-          <Link className="text-sm font-medium text-slate-700 hover:text-blue-700 transition-colors" to="/login">
-            Login
-          </Link>
-        </nav>
-      </header>
+      
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50">
           <div className="container mx-auto px-4 md:px-6">
