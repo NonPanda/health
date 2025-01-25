@@ -39,7 +39,7 @@ export default function Login() {
     return (
     
         <div className="flex flex-row">
-        <div className="flex relative">
+        <div className="flex relative hidden md:block">
         <div className="absolute inset-0 overflow-hidden">
           <img
             src={rainbow}
@@ -50,7 +50,7 @@ export default function Login() {
   <img
     src= {person}
     alt="Person"
-    className="mx-auto mt-20 scale-75"
+    className="mx-auto mt-20 scale-75 "
   />
 </div>
 <div className="flex flex-1 flex-col justify-center items-center bg-white">

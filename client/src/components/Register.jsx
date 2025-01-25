@@ -43,7 +43,7 @@ export default function Register() {
     return (
     
         <div className="flex flex-row">
-      <div className="flex relative">
+      <div className="flex relative hidden md:block">
         <div className="absolute inset-0 overflow-hidden">
           <img
             src={rainbow}
