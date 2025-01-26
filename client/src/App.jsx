@@ -7,27 +7,11 @@ import {auth } from './firebaseConfig'
 import { use } from 'react'
 import HomePage from './components/HomePage'
 import SignUp from './components/Signup/Signup'
+import ForgotPassword from './components/Signup/ForgotPassword'
+import ResetPassword from './components/Signup/ResetPassword'
+
 
 function App() {
-  // const [user, setUser] = useState(null);
-  // useEffect(() => {
-  // const unsubscribe=auth.onAuthStateChanged((user) => {
-  //   if (user) {
-  //     setUser(user)
-  //   } else {
-  //     setUser(null)
-  //   }
-  // });
-  // return () => {
-  //   unsubscribe();
-  // }
-
-  // }, []);
-
-
-  // console.log(user);
-
-
 
   return (
     <>
@@ -36,6 +20,8 @@ function App() {
         <Routes>
         <Route path="/" element={<HomePage/>} />
         <Route path="/signup" element={<SignUp/>} />
+        <Route path="/forgot-password" element={<ForgotPassword/>} />
+        <Route path="/reset-password/:id/:token" element={<ResetPassword/>} />
         </Routes>
 
 

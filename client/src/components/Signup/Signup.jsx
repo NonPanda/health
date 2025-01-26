@@ -5,6 +5,7 @@ import person from '../../assets/person.png';
 import rainbow from '../../assets/rainbow.png';
 import axios from 'axios';
 import './Signup.css';
+import { useNavigate } from 'react-router-dom';
 
 
 const CustomInput = ({ 
@@ -19,7 +20,7 @@ const CustomInput = ({
         onChange={onChange}
         value={value}
         className={`p-2 border rounded-md w-full ${
-          error ? 'border-red-500' : 'border-gray-300'
+          error ? 'border-red-500' : 'border-gray-300 focus:outline-gray-400'
         }`}
       />
       {error && (
@@ -39,6 +40,8 @@ export default function Signup() {
     password: "",
   });
   const [errors, setErrors] = useState({});
+  const [isDoctor, setIsDoctor] = useState(false);
+  const navigate = useNavigate();
 
 
   const validateForm = () => {
@@ -85,6 +88,10 @@ export default function Signup() {
     setErrors({}); 
   };
 
+   const handleDoctorToggle = () => {
+    setIsDoctor((prev) => !prev);
+  };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
@@ -107,7 +114,7 @@ export default function Signup() {
             if (response.status === 200) {
               console.log('Token:', response.data.token); 
               localStorage.setItem('token', response.data.token); 
-              window.location.href = "/";
+              navigate('/');
 
             }
 
@@ -208,9 +215,25 @@ export default function Signup() {
           error={errors.password}
           value={formData.password}
         />
-        <a href="#" className="text-blue-500 text-sm -mt-4 mb-4 block text-right ">
-          Forgot Password?
-        </a>
+        <div className="flex justify-between items-center -mt-4 mb-4">
+  <div className="flex items-center">
+    <input
+      type="checkbox"
+      id="doctorToggle"
+      checked={isDoctor}
+      onChange={handleDoctorToggle}
+      className="mr-2 mt-1"
+    />
+    <label htmlFor="doctorToggle" className="text-sm text-gray-400">
+      Doctor
+    </label>
+  </div>
+  
+  <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
+    Forgot Password?
+  </Link>
+</div>
+
         <button className="w-full bg-black text-white p-4 text-xl font-bold rounded-md hover:bg-gray-800">
           Log In
         </button>
