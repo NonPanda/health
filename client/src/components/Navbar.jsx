@@ -79,7 +79,7 @@ export default function Navbar({ user }) {
             </>
         ) : (
             <Link
-                to="/login"
+                to="/signup"
                 className="bg-blue-700 text-white px-4 py-2 rounded text-l font-bold hover:bg-blue-800 transition-colors"
             >
                 Login
