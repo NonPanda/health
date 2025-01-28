@@ -1,41 +1,19 @@
 import React from "react";
-import { auth, provider, signInWithPopup } from "../firebaseConfig";
-import {signOut} from "firebase/auth";
 import {useState,useEffect } from "react";
-import { GoogleAuthProvider } from "firebase/auth";
 import { Link } from "react-router-dom";
 import { Stethoscope } from "lucide-react";
+import pic from "../assets/pic.png";
 
 
 
 export default function Navbar({ user }) {
  const [show,isShow] = useState(false);
 
- const handleSignIn = async () => {
-     try {
-        const provider = new GoogleAuthProvider();
-        provider.setCustomParameters({
-            prompt: 'select_account'
-        });
-         const result = await signInWithPopup(auth, provider); 
-         const credential = GoogleAuthProvider.credentialFromResult(result);
-         const token = credential.accessToken;
-         const loggedInUser = result.user;
-         console.log
-         console.log("User signed in:", loggedInUser);
-     } catch (error) {
-         console.error("Error during sign-in:", error.message);
-     }
+    const handleSignOut = () => {
+        localStorage.removeItem('token');
+        window.location.reload();
+        setUser(null);
     }
-    
- const handleSignOut = async () => {
-     try {
-         await signOut(auth);
-         console.log("User signed out");
-     } catch (error) {
-         console.error("Error during sign-out:", error.message);
-     }
- }
 
     const togglenavbar = () => {
         isShow(!show);
@@ -62,16 +40,21 @@ export default function Navbar({ user }) {
         <Link to="/chat" className="text-sm font-medium text-slate-700 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-700">
             AI Chat Assistant
         </Link>
+        {user && (
+            <Link to="/profile" className="text-sm font-medium text-slate-700 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-700">
+                Profile
+            </Link>
+        )}
+
     </div>
 
     <div className="flex items-center">
         {user ? (
             <>
                 <img
-                    src={user.photoURL}
-                    referrerPolicy="no-referrer"
-                    alt={user.displayName}
-                    className="w-8 h-8 rounded-full cursor-pointer"
+                    src={user.pfp || pic}
+                    alt="user"
+                    className="w-10 h-10 rounded-full cursor-pointer"
                 />
                 <button className="bg-blue-700 text-white px-4 py-2 rounded ml-4 text-sm hover:bg-blue-800 transition-colors" onClick={handleSignOut}>
                     Logout

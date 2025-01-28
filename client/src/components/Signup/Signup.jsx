@@ -43,6 +43,14 @@ export default function Signup() {
   const [isDoctor, setIsDoctor] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/profile');
+    }
+  }, [navigate]);
+
+
 
   const validateForm = () => {
     const newErrors = {};
@@ -113,8 +121,9 @@ export default function Signup() {
       
             if (response.status === 200) {
               console.log('Token:', response.data.token); 
-              localStorage.setItem('token', response.data.token); 
-              navigate('/');
+              localStorage.setItem('token', response.data.token);           
+              window.location.reload();
+              
 
             }
 
@@ -152,8 +161,6 @@ export default function Signup() {
             console.log('Response received:', response);
         
             if (response.status === 200) {
-              console.log('Token:', response.data.token); 
-              localStorage.setItem('token', response.data.token);
               handleToggleForm();
             } else {
               setErrors({ general: "Registration Failed." });
