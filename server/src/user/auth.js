@@ -207,5 +207,7 @@ const validateAdmin = async (req, res, next) => {
   }
 };
 
+//Profile Picture 
+
 
 module.exports = { register, login, editUser, sendEmail, validateUser, validateAdmin };
