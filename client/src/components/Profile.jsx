@@ -128,7 +128,7 @@ export default function Profile({ user }) {
       <div className="space-y-1">
         <div className="flex items-center space-x-2">
           <Droplet className="w-5 h-5 text-blue-900" />
-          <h2 className="text-lg font-semibold text-blue-900">Allergic Reactions</h2>
+          <h2 className="pl-1 text-lg font-semibold text-blue-900">Allergic Reactions</h2>
         </div>
         <Input
           name="allergies"
@@ -163,7 +163,7 @@ export default function Profile({ user }) {
       <div className="space-y-1">
         <div className="flex items-center space-x-2">
           <SyringeIcon className="w-5 h-5 text-blue-900" />
-          <h2 className="text-lg font-semibold text-blue-900">Medications</h2>
+          <h2 className="pl-5 text-lg font-semibold text-blue-900">Medications</h2>
         </div>
         <Input
           name="medications"
@@ -177,7 +177,7 @@ export default function Profile({ user }) {
       <div className="space-y-1">
         <div className="flex items-center space-x-2">
           <CakeIcon className="w-5 h-5 text-blue-900" />
-          <h2 className="text-lg font-semibold text-blue-900">Diet Preferences</h2>
+          <h2 className="pl-2 text-lg font-semibold text-blue-900">Diet Preferences</h2>
           </div>
           <Input
             name="diet"

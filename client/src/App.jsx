@@ -2,13 +2,13 @@ import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import { useEffect } from 'react'
-import './App.css'
 import HomePage from './components/HomePage'
 import SignUp from './components/Signup/Signup'
 import ForgotPassword from './components/Signup/ForgotPassword'
 import ResetPassword from './components/Signup/ResetPassword'
 import axios from 'axios'
 import Profile from './components/Profile'
+import DoctorProfile from './components/DoctorProfile'
 
 
 function App() {
@@ -42,6 +42,8 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword/>} />
         <Route path="/reset-password/:id/:token" element={<ResetPassword/>} />
         <Route path="profile" element={<Profile user={user} />} />
+        <Route path="doctor-profile" element={<DoctorProfile user={user} />} />
+      
         </Routes>
 
 

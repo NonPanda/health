@@ -45,6 +45,12 @@ export default function Navbar({ user }) {
                 Profile
             </Link>
         )}
+        {user && (
+            <Link to="/doctor-profile" className="text-sm font-medium text-slate-700 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-700">    
+                Doctor Profile
+            </Link>
+
+        )}
 
     </div>
 
