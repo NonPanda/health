@@ -111,4 +111,48 @@ router.get("/user", validateUser, async (req, res) => {
   }
 });
 
+//----------------------------------------------
+  
+
+
+  
+    
+
+
+// app.put('/update-pfp',upload.single('pfp'),async(req,res)=>{
+//   try {
+//       const {userId}=req.body;
+
+
+//       if(!userId){
+//           return res.status(400).json("User ID is required");
+//       }
+
+//       if(!req.file){
+//           return res.status(400).json("Image file is required");
+//       }
+
+//       const base64Image=req.file.buffer.toString('base64');
+
+//       const updatedUser=await UserSchema.findByIdAndUpdate(
+//           userId,
+//           { profilePicture:`data:${req.file.mimetype};base64,${base64Image}`},
+//           {new:true}
+//       );
+
+//       if(!updatedUser){
+//           return res.status(404).json("User not found");
+//       }
+
+//       res.status(200).json({
+//           message: "Profile picture updated successfully",
+//           user: updatedUser,
+//       });
+//   } catch (err) {
+//       console.error("Error:", err);  
+//       res.status(500).json("Error updating profile picture");
+//   }
+// });
+
+
 module.exports = router;
