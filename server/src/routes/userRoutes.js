@@ -12,17 +12,6 @@ const router = express.Router();
 
 const frontendUrl = process.env.FRONTEND_URL; 
 
-// router.post('/register', async (req, res) => {
-//   const { name, email, password } = req.body;
-//   const result = await register(name, email, password);
-//   res.status(result.status).json({ message: result.message, token: result.token });
-// });
-
-// router.post('/login', async (req, res) => {
-  //   const { email, password } = req.body;
-  //   const result = await login(email, password);
-  //   res.status(result.status).json({ message: result.message, token: result.token });
-  // });
   
   router.post('/register',register);
   router.post('/login',login);
@@ -119,8 +108,8 @@ router.get("/user", validateUser, async (req, res) => {
 
 
 
-router.get("/profile",getProfile);
-router.put("/profile",updateProfile);
+router.get("/getprofile",getProfile);
+router.put("/updateprofile",updateProfile);
 
 //----------------------------------------------
   
