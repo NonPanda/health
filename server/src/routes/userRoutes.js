@@ -1,26 +1,32 @@
 const express = require('express');
-const { register, login, editUser, sendEmail } = require('../user/auth.js'); // Adjust the path as necessary
+const {  editUser, sendEmail } = require('../user/auth.js'); // Adjust the path as necessary
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel.js'); // Adjust based on your user model
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const { validateUser } = require('../user/auth.js');
+const {register, login, getProfile ,updateProfile}=require('../controllers/usercontroller.js');
+const { appendFile } = require('fs');
+const {isAuthenticated}=require('../middlewares/auth.js');
 const router = express.Router();
 
 const frontendUrl = process.env.FRONTEND_URL; 
-//----------------------------------------------
-router.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
-  const result = await register(name, email, password);
-  res.status(result.status).json({ message: result.message, token: result.token });
-});
 
-//----------------------------------------------
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  const result = await login(email, password);
-  res.status(result.status).json({ message: result.message, token: result.token });
-});
+// router.post('/register', async (req, res) => {
+//   const { name, email, password } = req.body;
+//   const result = await register(name, email, password);
+//   res.status(result.status).json({ message: result.message, token: result.token });
+// });
+
+// router.post('/login', async (req, res) => {
+  //   const { email, password } = req.body;
+  //   const result = await login(email, password);
+  //   res.status(result.status).json({ message: result.message, token: result.token });
+  // });
+  
+  router.post('/register',register);
+  router.post('/login',login);
+  router.use(isAuthenticated);
 
 //----------------------------------------------
 router.put('/edit/:userId', async (req, res) => {
@@ -110,6 +116,11 @@ router.get("/user", validateUser, async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+
+
+router.get("/profile",getProfile);
+router.put("/profile",updateProfile);
 
 //----------------------------------------------
   

@@ -2,16 +2,21 @@ const express = require('express');
 const app = express();
 require('dotenv').config({path: '../.env'});
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const connectDB = require('./src/db'); // Import the connectDB function
 connectDB(); // Call the connectDB function
 const userRoutes = require('./src/routes/userRoutes');
+const doctorRoutes = require('./src/routes/doctorRoutes.js');
 
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors());
 
 
-app.use('/', userRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/doctor', doctorRoutes);
+
 
 
 const PORT = process.env.PORT || 5000;
