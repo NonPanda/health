@@ -1,65 +1,32 @@
 const mongoose=require('mongoose');
 const {hash}=require('bcrypt');
+const User = require('./userModel.js');
 
 const doctorSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true
-      },
-      email: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-        lowercase: true
-      },
-      password: {
-        type: String,
-        required: true,
-        minlength: 6
-      },
-      phone: {
-        type: String,
-        trim: true,
-        required: false
-      },
-        speciality: {
-            type: String,
-            required: false
-        },
-        workingHours:{
-            type: String,
-            required: false
-        },
-        education:{
-            type: String,
-            required: false
-        },
+      user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+      specialty: { type: String, required: true },
+      role: {type: String, default: 'doctor'},
+      qualifications: [String],
+      experience: Number,
+      availableSlots: [{
+        date: Date,
+        times: [String]
+      }],
+      rating: { type: Number, default: 0 },
+      reviews: [{
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        review: String
+      }],
+      profile:{
+        avatar: String,
+        phone: String,
+        online: Boolean,
+        fees: Number,
         location: {
-            type: String,
-            required: false
+          type: { type: String, default: 'Point' },
+          coordinates: [Number]
         },
-        experince:{
-            type: Number,
-            required: false
-        },
-        certifications: {
-            type: [String],
-            required: false
-        },
-        online:{
-            type: Boolean,
-            required: false
-        },
-        fees:{
-            type: Number,
-            required: false
-        },
-        pfp: {
-            type: String,
-            required: false
-        }
+      }
 },
 {
     timestamps: true

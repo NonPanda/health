@@ -1,7 +1,7 @@
 const User = require('../models/userModel.js');
+const Doctor= require('../models/doctorModel.js');
 const { compare } = require('bcrypt');
 const {TryCatch, ErrorHandler,cookieOptions,sendToken}=require('../constants/config.js');
-
 
 const register = TryCatch(async (req, res, next) => {
     const { name, email, password} = req.body;
@@ -24,6 +24,12 @@ const login = TryCatch(async (req, res, next) => {
     const isMatch = await compare(password, user.password);
     console.log(isMatch);
     if (!isMatch) return next(new ErrorHandler("Invalid email or password", 404));
+
+    const doctor= await Doctor.findOne({user: user._id});
+    console.log(doctor);
+    if(doctor){
+        user.role="doctor";
+    }
 
     sendToken(res, user, 200, `Welcome back ${user.name}`);
 });

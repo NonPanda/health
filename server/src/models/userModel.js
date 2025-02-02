@@ -19,46 +19,20 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 6
   },
-  phone: {
-    type: String,
-    trim: true,
-    required: false
-  },
-  weight: {
-    type: Number,
-    required: false
-  },
-  height: {
-    type: Number,
-    required: false
-  },
-  age: {
-    type: Number,
-    required: false
-  },
-  allergies: {
-    type: [String],  
-    required: false
-  },
-  emergencyContact: {
-    type: String,
-    required: false
-  },
-  medications: {
-    type: [String], 
-    required: false
-  },
-  diet: {
-    type: [String], 
-    required: false
-  },
-  location: {
-    type: String,
-    required: false
-  },
-  pfp: {
-    type: String, 
-    required: false
+  role: { type: String, enum: ['user', 'doctor', 'admin'], default: 'user' },
+  profile: {
+    avatar: String,
+    height: Number,
+    weight: Number,
+    age: Number,
+    medications: [String],
+    contact: String,
+    allergies: [String],
+    dietPreference: [String],
+    location: {
+      type: { type: String, default: 'Point' },
+      coordinates: [Number]
+    },
   }
 }, {
   timestamps: true

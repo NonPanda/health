@@ -2,29 +2,26 @@ const {compare}=require('bcrypt');
 const Doctor = require('../models/doctorModel.js');
 const {TryCatch, ErrorHandler,cookieOptions,sendToken}=require('../constants/config.js');
 
-
-const register = TryCatch(async (req, res, next) => {
-    const { name, email, password} = req.body;
-    const doctor = await Doctor.create({
-        name,
-        email,
-        password,
+const getDoctorProfile=TryCatch(async(req,res,next)=>{
+    const doctor=await Doctor.findById(req.user._id);
+    if(!doctor) return next(new ErrorHandler("Doctor not found",404));
+    res.status(200).json({
+        success:true,
+        doctor,
     });
-
-    sendToken(res, doctor, 201, "Doctor Created");
-});
-const login = TryCatch(async (req, res, next) => {
-    const { email, password } = req.body;
-    const doctor = await Doctor.findOne({ email }).select("+password");
-    if (!doctor) return next(new ErrorHandler("Invalid email or password", 404));
-
-    console.log(doctor);
-    
-    const isMatch = await compare(password, doctor.password);
-    console.log(isMatch);
-    if (!isMatch) return next(new ErrorHandler("Invalid email or password", 404));
-
-    sendToken(res, doctor, 200, `Welcome back ${doctor.name}`);
 });
 
-module.exports = { register, login };
+const updateDoctorProfile=TryCatch(async(req,res,next)=>{
+    const doctor=await Doctor.findByIdAndUpdate(
+        req.user._id,
+        {$set:req.body},
+        {new:true}
+    );
+    if(!doctor) return next(new ErrorHandler("Doctor not found",404));
+    res.status(200).json({
+        success:true,
+        doctor,
+    });
+});
+
+module.exports = { getDoctorProfile, updateDoctorProfile };
