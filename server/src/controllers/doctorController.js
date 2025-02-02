@@ -1,27 +1,28 @@
-const {compare}=require('bcrypt');
 const Doctor = require('../models/doctorModel.js');
-const {TryCatch, ErrorHandler,cookieOptions,sendToken}=require('../constants/config.js');
+const {TryCatch, ErrorHandler}=require('../constants/config.js');
 
-const getDoctorProfile=TryCatch(async(req,res,next)=>{
-    const doctor=await Doctor.findById(req.user._id);
-    if(!doctor) return next(new ErrorHandler("Doctor not found",404));
+const getProfile = TryCatch(async (req, res, next) => {
+    const doctor = await Doctor.findOne({user: req.user});
+    if (!doctor) return next(new ErrorHandler("User not found", 404));
     res.status(200).json({
-        success:true,
+        success: true,
         doctor,
     });
 });
 
-const updateDoctorProfile=TryCatch(async(req,res,next)=>{
-    const doctor=await Doctor.findByIdAndUpdate(
-        req.user._id,
-        {$set:req.body},
-        {new:true}
-    );
-    if(!doctor) return next(new ErrorHandler("Doctor not found",404));
+const updateProfile = TryCatch(async (req, res, next) => {
+    const updateduser = await Doctor.findOneAndUpdate(
+        {user: req.user},
+        { $set: req.body },
+        { new: true }
+    )
+    if (!updateduser) return next(new ErrorHandler("User not found", 404));
     res.status(200).json({
-        success:true,
-        doctor,
+        success: true,
+        user: updateduser,
     });
+    
 });
 
-module.exports = { getDoctorProfile, updateDoctorProfile };
+
+module.exports = { updateProfile, getProfile };

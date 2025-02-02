@@ -34,32 +34,28 @@ const login = TryCatch(async (req, res, next) => {
     sendToken(res, user, 200, `Welcome back ${user.name}`);
 });
 
-
-
-const getProfile = async (req, res) => {
-  try {
+const getProfile = TryCatch(async (req, res, next) => {
     const user = await User.findById(req.user);
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return next(new ErrorHandler("User not found", 404));
     res.status(200).json({
         success: true,
         user,
     });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+});
 
-const updateProfile = async (req, res) => {
-  try {
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      { $set: req.body },
-      { new: true }
+const updateProfile = TryCatch(async (req, res, next) => {
+    const updateduser = await User.findByIdAndUpdate(
+        req.user,
+        { $set: req.body },
+        { new: true }
     );
-    res.json(updatedUser);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
+    if (!updateduser) return next(new ErrorHandler("User not found", 404));
+    res.status(200).json({
+        success: true,
+        user: updateduser,
+    });
+    
+});
+
 
 module.exports = { register, login,getProfile, updateProfile };

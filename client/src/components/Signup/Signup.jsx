@@ -113,7 +113,7 @@ export default function Signup() {
         return;
       }
         try {
-            const response = await axios.post('http://localhost:5000/login', {
+            const response = await axios.post('http://localhost:5000/api/user/login', {
               email: formData.email,
               password: formData.password,
             });
@@ -121,7 +121,18 @@ export default function Signup() {
       
             if (response.status === 200) {
               console.log('Token:', response.data.token); 
-              localStorage.setItem('token', response.data.token);           
+              localStorage.setItem('token', response.data.token);  
+              
+              //role will be checked here nd accordingly profile will be shown
+              const role = response.data.user.role;
+              if(role==="doctor"){
+                navigate('/doctor-profile');
+              }else{
+                navigate('/profile');
+              }
+              //
+
+              
               window.location.reload();
               
 
@@ -152,7 +163,7 @@ export default function Signup() {
           }
         
           try {
-            const response = await axios.post('http://localhost:5000/register', {
+            const response = await axios.post('http://localhost:5000/api/user/register', {
               name: formData.username,
               email: formData.email,
               password: formData.password,
