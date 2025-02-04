@@ -30,9 +30,13 @@ const userSchema = new mongoose.Schema({
     allergies: [String],
     dietPreference: [String],
     location: {
-      type: { type: String, default: 'Point' },
-      coordinates: [Number]
-    },
+      type: { type: String,default: "Point", enum: ["Point"] },
+      coordinates: [Number],
+      formattedAddress: String,
+      city: String,
+      state: String,
+      zipcode: String
+    }
   }
 }, {
   timestamps: true
@@ -44,5 +48,9 @@ userSchema.pre("save", async function(next) {
   this.password = await hash(this.password, 10);
 
 });
+
+
+// Create a 2dsphere index on the location field for geospatial queries
+userSchema.index({ "profile.location": "2dsphere" });
 
 module.exports = mongoose.model('User', userSchema);

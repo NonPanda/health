@@ -9,7 +9,7 @@ import ResetPassword from './components/Signup/ResetPassword'
 import axios from 'axios'
 import Profile from './components/Profile'
 import DoctorProfile from './components/DoctorProfile'
-
+import DoctorSearch from './components/doctorsearch'
 
 function App() {
   const [user,setUser] = useState(null);
@@ -43,6 +43,7 @@ function App() {
         <Route path="/reset-password/:id/:token" element={<ResetPassword/>} />
         <Route path="profile" element={<Profile user={user} />} />
         <Route path="doctor-profile" element={<DoctorProfile user={user} />} />
+        <Route path="doctorsearch" element={<DoctorSearch />} />
       
         </Routes>
 
