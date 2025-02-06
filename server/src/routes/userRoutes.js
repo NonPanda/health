@@ -5,7 +5,7 @@ const User = require('../models/userModel.js'); // Adjust based on your user mod
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const { validateUser } = require('../user/auth.js');
-const {register, login, getProfile ,updateProfile}=require('../controllers/usercontroller.js');
+const {register, login, getProfile ,updateProfile,logout,userlocate}=require('../controllers/usercontroller.js');
 const { appendFile } = require('fs');
 const {isAuthenticated}=require('../middlewares/auth.js');
 const router = express.Router();
@@ -16,6 +16,17 @@ const frontendUrl = process.env.FRONTEND_URL;
   router.post('/register',register);
   router.post('/login',login);
   router.use(isAuthenticated);
+  router.get('/logout',logout); 
+  router.get("/getprofile",getProfile);
+  router.put("/updateprofile",updateProfile);
+  router.get('/update-location',userlocate);
+
+
+
+
+
+
+
 
 //----------------------------------------------
 router.put('/edit/:userId', async (req, res) => {
@@ -113,8 +124,6 @@ router.get("/check", validateUser, async (req, res) => {
 
 
 
-router.get("/getprofile",getProfile);
-router.put("/updateprofile",updateProfile);
 
 //----------------------------------------------
   
