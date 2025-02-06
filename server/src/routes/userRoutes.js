@@ -97,9 +97,14 @@ router.post('/reset-password/:id/:token', async (req, res) => {
 });
 
 //----------------------------------------------
-router.get("/user", validateUser, async (req, res) => {
+router.get('/logout', async (req, res) => {
+  res.clearCookie('token');
+  res.send('Logged out');
+});
+
+router.get("/check", validateUser, async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user);
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -116,13 +116,14 @@ export default function Signup() {
             const response = await axios.post('http://localhost:5000/api/user/login', {
               email: formData.email,
               password: formData.password,
-            });
-            console.log('Response received:', response); 
+            }
+            ,{withCredentials:true}
+          );
+
+            console.log('Response received:', response);
+            
       
-            if (response.status === 200) {
-              console.log('Token:', response.data.token); 
-              localStorage.setItem('token', response.data.token);  
-              
+            if (response.status === 200) {              
               //role will be checked here nd accordingly profile will be shown
               const role = response.data.user.role;
               if(role==="doctor"){
@@ -130,7 +131,6 @@ export default function Signup() {
               }else{
                 navigate('/profile');
               }
-              //
 
               
               window.location.reload();
@@ -171,7 +171,7 @@ export default function Signup() {
         
             console.log('Response received:', response);
         
-            if (response.status === 200) {
+            if (response.status === 201) {
               handleToggleForm();
             } else {
               setErrors({ general: "Registration Failed." });
@@ -205,14 +205,14 @@ export default function Signup() {
     <img
       src={person}
       alt="Person"
-      className="mx-auto mt-20 scale-75"
+      className="mx-auto mt-12 md:mt-20 mb-4 scale-75"
     />
     </div>
 
-    <div className={`w-full md:w-2/5 perspective ${isLoginForm ? "" : "flipped"}`}>
+    <div className={`w-[90%] mr-0 md:mr-8 md:w-2/5 perspective ${isLoginForm ? "" : "flipped"}`}>
     <div className="flipper">
       <div className="front flex flex-1 flex-col justify-center items-center bg-white">
-      <h1 className="text-4xl font-bold mb-8 text-center">
+      <h1 className="text-4xl font-bold py-4 text-center">
         Hello!<br />Welcome Back
       </h1>
       <form className="w-full flex justify-center items-center" onSubmit={handleLoginSubmit}>

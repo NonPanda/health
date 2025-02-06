@@ -9,27 +9,35 @@ import ResetPassword from './components/Signup/ResetPassword'
 import axios from 'axios'
 import Profile from './components/Profile'
 import DoctorProfile from './components/DoctorProfile'
-
+import Cookies from 'js-cookie'
 
 function App() {
   const [user,setUser] = useState(null);
-  useEffect(()=>
-  {
-    const token=localStorage.getItem('token');
-    if(token&&!user){
-      axios.get('http://localhost:5000/user',{headers:{authorization:`Bearer ${token}`}})
-      .then((res)=>{
-        setUser(res.data);
-        console.log(res.data);
-      })
-      .catch((err)=>{
-        console.log(err);
-        localStorage.removeItem('token');
+  
 
-      })
-
+  useEffect(() => {
+    const token = Cookies.get('token'); 
+  
+    if (token) {
+      axios
+        .get('http://localhost:5000/api/user/check', {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true, 
+        })
+        .then((res) => {
+          setUser(res.data); 
+          console.log("User data from backend:", res.data);
+        })
+        .catch((err) => {
+          console.log("Error fetching user:", err);
+          Cookies.remove('token');
+        });
     }
-  },[])
+  }, []);
+
+  console.log("User data from frontend:", user);
+  
+
  
 
   return (

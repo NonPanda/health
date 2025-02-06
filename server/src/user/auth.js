@@ -140,6 +140,7 @@ const validateUser = async (req, res, next) => {
   try {
     // console.log('req.headers:', req.headers)
     // Check for the Authorization header
+  
     const authHeader = req.headers["authorization"];
     if (!authHeader) {
       return res.status(401).json({ error: "Authorization header missing" });
@@ -156,9 +157,8 @@ const validateUser = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const { userId, isAdmin } = decoded;
 
-    // console.log('decoded:', decoded)
     // Check if the user exists in the database
-    const user = await User.findById(userId);
+    const user = await User.findById(decoded._id);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }

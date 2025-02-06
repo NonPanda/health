@@ -19,19 +19,17 @@ const login = TryCatch(async (req, res, next) => {
     const user = await User.findOne({ email }).select("+password");
     if (!user) return next(new ErrorHandler("Invalid email or password", 404));
 
-    console.log(user);
     
     const isMatch = await compare(password, user.password);
-    console.log(isMatch);
     if (!isMatch) return next(new ErrorHandler("Invalid email or password", 404));
 
     const doctor= await Doctor.findOne({user: user._id});
-    console.log(doctor);
     if(doctor){
         user.role="doctor";
     }
 
-    sendToken(res, user, 200, `Welcome back ${user.name}`);
+    sendToken(res, user, 200, `Welcome back ${user.name}!`);
+
 });
 
 const getProfile = TryCatch(async (req, res, next) => {

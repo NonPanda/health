@@ -15,6 +15,8 @@ const Input = ({ name, placeholder, value: initialValue, onChange, inputClassNam
   const handleChange = (e) => setValue(e.target.value);
   const centered = ["location"].includes(name) ? "": "text-center";
 
+  
+
 
   return (
     <div className="relative">
