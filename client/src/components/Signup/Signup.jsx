@@ -124,7 +124,6 @@ export default function Signup() {
             
       
             if (response.status === 200) {              
-              //role will be checked here nd accordingly profile will be shown
               const role = response.data.user.role;
               if(role==="doctor"){
                 navigate('/doctor-profile');
@@ -167,6 +166,7 @@ export default function Signup() {
               name: formData.username,
               email: formData.email,
               password: formData.password,
+              role: isDoctor ? "doctor" : "patient",
             });
         
             console.log('Response received:', response);

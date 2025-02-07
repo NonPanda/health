@@ -11,7 +11,7 @@ export default function Navbar({ user }) {
     const handleSignOut = () => {
         Cookies.remove("token");
         setOpen(false);
-        window.location.reload();
+        window.location.href = "/";
 
     }
 
@@ -41,7 +41,7 @@ export default function Navbar({ user }) {
             Specialties
         </Link>
         <Link to="/chat" className="text-sm font-medium text-slate-700 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-700">
-            AI Chat Assistant
+            AI Chat
         </Link>
         {user && (
         <>
@@ -107,7 +107,7 @@ export default function Navbar({ user }) {
                     <Link to="/chat" className="text-slate-700 text-lg font-medium py-2 px-4 hover:bg-blue-50 rounded-md"
                     onClick={toggleNavbar}>
 
-                        AI Chat Assistant
+                     AI Chat
                     </Link>
                     {user &&(
                         <>

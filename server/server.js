@@ -3,8 +3,8 @@ const app = express();
 require('dotenv').config({path: '../.env'});
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const connectDB = require('./src/db'); // Import the connectDB function
-connectDB(); // Call the connectDB function
+const connectDB = require('./src/db'); 
+connectDB(); 
 const userRoutes = require('./src/routes/userRoutes');
 const doctorRoutes = require('./src/routes/doctorRoutes.js');
 

@@ -22,7 +22,11 @@
 
   --cool: #3cc4bf;
   --yellow: #f2b147;
+
 }
+
+
+
 
 body {
   background-color: var(--background);
