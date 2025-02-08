@@ -101,7 +101,7 @@ router.post('/reset-password/:id/:token', async (req, res) => {
     // Respond with success
     res.send({ Status: "Success" });
   } catch (err) {
-    console.error(err); // Log the error for server-side debugging
+    console.error(err); 
     res.status(500).json({ Status: "An error occurred on the server" });
   }
 });

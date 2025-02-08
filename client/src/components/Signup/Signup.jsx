@@ -30,7 +30,7 @@ const CustomInput = ({
   );
 };
 
-export default function Signup() {
+export default function Signup({ setUser }) {
 
 
   const [isLoginForm, setIsLoginForm] = useState(true);
@@ -42,14 +42,6 @@ export default function Signup() {
   const [errors, setErrors] = useState({});
   const [isDoctor, setIsDoctor] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      navigate('/profile');
-    }
-  }, [navigate]);
-
 
 
   const validateForm = () => {
@@ -112,7 +104,9 @@ export default function Signup() {
       if(!validateForm()) {
         return;
       }
-        try {
+      if(!isDoctor){
+
+               try {
             const response = await axios.post('http://localhost:5000/api/user/login', {
               email: formData.email,
               password: formData.password,
@@ -123,17 +117,12 @@ export default function Signup() {
             console.log('Response received:', response);
             
       
-            if (response.status === 200) {              
-              const role = response.data.user.role;
-              if(role==="doctor"){
-                navigate('/doctor-profile');
-              }else{
+            if (response.status === 200) { 
+               setUser(response.data.user);             
                 navigate('/profile');
-              }
+              
 
-              
-              window.location.reload();
-              
+                            
 
             }
 
@@ -152,7 +141,40 @@ export default function Signup() {
               setErrors({ general: "Please try again later." });
             }
           }
-        };
+        }
+        else{
+          try {
+            const response = await axios.post('http://localhost:5000/api/doctor/login', {
+              email: formData.email,
+              password: formData.password,
+            }
+            ,{withCredentials:true}
+          );
+
+
+            console.log('Response received:', response);
+          
+            if (response.status === 200) {
+              setUser(response.data.user);
+              navigate('/doctor-profile');
+            }
+          } catch (error) {
+            if (error.response) {
+              if (error.response.status === 401) {
+                setErrors({password: "Invalid email or password."});
+              } else if (error.response.status === 404) {
+                setErrors({ email: "User does not exist." });
+              }
+            } else {
+              setErrors({ general: "Please try again later." });
+            }
+          }
+        }
+    };
+
+
+
+
 
         const handleRegisterSubmit = async (e) => {
           e.preventDefault();
