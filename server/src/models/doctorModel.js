@@ -25,7 +25,7 @@ const doctorSchema = new mongoose.Schema({
       phone: String,
       fees: Number,
       speciality: { type: String },
-      role: {type: String, default: 'doctor'},
+      // role: {type: String, default: 'doctor'},
       qualifications: [String],
       experience: Number,
       availableSlots: [{
@@ -34,7 +34,11 @@ const doctorSchema = new mongoose.Schema({
       }],
       location: {
         type: { type: String, default: 'Point' },
-        coordinates: [Number]
+        coordinates: [Number],
+        formattedAddress: String,
+        city: String,
+        state: String,
+        zipcode: String
       }},
       rating: { type: Number, default: 0 },
       reviews: [{

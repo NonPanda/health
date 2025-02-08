@@ -1,6 +1,5 @@
 const Doctor = require('../models/doctorModel.js');
 const {TryCatch, ErrorHandler,cookieOptions,sendToken}=require('../constants/config.js');
-const {getcoordinates}=require('../middlewares/geo.js');
 const { compare } = require('bcrypt');
 
 
@@ -33,8 +32,6 @@ const register = TryCatch(async (req, res, next) => {
 );
 
 
-
-
 const getProfile = TryCatch(async (req, res, next) => {
     const doctor = await Doctor.findById(req.user);
     if (!doctor) return next(new ErrorHandler("User not found", 404));
@@ -58,16 +55,6 @@ const updateProfile = TryCatch(async (req, res, next) => {
     
 });
 
-const doctorlocate =TryCatch(async(req,res)=>{
-    const ip = req.headers['x-forwarded-for'] || req.ip;
-    const user= await Doctor.findById(req.user);
-    if(!user.profile.location){
-        user.profile.location= await getcoordinates(ip);
-        await user.save();
-    }
-    req.location=user.profile.location;
-    if(!req.location) return next(new ErrorHandler("Location not found", 404));
-    res.status(200).json({ success: true, message: "Doctor located", location: req.location });
-});
 
-module.exports = { updateProfile, getProfile, register, login, logout, doctorlocate };
+
+module.exports = { updateProfile, getProfile, register, login, logout};

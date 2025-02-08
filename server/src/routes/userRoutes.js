@@ -107,10 +107,10 @@ router.post('/reset-password/:id/:token', async (req, res) => {
 });
 
 //----------------------------------------------
-router.get('/logout', async (req, res) => {
-  res.clearCookie('token');
-  res.send('Logged out');
-});
+// router.get('/logout', async (req, res) => {
+//   res.clearCookie('token');
+//   res.send('Logged out');
+// });
 
 router.get("/check", validateToken, async (req, res) => {
   try {
