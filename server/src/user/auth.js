@@ -1,213 +1,211 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel'); // Adjust the path as necessary
 const nodemailer = require('nodemailer');
+const User = require('../models/userModel'); 
+const Doctor = require('../models/doctorModel'); 
 require('dotenv').config();
 
 /*********************************************************
                       Register
 *********************************************************/
-const register = async (name, email, password ) => {
+const register = async (role, name, email, password) => {
     try {
-      // Check if the user already exists
-      const existingUser = await User.findOne({ email });
-      if (existingUser) return { message: "User already exists", status: 403 };
-  
-      // Hash the password before saving it to the database
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-  
-      // Create a new user object
-      const newUser = new User({
-        name,
-        email,
-        password: hashedPassword,
-      });
-  
-      // Save the new user to the database
-      await newUser.save();
-  
-      // Generate a token for the new user
-      const token = jwt.sign({ userId: newUser._id },process.env.JWT_SECRET);
+        const Model = role === 'doctor' ? Doctor : User;
 
-      // Return success message and token
-      return { 
-        message: "User created successfully", 
-        token: token,
-        status: 200
-      };
+        const existingEntity = await Model.findOne({ email });
+        if (existingEntity) {
+            return {
+                message: `${role === 'doctor' ? 'Doctor' : 'User'} already exists`,
+                status: 403
+            };
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newEntity = new Model({
+            name,
+            email,
+            password: hashedPassword,
+        });
+
+        await newEntity.save();
+
+        const token = jwt.sign({ userId: newEntity._id }, process.env.JWT_SECRET);
+
+        return {
+            message: `${role === 'doctor' ? 'Doctor' : 'User'} created successfully`,
+            token: token,
+            status: 200
+        };
     } catch (error) {
-      console.error("Error in user registration:", error);
-      return { message: "Error registering user", status: 500 };
+        console.error(`Error in ${role} registration:`, error);
+        return {
+            message: `Error registering ${role}`,
+            status: 500
+        };
     }
-  };
-
+};
 
 /*********************************************************
                       Login
 *********************************************************/
-const login = async (email, password) => {
-  try {
-    // Find the user by email
-    const user = await User.findOne({ email });
-    if (!user) return { message: "User not found", status: 404 };
+const login = async (role, email, password) => {
+    try {
+        const Model = role === 'doctor' ? Doctor : User;
 
-    // Check if the password is correct
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return { message: "Invalid credentials", status: 401 };
+        const entity = await Model.findOne({ email });
+        if (!entity) {
+            return {
+                message: `${role === 'doctor' ? 'Doctor' : 'User'} not found`,
+                status: 404
+            };
+        }
 
-    const isAdmin = user.role === 1;
-    // Generate a token for the user
-    const token = jwt.sign({ userId: user._id, isAdmin:isAdmin}, process.env.JWT_SECRET);
+        const isMatch = await bcrypt.compare(password, entity.password);
+        if (!isMatch) {
+            return { message: 'Invalid credentials', status: 401 };
+        }
 
-    // console.log('isAdmin:', isAdmin);
-    // Return success message and token
-    return {
-      isAdmin:true,
-      message: "Logged in successfully",
-      token: token,
-      status: 200
-    };
-  } catch (error) {
-    console.error("Error in user login:", error);
-    return { message: "Error logging in user", status: 500 };
-  }
+        const token = jwt.sign({ userId: entity._id }, process.env.JWT_SECRET);
+
+        return {
+            message: `${role === 'doctor' ? 'Doctor' : 'User'} logged in successfully`,
+            token: token,
+            status: 200
+        };
+    } catch (error) {
+        console.error(`Error in ${role} login:`, error);
+        return { message: `Error logging in ${role}`, status: 500 };
+    }
 };
 
-
 /*********************************************************
-                      editUser
+                      Edit User/Doctor
 *********************************************************/
-const editUser = async (userId, updates) => {
-  try {
-    // Find the user by ID
-    const user = await User.findById(userId);
-    if (!user) return { message: "User not found", status: 404 };
+const editEntity = async (role, entityId, updates) => {
+    try {
+        const Model = role === 'doctor' ? Doctor : User;
 
-    // Update fields if they exist in updates object
-    if (updates.name) user.name = updates.name;
-    if (updates.email) user.email = updates.email;
-    if (updates.password) {
-      // Hash the new password before saving
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(updates.password, salt);
+        const entity = await Model.findById(entityId);
+        if (!entity) {
+            return {
+                message: `${role === 'doctor' ? 'Doctor' : 'User'} not found`,
+                status: 404
+            };
+        }
+
+        if (updates.name) entity.name = updates.name;
+        if (updates.email) entity.email = updates.email;
+        if (updates.password) {
+            const salt = await bcrypt.genSalt(10);
+            entity.password = await bcrypt.hash(updates.password, salt);
+        }
+
+        await entity.save();
+
+        return {
+            message: `${role === 'doctor' ? 'Doctor' : 'User'} updated successfully`,
+            status: 200
+        };
+    } catch (error) {
+        console.error(`Error in updating ${role}:`, error);
+        return {
+            message: `Error updating ${role}`,
+            status: 500
+        };
     }
-
-    // Save the updated user
-    await user.save();
-
-    // Return success message
-    return {
-      message: "User updated successfully",
-      status: 200
-    };
-  } catch (error) {
-    console.error("Error in updating user:", error);
-    return { message: "Error updating user", status: 500 };
-  }
 };
 
 /*********************************************************
                       Forgot Password
 *********************************************************/
 async function sendEmail(to, subject, html) {
-  // Create a transporter object using the default SMTP transport
-  let transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
+    try {
+        let transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: process.env.SMTP_PORT,
+            secure: false,
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
 
-  // Send mail with defined transport object
-  let info = await transporter.sendMail({
-    from: '"Health" <$process.env.EMAIL_USER>', // sender address
-    to: to, // list of receivers
-    subject: subject, // Subject line',
-    html: html,
-  });
-
-  // console.log('Message sent: %s', info.messageId);
+        await transporter.sendMail({
+            from: `"Health App" <${process.env.EMAIL_USER}>`,
+            to: to,
+            subject: subject,
+            html: html,
+        });
+    } catch (error) {
+        console.error('Error sending email:', error);
+    }
 }
 
 /*********************************************************
-                      Validate User
+                      Validate Token
 *********************************************************/
-const validateUser = async (req, res, next) => {
-  try {
-    // console.log('req.headers:', req.headers)
-    // Check for the Authorization header
-  
-    const authHeader = req.headers["authorization"];
-    if (!authHeader) {
-      return res.status(401).json({ error: "Authorization header missing" });
-    }
-    // console.log('authHeader:', authHeader)
-    // Extract the token from the Authorization header
-    const token = authHeader.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({ error: "Token missing" });
-    }
+const validateToken = async (req, res, next) => {
+    try {
+        const authHeader = req.headers['authorization'];
+        if (!authHeader) {
+            return res.status(401).json({ error: 'Authorization header missing' });
+        }
 
-    // console.log('token:', token)
-    // Verify the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const { userId, isAdmin } = decoded;
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ error: 'Token missing' });
+        }
 
-    // Check if the user exists in the database
-    const user = await User.findById(decoded._id);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const { userId } = decoded;
+
+        const user = await User.findById(userId) || await Doctor.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        req.user = user;
+        next();
+    } catch (error) {
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ error: 'Invalid token' });
+        }
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json({ error: 'Token expired' });
+        }
+        res.status(500).json({ error: error.message });
     }
-
-
-    // Attach user and admin info to the request object
-    req.user = user;
-    req.isAdmin = user.role === 1;
-    req.canUpload = user.canUpload;
-
-    next(); // Proceed to the next middleware or route handler
-  } catch (error) {
-    if (error.name === "JsonWebTokenError") {
-      return res.status(401).json({ error: "Invalid token" });
-    }
-    if (error.name === "TokenExpiredError") {
-      return res.status(401).json({ error: "Token expired" });
-    }
-    res.status(500).json({ error: error.message });
-  }
 };
 
 /*********************************************************
-                      Validate admin
+                      Validate Admin
 *********************************************************/
 const validateAdmin = async (req, res, next) => {
-  try {
-    const authHeader = req.headers["authorization"];
-    if (!authHeader) {
-      return res.status(401).json({ error: "Authorization header missing" });
-    }
-    const token = authHeader.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({ error: "Token missing" });
-    }
+    try {
+        const authHeader = req.headers['authorization'];
+        if (!authHeader) {
+            return res.status(401).json({ error: 'Authorization header missing' });
+        }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.userId);
-    if (!user || user.role !== 1) {
-      return res.status(403).json({ error: "Access denied" });
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ error: 'Token missing' });
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.userId) || await Doctor.findById(decoded.userId);
+
+        if (!user || user.role !== 1) {
+            return res.status(403).json({ error: 'Access denied' });
+        }
+
+        req.user = user;
+        next();
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
-    req.user = user;
-    next();
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
 };
 
-//Profile Picture 
-
-
-module.exports = { register, login, editUser, sendEmail, validateUser, validateAdmin };
+module.exports = { register, login, editEntity, sendEmail, validateToken, validateAdmin };

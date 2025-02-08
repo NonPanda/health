@@ -2,12 +2,11 @@ const express = require('express');
 const {getProfile,updateProfile,login,logout,register} = require('../controllers/doctorController.js');
 const router=express.Router();
 const {isAuthenticated}=require('../middlewares/auth.js');
-const {  editUser, sendEmail } = require('../doctor/auth.js');
+const {  editUser, sendEmail, validateToken } = require('../user/auth.js');
 const jwt = require('jsonwebtoken');
 const Doctor = require('../models/doctorModel.js');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
-const { validateUser } = require('../doctor/auth.js');
 const { appendFile } = require('fs');
 
 const frontendUrl = process.env.FRONTEND_URL; 
@@ -102,7 +101,7 @@ router.post('/forgot-password', async (req, res) => {
     res.send('Logged out');
   });
   
-  router.get("/check", validateUser, async (req, res) => {
+  router.get("/check", validateToken, async (req, res) => {
     try {
       const user = await Doctor.findById(req.user);
       res.json(user);

@@ -1,10 +1,9 @@
 const express = require('express');
-const {  editUser, sendEmail } = require('../user/auth.js'); // Adjust the path as necessary
+const {  editUser, sendEmail,validateToken } = require('../user/auth.js'); // Adjust the path as necessary
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel.js'); // Adjust based on your user model
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
-const { validateUser } = require('../user/auth.js');
 const {register, login, getProfile ,updateProfile,logout,userlocate}=require('../controllers/usercontroller.js');
 const { appendFile } = require('fs');
 const {isAuthenticated}=require('../middlewares/auth.js');
@@ -113,7 +112,7 @@ router.get('/logout', async (req, res) => {
   res.send('Logged out');
 });
 
-router.get("/check", validateUser, async (req, res) => {
+router.get("/check", validateToken, async (req, res) => {
   try {
     const user = await User.findById(req.user);
     res.json(user);
