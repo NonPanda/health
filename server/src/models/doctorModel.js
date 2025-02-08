@@ -3,30 +3,44 @@ const {hash}=require('bcrypt');
 const User = require('./userModel.js');
 
 const doctorSchema = new mongoose.Schema({
-      user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-      specialty: { type: String, required: true },
+      name: {
+        type: String,
+        required: true,
+        trim: true
+      },
+      email: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true,
+        lowercase: true
+      },
+      password: {
+        type: String,
+        required: true,
+        minlength: 6
+      },
+      profile:{
+      avatar: String,
+      phone: String,
+      fees: Number,
+      speciality: { type: String },
       role: {type: String, default: 'doctor'},
       qualifications: [String],
       experience: Number,
       availableSlots: [{
         date: Date,
-        times: [String]
+        times: [String],
       }],
+      location: {
+        type: { type: String, default: 'Point' },
+        coordinates: [Number]
+      }},
       rating: { type: Number, default: 0 },
       reviews: [{
         user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         review: String
       }],
-      profile:{
-        avatar: String,
-        phone: String,
-        online: Boolean,
-        fees: Number,
-        location: {
-          type: { type: String, default: 'Point' },
-          coordinates: [Number]
-        },
-      }
 },
 {
     timestamps: true
