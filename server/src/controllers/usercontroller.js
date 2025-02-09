@@ -80,17 +80,32 @@ const updateProfile = TryCatch(async (req, res, next) => {
   });
 });
 
-const userlocate=TryCatch(async(req,res)=>{
-    const ip = req.headers['x-forwarded-for'] || req.ip;
-    const user= await User.findById(req.user);
-    if(!user.profile.location){
-        user.profile.location= await getcoordinates(ip);
-        await user.save();
+const userlocate = TryCatch(async (req, res, next) => {
+    const user = await User.findById(req.user);
+    if (!user) {
+      return next(new ErrorHandler("User not found", 404));
     }
-    req.location=user.profile.location;
-    if(!req.location) return next(new ErrorHandler("Location not found", 404));
-    res.status(200).json({ success: true, message: "User located", location: req.location });
-});
-
+  
+    let ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    console.log("User IP detected:", ip);
+  
+    if (!ip) {
+      return next(new ErrorHandler("No IP address detected", 400));
+    }
+  
+    const locationData = await getcoordinates(ip);
+    if (!locationData || !locationData.coordinates) {
+      return next(new ErrorHandler("Failed to retrieve location data", 500));
+    }
+  
+    user.profile.location = locationData;
+    await user.save();
+  
+    res.json({
+      success: true,
+      message: "User located",
+      location: user.profile.location,
+    });
+  });
 
 module.exports = { register, login,logout,getProfile, updateProfile, userlocate };
