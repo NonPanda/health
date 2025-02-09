@@ -24,7 +24,7 @@ const doctorSchema = new mongoose.Schema({
       avatar: String,
       phone: String,
       fees: Number,
-      speciality: { type: String },
+      specialities: [String],
       // role: {type: String, default: 'doctor'},
       qualifications: [String],
       experience: Number,
@@ -32,14 +32,12 @@ const doctorSchema = new mongoose.Schema({
         date: Date,
         times: [String],
       }],
+      },
       location: {
-        type: { type: String, default: 'Point' },
-        coordinates: [Number],
-        formattedAddress: String,
-        city: String,
-        state: String,
-        zipcode: String
-      }},
+        type: { type: String, enum: ["Point"], required: true, default: "Point" },
+        coordinates: { type: [Number], required: true, default: [0, 0] },
+        formattedAddress: { type: String, default: "Unknown" }
+    },
       rating: { type: Number, default: 0 },
       reviews: [{
         user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -49,6 +47,8 @@ const doctorSchema = new mongoose.Schema({
 {
     timestamps: true
 });
+
+doctorSchema.index({ "location": "2dsphere" });
 
 doctorSchema.pre("save", async function(next) {
    

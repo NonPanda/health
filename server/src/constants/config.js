@@ -3,9 +3,9 @@ const jwt = require('jsonwebtoken');
 
 const cookieOptions = {
     maxAge: 15 * 24 * 60 * 60 * 1000,
-    sameSite: "lax",
+    sameSite: "none",
     secure: true,
-    httpOnly: false,
+    httpOnly: true,
 };
 
 const sendToken = (res, user, code, message) => {
