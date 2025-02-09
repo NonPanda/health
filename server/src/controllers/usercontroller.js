@@ -110,4 +110,31 @@ const userlocate = TryCatch(async (req, res, next) => {
     });
   });
 
+
+
+
+  //forgot password
+async function sendEmail(to, subject, html) {
+    try {
+        let transporter = nodemailer.createTransport({
+            host: process.env.SMTP_HOST,
+            port: process.env.SMTP_PORT,
+            secure: false,
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+
+        await transporter.sendMail({
+            from: `"Health App" <${process.env.EMAIL_USER}>`,
+            to: to,
+            subject: subject,
+            html: html,
+        });
+    } catch (error) {
+        console.error('Error sending email:', error);
+    }
+}
+
 module.exports = { register, login,logout,getProfile, updateProfile, userlocate };

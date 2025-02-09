@@ -1,25 +1,25 @@
 const express = require('express');
-const {  editUser, sendEmail,validateToken } = require('../user/auth.js'); // Adjust the path as necessary
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel.js'); // Adjust based on your user model
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
-const {register, login, getProfile ,updateProfile,logout,userlocate}=require('../controllers/usercontroller.js');
+const {register, login, getProfile ,updateProfile,logout,userlocate,sendEmail}=require('../controllers/usercontroller.js');
 const { appendFile } = require('fs');
+const {isAuthenticated}=require('../middlewares/auth.js');
 const router = express.Router();
 
-const frontendUrl = process.env.FRONTEND_URL; 
-
-  
   router.post('/register',register);
   router.post('/login',login);
+
+  router.use(isAuthenticated);
+
   router.get('/logout',logout); 
   router.get("/getprofile",getProfile);
   router.put("/updateprofile",updateProfile);
   router.get('/update-location',userlocate);
 
 
-//----------------------------------------------
+
 router.post('/forgot-password', async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
@@ -49,7 +49,7 @@ router.post('/forgot-password', async (req, res) => {
   res.send('Password reset email sent.');
 });
 
-//----------------------------------------------
+
 router.post('/reset-password/:id/:token', async (req, res) => {
   const { id } = req.params;
   const { password } = req.body;
@@ -77,66 +77,10 @@ router.post('/reset-password/:id/:token', async (req, res) => {
   }
 });
 
-//----------------------------------------------
-// router.get('/logout', async (req, res) => {
-//   res.clearCookie('token');
-//   res.send('Logged out');
-// });
-
-router.get("/check", validateToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.user);
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
 
 
 
 
-//----------------------------------------------
-  
-
-
-  
-    
-
-
-// app.put('/update-pfp',upload.single('pfp'),async(req,res)=>{
-//   try {
-//       const {userId}=req.body;
-
-
-//       if(!userId){
-//           return res.status(400).json("User ID is required");
-//       }
-
-//       if(!req.file){
-//           return res.status(400).json("Image file is required");
-//       }
-
-//       const base64Image=req.file.buffer.toString('base64');
-
-//       const updatedUser=await UserSchema.findByIdAndUpdate(
-//           userId,
-//           { profilePicture:`data:${req.file.mimetype};base64,${base64Image}`},
-//           {new:true}
-//       );
-
-//       if(!updatedUser){
-//           return res.status(404).json("User not found");
-//       }
-
-//       res.status(200).json({
-//           message: "Profile picture updated successfully",
-//           user: updatedUser,
-//       });
-//   } catch (err) {
-//       console.error("Error:", err);  
-//       res.status(500).json("Error updating profile picture");
-//   }
-// });
 
 
 module.exports = router;
