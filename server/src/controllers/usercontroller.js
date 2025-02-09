@@ -6,6 +6,8 @@ const {getcoordinates}=require('../middlewares/geo.js');
 
 const register = TryCatch(async (req, res, next) => {
     const { name, email, password} = req.body;
+    const duplicate= await User.findOne({email});
+    if(duplicate) return next(new ErrorHandler("User already exists", 400));
     const user = await User.create({
         name,
         email,
@@ -69,7 +71,7 @@ const userlocate = TryCatch(async (req, res, next) => {
       return next(new ErrorHandler("User not found", 404));
     }
   
-    let ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    let ip = req.headers["x-forwarded-for"] || req.ip;
     console.log("User IP detected:", ip);
   
     if (!ip) {
