@@ -111,7 +111,8 @@ export default function Signup({ setUser }) {
               email: formData.email,
               password: formData.password,
             }
-            ,{withCredentials:true}
+            ,{withCredentials:true},
+
           );
 
             console.log('Response received:', response);

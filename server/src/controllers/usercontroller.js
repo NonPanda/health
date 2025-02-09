@@ -113,7 +113,6 @@ const userlocate = TryCatch(async (req, res, next) => {
 
 
 
-  //forgot password
 async function sendEmail(to, subject, html) {
     try {
         let transporter = nodemailer.createTransport({
