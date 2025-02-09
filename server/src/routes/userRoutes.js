@@ -6,7 +6,6 @@ const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const {register, login, getProfile ,updateProfile,logout,userlocate}=require('../controllers/usercontroller.js');
 const { appendFile } = require('fs');
-const {isAuthenticated}=require('../middlewares/auth.js');
 const router = express.Router();
 
 const frontendUrl = process.env.FRONTEND_URL; 
@@ -14,39 +13,11 @@ const frontendUrl = process.env.FRONTEND_URL;
   
   router.post('/register',register);
   router.post('/login',login);
-  router.use(isAuthenticated);
   router.get('/logout',logout); 
   router.get("/getprofile",getProfile);
   router.put("/updateprofile",updateProfile);
   router.get('/update-location',userlocate);
 
-
-
-
-
-
-
-
-//----------------------------------------------
-router.put('/edit/:userId', async (req, res) => {
-  const { userId } = req.params;
-  const updates = req.body; // Contains the fields to update
-  const result = await editUser(userId, updates);
-  res.status(result.status).json({ message: result.message });
-});
-
-//----------------------------------------------
-router.post('/contactus', async (req, res) => {
-  try {
-    const { name, email, message } = req.body;
-    const newContact = new Contact({ name, email, message });
-    await newContact.save();
-    res.status(201).send('Contact saved');
-  } catch (error) {
-    console.error('Error saving contact:', error);
-    res.status(500).send('Error saving contact');
-  }
-});
 
 //----------------------------------------------
 router.post('/forgot-password', async (req, res) => {

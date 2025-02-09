@@ -50,17 +50,34 @@ const getProfile = TryCatch(async (req, res, next) => {
 });
 
 const updateProfile = TryCatch(async (req, res, next) => {
-    const updateduser = await User.findByIdAndUpdate(
-        req.user,
-        { $set: req.body },
-        { new: true }
-    );
-    if (!updateduser) return next(new ErrorHandler("User not found", 404));
-    res.status(200).json({
-        success: true,
-        user: updateduser,
-    });
-    
+  const { userId, profile } = req.body; 
+
+  if (!userId) {
+    return next(new ErrorHandler("User ID is required", 400));
+  }
+
+  if (!profile || typeof profile !== "object") {
+    return next(new ErrorHandler("Invalid profile data", 400));
+  }
+
+  if (Object.keys(profile).length === 0) {
+    return next(new ErrorHandler("No fields to update", 400));
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId, 
+    { $set: { profile } },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedUser) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    user: updatedUser,
+  });
 });
 
 const userlocate=TryCatch(async(req,res)=>{

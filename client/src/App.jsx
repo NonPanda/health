@@ -14,6 +14,22 @@ import DoctorSearch from './components/doctorsearch'
 
 function App() {
   const [user,setUser] = useState(null);
+
+  useEffect(() => {
+    const token = Cookies.get('token');
+    if (token && !user) {
+      axios.get('http://localhost:5000/api/user/check', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(res => setUser(res.data))
+      .catch(err => console.log(err));
+    }
+  }, []);
+
+
+
   
   return (
     <>
@@ -24,7 +40,7 @@ function App() {
         <Route path="/signup" element={<SignUp setUser={setUser}  />} />
         <Route path="/forgot-password" element={<ForgotPassword/>} />
         <Route path="/reset-password/:id/:token" element={<ResetPassword/>} />
-        <Route path="profile" element={<Profile user={user} />} />
+        <Route path="profile" element={<Profile user={user} setUser={setUser} />} />
         <Route path="doctor-profile" element={<DoctorProfile user={user} />} />
         <Route path="doctorsearch" element={<DoctorSearch />} />
       

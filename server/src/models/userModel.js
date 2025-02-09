@@ -36,7 +36,8 @@ const userSchema = new mongoose.Schema({
       city: String,
       state: String,
       zipcode: String
-    }
+    },
+    emergency: String,
   }
 }, {
   timestamps: true

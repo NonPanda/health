@@ -11,7 +11,6 @@ const appointmentSchema = new mongoose.Schema({
     default: 'pending'
   },
   symptoms: [String],
-//   notes: String
 });
 
 module.exports = mongoose.model('Appointment', appointmentSchema);

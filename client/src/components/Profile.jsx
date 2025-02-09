@@ -1,7 +1,10 @@
-import React, { useState } from "react";
-import { CakeIcon, Pencil, WeightIcon, PhoneIcon, MapPin, Droplet, Ruler, Cake, SyringeIcon } from "lucide-react";
+import React, { useState,useEffect } from "react";
+import { CakeIcon, Pencil, WeightIcon, PhoneIcon, MapPin, Droplet, Ruler, Cake, SyringeIcon, Cookie } from "lucide-react";
 import pic from "../assets/pic.png";
 import MaleIcon from "../assets/male.svg";
+import axios from "axios";
+import Cookies from "js-cookie";
+
 
 const Input = ({ name, placeholder, value: initialValue, onChange, inputClassName = "" }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -43,14 +46,132 @@ const Input = ({ name, placeholder, value: initialValue, onChange, inputClassNam
   );
 };
 
-export default function Profile({ user }) {
+export default function Profile({ user , setUser}) {
+  const [updateProfile, setUpdateProfile] = useState({
+    name: "",
+    email: "",
+    contact: "",
+    weight: 0,
+    height: 0,
+    age: 0,
+    allergies: [],
+    medications: [],
+    dietPreferences: [],
+    emergency: "",
+    location: {
+      coordinates: [],
+      formattedAddress: "",
+      city: "",
+      state: "",
+      zipcode: "",
+    },
+  });
+  const [changed, setChanged] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setUpdateProfile({
+        name: user?.name || "",
+        email: user?.email || "",
+        contact: user?.profile?.contact || "",
+        weight: user?.profile?.weight || 0,
+        height: user?.profile?.height || 0,
+        age: user?.profile?.age || 0,
+        allergies: Array.isArray(user?.profile?.allergies) ? user?.profile?.allergies : [],
+        medications: Array.isArray(user?.profile?.medications) ? user?.profile?.medications : [],
+        dietPreferences: Array.isArray(user?.profile?.dietPreference) ? user?.profile?.dietPreference : [],
+        emergency: user?.profile?.emergency || "",
+        location: user?.profile?.location || {
+          coordinates: [],
+          formattedAddress: "",
+          city: "",
+          state: "",
+          zipcode: "",
+        },
+      });
+    }
+  }, [user]);
+
+
   const handleInputChange = (name, newValue) => {
-    console.log(`${name} changed to ${newValue}`);
+    setUpdateProfile((prevState) => {
+      let updatedValue = newValue;
+  
+      if (name === "allergies" || name === "medications" || name === "dietPreferences") {
+        updatedValue = typeof newValue === "string" ? newValue.split(",").map((item) => item.trim()) : newValue;
+  
+        const isArrayEqual = Array.isArray(prevState[name]) && Array.isArray(updatedValue) && prevState[name].length === updatedValue.length &&prevState[name].every((val, index) => val === updatedValue[index]);
+  
+        if (!isArrayEqual) {
+          setChanged(true);
+        }
+      } else {
+        if (prevState[name] !== updatedValue) {
+          setChanged(true);
+        }
+      }
+  
+      return {
+        ...prevState,
+        [name]: updatedValue,
+      };
+    });
+  };
+  const handleSave = async () => {
+    try {
+      if (Object.keys(updateProfile).length === 0) return;
+  
+      const profileUpdate = {
+        userId: user._id,
+        profile: {
+          contact: updateProfile.contact,
+          weight: updateProfile.weight,
+          height: updateProfile.height,
+          age: updateProfile.age,
+          allergies: updateProfile.allergies,
+          medications: updateProfile.medications,
+          dietPreference: updateProfile.dietPreferences,
+          emergency: updateProfile.emergency,
+          location: updateProfile.location
+        }
+      };
+  
+      const res = await axios.put(`http://localhost:5000/api/user/updateprofile`, profileUpdate, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      setChanged(false);
+  
+     
+    } catch (err) {
+      console.log(err);
+    }
   };
 
+  if (!user || Object.keys(updateProfile).length === 0) {
+    return <div>Loading...</div>;
+  }
   return (
-    <div className="flex items-center justify-center">
-      <div className="w-full px-4 md:px-24 py-20">
+    <div>
+          <div className={`py-1 sticky w-full bg-white/80 backdrop-blur-sm shadow-sm transform transition-all duration-1000 ease-in-out ${changed ? "opacity-100" : "opacity-0"}`}>
+        <div className={` mx-auto px-4 py-2 flex items-center justify-between`}>
+          <div className={`text-sm text-gray-500`}>
+            {changed ? "Changes pending..." : "All changes saved"}
+          </div>
+          <button 
+            onClick={handleSave} 
+            className={`
+              transform transition-all duration-700 ease-in-out px-6 py-2 rounded-lg font-medium w-[150px]
+              ${changed? 'bg-blue-500 hover:bg-blue-600 text-white translate-y-0 opacity-100 shadow-md': 'bg-gray-100 text-gray-400 opacity-0 pointer-events-none'
+              }
+            `}
+          >
+            {changed ? 'Save Changes' : 'Saved'}
+          </button>
+        </div>
+      </div>
+      <div className="w-full px-4 md:px-24 py-4">
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 mb-8 justify-between -pr-4 sm:pr-4">
           <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
             <img src={user?.pfp || pic} alt="user" className="sm:ml-0 ml-4 w-32 h-32 rounded-full shadow-md" />
@@ -65,10 +186,10 @@ export default function Profile({ user }) {
           <div className="sm:scale-100 scale-90 flex items-center space-x-2">
             <PhoneIcon className="w-6 h-6 text-blue-900" />
             <Input
-              name="phone"
+              name="contact"
               placeholder="XXXXXXXXXX"
-              value={user?.phone}
-              onChange={(newValue) => handleInputChange("phone", newValue)}
+              value={user?.profile.contact}
+              onChange={(newValue) => handleInputChange("contact", newValue)}
               inputClassName="lg:text-lg w-[160px] mr-2 md:mr-0"
             />
           </div>
@@ -85,7 +206,7 @@ export default function Profile({ user }) {
               <Input
                 name="weight"
                 placeholder="X kg"
-                value={user?.weight}
+                value={user?.profile.weight}
                 onChange={(newValue) => handleInputChange("weight", newValue)}
                 inputClassName="w-full md:w-36"
               />
@@ -98,7 +219,7 @@ export default function Profile({ user }) {
               <Input
                 name="height"
                 placeholder="X cm"
-                value={user?.height}
+                value={user?.profile.height}
                 onChange={(newValue) => handleInputChange("height", newValue)}
                 inputClassName="w-full md:w-36"
               />
@@ -111,7 +232,7 @@ export default function Profile({ user }) {
               <Input
                 name="age"
                 placeholder="XX"
-                value={user?.age}
+                value={user?.profile.age}
                 onChange={(newValue) => handleInputChange("age", newValue)}
                 inputClassName="w-full md:w-36"
               />
@@ -122,13 +243,16 @@ export default function Profile({ user }) {
               <Droplet className="w-6 h-6 text-blue-900" />
               <h2 className="text-2xl font-semibold text-blue-900">Allergic Reactions</h2>
             </div>
-            <Input
-              name="allergies"
-              placeholder="Peanuts, Shellfish"
-              value={user?.allergies?.join(", ")}
-              onChange={(newValue) => handleInputChange("allergies", newValue)}
-              inputClassName="w-full md:min-w-[300px]"
-            />
+                <Input
+            name="allergies"
+            placeholder="Peanuts, Shellfish"
+            value={Array.isArray(user?.profile.allergies) ? user.profile.allergies.join(", ") : ""}
+            onChange={(newValue) => {
+              const allergyArray = newValue.split(",").map((item) => item.trim());
+              handleInputChange("allergies", allergyArray);
+            }}
+            inputClassName="w-full md:min-w-[300px]"
+          />
           </div>
         </div>
 
@@ -141,7 +265,7 @@ export default function Profile({ user }) {
             <Input
               name="emergency"
               placeholder="XXXXXXXXXX"
-              value={user?.emergency}
+              value={user?.profile.emergency}
               onChange={(newValue) => handleInputChange("emergency", newValue)}
               inputClassName="w-full md:min-w-[300px]"
             />
@@ -154,8 +278,11 @@ export default function Profile({ user }) {
             <Input
               name="medications"
               placeholder="Aspirin, Ibuprofen"
-              value={user?.medications?.join(", ")}
-              onChange={(newValue) => handleInputChange("medications", newValue)}
+              value={Array.isArray(user?.profile.medications) ? user?.profile.medications.join(", ") : ""}
+              onChange={(newValue) => {
+                const medicationArray = newValue.split(",").map((item) => item.trim());
+                handleInputChange("medications", medicationArray);
+              }}
               inputClassName="w-full md:min-w-[300px]"
             />
           </div>
@@ -165,116 +292,128 @@ export default function Profile({ user }) {
               <h2 className="text-2xl font-semibold text-blue-900">Diet Preferences</h2>
             </div>
             <Input
-              name="diet"
+              name="dietPreferences"
               placeholder="Vegan, Vegetarian"
-              value={user?.diet?.join(", ")}
-              onChange={(newValue) => handleInputChange("diet", newValue)}
+              value={Array.isArray(user?.profile.dietPreference) ? user?.profile.dietPreference.join(", ") : ""}
+              onChange={(newValue) => {
+                const dietPreferenceArray = newValue.split(",").map((item) => item.trim());
+                handleInputChange("dietPreferences", dietPreferenceArray);
+              }}
               inputClassName="w-full md:min-w-[300px]"
             />
           </div>
         </div>
 
         <div className="[@media(max-width:390px)]:scale-75 [@media(max-width:390px)]:-mt-16 flex lg:hidden flex-col space-y-8">
-  <div className="flex justify-center space-x-8">
-    <div className="flex flex-col items-center space-y-2">
-      <div className="flex items-center space-x-3">
-        <Cake className="w-6 h-6 text-blue-900" />
-        <h2 className="text-2xl font-semibold text-blue-900">Age</h2>
+    <div className="flex justify-center space-x-8">
+      <div className="flex flex-col items-center space-y-2">
+        <div className="flex items-center space-x-3">
+          <Cake className="w-6 h-6 text-blue-900" />
+          <h2 className="text-2xl font-semibold text-blue-900">Age</h2>
+        </div>
+        <Input
+          name="age"
+          placeholder="XX"
+          value={user?.profile.age}
+          onChange={(newValue) => handleInputChange("age", newValue)}
+          inputClassName="w-30"
+        />
       </div>
-      <Input
-        name="age"
-        placeholder="XX"
-        value={user?.age}
-        onChange={(newValue) => handleInputChange("age", newValue)}
-        inputClassName="w-30"
-      />
-    </div>
-    <div className="flex flex-col items-center space-y-2">
-      <div className="flex items-center space-x-3">
-        <WeightIcon className="w-6 h-6 text-blue-900" />
-        <h2 className="text-2xl font-semibold text-blue-900">Weight</h2>
+      <div className="flex flex-col items-center space-y-2">
+        <div className="flex items-center space-x-3">
+          <WeightIcon className="w-6 h-6 text-blue-900" />
+          <h2 className="text-2xl font-semibold text-blue-900">Weight</h2>
+        </div>
+        <Input
+          name="weight"
+          placeholder="X kg"
+          value={user?.profile.weight}
+          onChange={(newValue) => handleInputChange("weight", newValue)}
+          inputClassName="w-30"
+        />
       </div>
-      <Input
-        name="weight"
-        placeholder="X kg"
-        value={user?.weight}
-        onChange={(newValue) => handleInputChange("weight", newValue)}
-        inputClassName="w-30"
-      />
-    </div>
-    <div className="flex flex-col items-center space-y-2">
-      <div className="flex items-center space-x-3">
-        <Ruler className="w-6 h-6 text-blue-900" />
-        <h2 className="text-2xl font-semibold text-blue-900">Height</h2>
+      <div className="flex flex-col items-center space-y-2">
+        <div className="flex items-center space-x-3">
+          <Ruler className="w-6 h-6 text-blue-900" />
+          <h2 className="text-2xl font-semibold text-blue-900">Height</h2>
+        </div>
+        <Input
+          name="height"
+          placeholder="X cm"
+          value={user?.profile.height}
+          onChange={(newValue) => handleInputChange("height", newValue)}
+          inputClassName="w-30"
+        />
       </div>
-      <Input
-        name="height"
-        placeholder="X cm"
-        value={user?.height}
-        onChange={(newValue) => handleInputChange("height", newValue)}
-        inputClassName="w-30"
-      />
     </div>
-  </div>
 
-  <div className="flex flex-col md:flex-row justify-center md:space-x-8 md:space-y-0 space-y-8">
-    <div className="flex flex-col items-center space-y-2">
-      <div className="flex items-center space-x-3">
-        <Droplet className="w-6 h-6 text-blue-900" />
-        <h2 className="text-2xl font-semibold text-blue-900">Allergic Reactions</h2>
+      <div className="flex flex-col md:flex-row justify-center md:space-x-8 md:space-y-0 space-y-8">
+        <div className="flex flex-col items-center space-y-2">
+          <div className="flex items-center space-x-3">
+            <Droplet className="w-6 h-6 text-blue-900" />
+            <h2 className="text-2xl font-semibold text-blue-900">Allergic Reactions</h2>
+          </div>
+          <Input
+            name="allergies"
+            placeholder="Peanuts, Shellfish"
+            value={Array.isArray(user?.profile.allergies) ? user?.profile.allergies.join(", ") : ""}
+            onChange={(newValue) => {
+              const allergyArray = newValue.split(",").map((item) => item.trim());
+              handleInputChange("allergies", allergyArray);
+            }}
+            inputClassName="w-full min-w-[300px]"
+          />
+        </div>
+        <div className="flex flex-col items-center space-y-2">
+          <div className="flex items-center space-x-3">
+            <PhoneIcon className="w-6 h-6 text-blue-900" />
+            <h2 className="text-2xl font-semibold text-blue-900">Emergency Contact</h2>
+          </div>
+          <Input
+            name="emergency"
+            placeholder="XXXXXXXXXX"
+            value={user?.profile.emergency}
+            onChange={(newValue) => handleInputChange("emergency", newValue)}
+            inputClassName="w-full min-w-[300px]"
+          />
+        </div>
       </div>
-      <Input
-        name="allergies"
-        placeholder="Peanuts, Shellfish"
-        value={user?.allergies?.join(", ")}
-        onChange={(newValue) => handleInputChange("allergies", newValue)}
-        inputClassName="w-full min-w-[300px]"
-      />
-    </div>
-    <div className="flex flex-col items-center space-y-2">
-      <div className="flex items-center space-x-3">
-        <PhoneIcon className="w-6 h-6 text-blue-900" />
-        <h2 className="text-2xl font-semibold text-blue-900">Emergency Contact</h2>
-      </div>
-      <Input
-        name="emergency"
-        placeholder="XXXXXXXXXX"
-        value={user?.emergency}
-        onChange={(newValue) => handleInputChange("emergency", newValue)}
-        inputClassName="w-full min-w-[300px]"
-      />
-    </div>
-  </div>
 
-  <div className="flex flex-col md:flex-row justify-center md:space-x-8 md:space-y-0 space-y-8">
-    <div className="flex flex-col items-center space-y-2">
-      <div className="flex items-center space-x-3">
-        <SyringeIcon className="w-6 h-6 text-blue-900" />
-        <h2 className="text-2xl font-semibold text-blue-900">Medications</h2>
+      <div className="flex flex-col md:flex-row justify-center md:space-x-8 md:space-y-0 space-y-8">
+        <div className="flex flex-col items-center space-y-2">
+          <div className="flex items-center space-x-3">
+            <SyringeIcon className="w-6 h-6 text-blue-900" />
+            <h2 className="text-2xl font-semibold text-blue-900">Medications</h2>
+          </div>
+          <Input
+            name="medications"
+            placeholder="Aspirin, Ibuprofen"
+            value={Array.isArray(user?.profile.medications) ? user?.profile.medications.join(", ") : ""}
+            onChange={(newValue) => {
+              const medicationArray = newValue.split(",").map((item) => item.trim());
+              handleInputChange("medications", medicationArray);
+            }}
+            inputClassName="w-full min-w-[300px]"
+          />
+        </div>
+        <div className="flex flex-col items-center space-y-2">
+          <div className="flex items-center space-x-3">
+            <CakeIcon className="w-6 h-6 text-blue-900" />
+            <h2 className="text-2xl font-semibold text-blue-900">Diet Preferences</h2>
+          </div>
+          <Input
+            name="dietPreferences"
+            placeholder="Vegan, Vegetarian"
+            value={Array.isArray(user?.profile.dietPreference) ? user?.profile.dietPreference.join(", ") : ""}
+            onChange={(newValue) => {
+              const dietPreferenceArray = newValue.split(",").map((item) => item.trim());
+              handleInputChange("dietPreferences", dietPreferenceArray);
+            }}
+            inputClassName="w-full min-w-[300px]"
+          />
+        </div>
       </div>
-      <Input
-        name="medications"
-        placeholder="Aspirin, Ibuprofen"
-        value={user?.medications?.join(", ")}
-        onChange={(newValue) => handleInputChange("medications", newValue)}
-        inputClassName="w-full min-w-[300px]"
-      />
     </div>
-    <div className="flex flex-col items-center space-y-2">
-      <div className="flex items-center space-x-3">
-        <CakeIcon className="w-6 h-6 text-blue-900" />
-        <h2 className="text-2xl font-semibold text-blue-900">Diet Preferences</h2>
-      </div>
-      <Input
-        name="diet"
-        placeholder="Vegan, Vegetarian"
-        value={user?.diet?.join(", ")}
-        onChange={(newValue) => handleInputChange("diet", newValue)}
-        inputClassName="w-full min-w-[300px]"
-      />
-    </div>
-  </div>
-</div>
 
         
 
@@ -293,5 +432,6 @@ export default function Profile({ user }) {
         </div> */}
       </div>
     </div>
+    
   );
 }
