@@ -16,17 +16,20 @@ function App() {
   const [user,setUser] = useState(null);
 
   useEffect(() => {
-    const token = Cookies.get('token');
-    if (token && !user) {
-      axios.get('http://localhost:5000/api/user/check', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    if (!user==="loading"&&user!==null) {
+      axios.get('http://localhost:5000/api/user/getprofile', {
+        withCredentials: true,
       })
-      .then(res => setUser(res.data))
+      .then(res => setUser(res.data.user))
       .catch(err => console.log(err));
     }
+    else if (user==="loading") {
+      setUser(null);
+    }
+
   }, []);
+
+
 
 
 

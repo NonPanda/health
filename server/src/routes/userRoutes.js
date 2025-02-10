@@ -1,6 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel.js'); // Adjust based on your user model
+const User = require('../models/userModel.js');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const {register, login, getProfile ,updateProfile,logout,userlocate,sendEmail}=require('../controllers/usercontroller.js');
@@ -10,7 +10,7 @@ const router = express.Router();
 
   router.post('/register',register);
   router.post('/login',login);
-
+  
   router.use(isAuthenticated);
 
   router.get('/logout',logout); 
@@ -76,8 +76,6 @@ router.post('/reset-password/:id/:token', async (req, res) => {
     res.status(500).json({ Status: "An error occurred on the server" });
   }
 });
-
-
 
 
 

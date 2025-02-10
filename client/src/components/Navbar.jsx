@@ -1,15 +1,29 @@
 import React from "react";
 import {useState} from "react";
 import { Link } from "react-router-dom";
-import { Stethoscope } from "lucide-react";
 import pic from "../assets/pic.png";
 import Cookies from "js-cookie";
+import axios from "axios";
+import sethescope from "../assets/stethoscope.svg";
 
-export default function Navbar({ user }) {
+export default function Navbar({ user, setUser }) {
     const [open, setOpen] = useState(false);
 
     const handleSignOut = () => {
-        Cookies.remove("token");
+
+        if(user){
+            axios.get('http://localhost:5000/api/user/logout', {
+                withCredentials: true,
+            })
+            .then(res => {
+                setUser("loading");
+            })
+            .catch(err => console.log(err));
+            setUser("loading");
+
+        }
+       
+
         setOpen(false);
         window.location.href = "/";
 
@@ -29,7 +43,9 @@ export default function Navbar({ user }) {
         <>
          <div className="w-full flex items-center justify-between px-4 md:px-6 py-2 bg-white border-b border-slate-200 md:shadow-md relative z-50">
          <Link to="/" className="flex items-center group transition-colors">
-            <Stethoscope className="h-8 w-8 text-blue-700 group-hover:text-blue-800" />
+            <img src={sethescope} alt="logo" className="w-8 h-8" />
+
+            
             <span className="ml-2 text-2xl font-bold text-blue-700 group-hover:text-blue-800">DoctorWho</span>
         </Link>
 

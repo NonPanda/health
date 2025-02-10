@@ -140,6 +140,7 @@ export default function Profile({ user , setUser}) {
         headers: {
           "Content-Type": "application/json",
         },
+        withCredentials: true,
       });
       setChanged(false);
   
@@ -316,7 +317,7 @@ export default function Profile({ user , setUser}) {
           placeholder="XX"
           value={user?.profile.age}
           onChange={(newValue) => handleInputChange("age", newValue)}
-          inputClassName="w-30"
+          inputClassName="w-24"
         />
       </div>
       <div className="flex flex-col items-center space-y-2">
@@ -329,7 +330,7 @@ export default function Profile({ user , setUser}) {
           placeholder="X kg"
           value={user?.profile.weight}
           onChange={(newValue) => handleInputChange("weight", newValue)}
-          inputClassName="w-30"
+          inputClassName="w-24"
         />
       </div>
       <div className="flex flex-col items-center space-y-2">
@@ -342,7 +343,7 @@ export default function Profile({ user , setUser}) {
           placeholder="X cm"
           value={user?.profile.height}
           onChange={(newValue) => handleInputChange("height", newValue)}
-          inputClassName="w-30"
+          inputClassName="w-24"
         />
       </div>
     </div>
