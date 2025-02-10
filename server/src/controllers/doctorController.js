@@ -23,6 +23,7 @@ const search= TryCatch(async(req,res,next)=>{
         return next(new ErrorHandler("Location coordinates not available", 400));
     }
 
+    console.log("search and max dist", search,maxDistance);
     const doctors=await Doctor.aggregate([
         {
             $geoNear:{
@@ -37,7 +38,7 @@ const search= TryCatch(async(req,res,next)=>{
         },
         {
             $match:{
-                specialities:{ $in: specialities}
+                "profile.specialities":{ $in: specialities}
             }
         },
         {
@@ -53,6 +54,7 @@ const search= TryCatch(async(req,res,next)=>{
         }
     }
     ]);
+    
 console.log("doctor",doctors);
 
     // const resultDoctor=[];
