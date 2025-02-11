@@ -24,14 +24,11 @@ const doctorSchema = new mongoose.Schema({
       avatar: String,
       phone: String,
       fees: Number,
-      specialities: [String],
-      // role: {type: String, default: 'doctor'},
-      qualifications: [String],
+      education: [String],
+      certifications: [String],
+      specialization: [String],
       experience: Number,
-      availableSlots: [{
-        date: Date,
-        times: [String],
-      }],
+      workingHours: String,
       },
       location: {
         type: { type: String, enum: ["Point"], required: true, default: "Point" },

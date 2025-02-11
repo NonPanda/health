@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { Pencil, PhoneIcon, MapPin, StethoscopeIcon, Clock10Icon, GraduationCapIcon, DollarSign } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Pencil, PhoneIcon, StethoscopeIcon, Clock10Icon, GraduationCapIcon, DollarSign } from "lucide-react";
 import pic from "../assets/pic.png";
 import MaleIcon from "../assets/male.svg";
+import axios from "axios";
 
 const Input = ({ name, placeholder, value: initialValue, onChange, inputClassName = "" }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -43,133 +44,229 @@ const Input = ({ name, placeholder, value: initialValue, onChange, inputClassNam
 };
 
 export default function DoctorProfile({ user }) {
+  const [updatedProfile, setUpdatedProfile] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    specialization: [],
+    workingHours: "", // Now a string
+    experience: "",
+    fees: "",
+    education: [],
+    certifications: [],
+  });
+
+  const [changed, setChanged] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setUpdatedProfile({
+        name: user?.name || "",
+        email: user?.email || "",
+        phone: user?.profile?.phone || "",
+        specialization: Array.isArray(user?.profile?.specialization) ? user?.profile?.specialization : [],
+        workingHours: user?.profile?.workingHours || "", // Now a string
+        experience: user?.profile?.experience || "",
+        fees: user?.profile?.fees || "",
+        education: Array.isArray(user?.profile?.education) ? user?.profile?.education : [],
+        certifications: Array.isArray(user?.profile?.certifications) ? user?.profile?.certifications : [],
+      });
+    }
+  }, [user]);
+
   const handleInputChange = (name, newValue) => {
-    console.log(`${name} changed to ${newValue}`);
+    setUpdatedProfile((prevState) => {
+      let updatedValue = newValue;
+
+      // Handle arrays (specialization, education, certifications)
+      if (name === "specialization" || name === "education" || name === "certifications") {
+        updatedValue = typeof newValue === "string" ? newValue.split(",").map((item) => item.trim()) : newValue;
+      }
+
+      // Check if the value has changed
+      if (JSON.stringify(prevState[name]) !== JSON.stringify(updatedValue)) {
+        setChanged(true);
+      }
+
+      return {
+        ...prevState,
+        [name]: updatedValue,
+      };
+    });
   };
 
+  const handleSave = async () => {
+    try {
+      const profileUpdate = {
+        userId: user._id,
+        profile: {
+          phone: updatedProfile.phone,
+          specialization: updatedProfile.specialization,
+          workingHours: updatedProfile.workingHours, // Now a string
+          experience: updatedProfile.experience,
+          fees: updatedProfile.fees,
+          education: updatedProfile.education,
+          certifications: updatedProfile.certifications,
+        },
+      };
+
+      const res = await axios.put(`http://localhost:5000/api/doctor/updateprofile`, profileUpdate, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+
+      setChanged(false);
+      console.log("Profile updated successfully:", res.data);
+    } catch (err) {
+      console.error("Error updating profile:", err);
+    }
+  };
+
+  if (!user || Object.keys(updatedProfile).length === 0) {
+    return <div>Loading...</div>;
+  }
+
   return (
-<div className="flex items-center justify-center">
-  <div className="w-full px-4 md:px-24 py-12">
-    {/* Top Section */}
-    <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 mb-8 justify-between sm:-pr-4 sm:pr-4">
-      <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-        <img
-          src={user?.pfp || pic}
-          alt="user"
-          className="ml-4 w-32 h-32 rounded-full shadow-md"
-        />
-        <div className="ml-10 text-center md:text-left">
-          <div className="flex items-center justify-center md:justify-start mb-4">
-            <h1 className="text-4xl font-bold text-blue-900">
-              {user?.name || "Username"}
-            </h1>
-            <img src={MaleIcon} className="w-10 h-10 ml-4" />
+    <div>
+      <div className={`py-1 sticky w-full bg-white/80 backdrop-blur-sm shadow-sm transform transition-all duration-1000 ease-in-out ${changed ? "opacity-100" : "opacity-0"}`}>
+        <div className={`mx-auto px-4 py-2 flex items-center justify-between`}>
+          <div className={`text-sm text-gray-500`}>
+            {changed ? "Changes pending..." : "All changes saved"}
           </div>
-          <p className="pr-5 text-xl text-slate-600">
-            {user?.email || "email@example.com"}
-          </p>
+          <button
+            onClick={handleSave}
+            className={`
+              transform transition-all duration-700 ease-in-out px-6 py-2 rounded-lg font-medium w-[150px]
+              ${changed ? 'bg-blue-500 hover:bg-blue-600 text-white translate-y-0 opacity-100 shadow-md' : 'bg-gray-100 text-gray-400 opacity-0 pointer-events-none'}
+            `}
+          >
+            {changed ? 'Save Changes' : 'Saved'}
+          </button>
         </div>
       </div>
-      <div className="sm:scale-100 scale-90 flex items-center space-x-2">
-        <PhoneIcon className="w-6 h-6 text-blue-900" />
-        <Input
-          name="phone"
-          placeholder="XXXXXXXXXX"
-          value={user?.phone}
-          onChange={(newValue) => handleInputChange("phone", newValue)}
-          inputClassName="text-xl w-[175px]"
-        />
+
+      <div className="w-full px-4 md:px-24 py-12">
+        {/* Top Section */}
+        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 mb-8 justify-between sm:-pr-4 sm:pr-4">
+          <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+            <img
+              src={user?.pfp || pic}
+              alt="user"
+              className="ml-4 w-32 h-32 rounded-full shadow-md"
+            />
+            <div className="ml-10 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start mb-4">
+                <h1 className="text-4xl font-bold text-blue-900">
+                  {user?.name || "Username"}
+                </h1>
+                <img src={MaleIcon} className="w-10 h-10 ml-4" />
+              </div>
+              <p className="pr-5 text-xl text-slate-600">
+                {user?.email || "email@example.com"}
+              </p>
+            </div>
+          </div>
+          <div className="sm:scale-100 scale-90 flex items-center space-x-2">
+            <PhoneIcon className="w-6 h-6 text-blue-900" />
+            <Input
+              name="phone"
+              placeholder="XXXXXXXXXX"
+              value={updatedProfile.phone}
+              onChange={(newValue) => handleInputChange("phone", newValue)}
+              inputClassName="text-xl w-[175px]"
+            />
+          </div>
+        </div>
+
+        {/* Responsive Grid Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-4">
+          <div className="flex flex-col items-center space-y-2">
+            <div className="flex items-center space-x-2">
+              <StethoscopeIcon className="w-6 h-6 text-blue-900" />
+              <h2 className="text-2xl font-semibold text-blue-900">Specialization</h2>
+            </div>
+            <Input
+              name="specialization"
+              placeholder="Cardiologist"
+              value={updatedProfile.specialization.join(", ")}
+              onChange={(newValue) => handleInputChange("specialization", newValue)}
+              inputClassName="w-[300px]"
+            />
+          </div>
+
+          <div className="flex flex-col items-center space-y-2">
+            <div className="flex items-center space-x-2">
+              <Clock10Icon className="w-6 h-6 text-blue-900" />
+              <h2 className="text-2xl font-semibold text-blue-900">Working Hours</h2>
+            </div>
+            <Input
+              name="workingHours"
+              placeholder="9:00 AM - 5:00 PM"
+              value={updatedProfile.workingHours} // Now a string
+              onChange={(newValue) => handleInputChange("workingHours", newValue)}
+              inputClassName="w-[300px]"
+            />
+          </div>
+
+          <div className="flex flex-col items-center space-y-2">
+            <div className="flex items-center space-x-2">
+              <GraduationCapIcon className="w-6 h-6 text-blue-900 flex-shrink-0" />
+              <h2 className="text-2xl font-semibold text-blue-900">Experience</h2>
+            </div>
+            <Input
+              name="experience"
+              placeholder="15 years"
+              value={updatedProfile.experience}
+              onChange={(newValue) => handleInputChange("experience", newValue)}
+              inputClassName="w-40"
+            />
+          </div>
+
+          <div className="flex flex-col items-center space-y-2">
+            <div className="flex items-center space-x-2">
+              <DollarSign className="w-6 h-6 text-blue-900 flex-shrink-0" />
+              <h2 className="text-2xl font-semibold text-blue-900">Consultation Fees</h2>
+            </div>
+            <Input
+              name="fees"
+              placeholder="Rs. 500"
+              value={updatedProfile.fees}
+              onChange={(newValue) => handleInputChange("fees", newValue)}
+              inputClassName="w-40"
+            />
+          </div>
+
+          <div className="flex flex-col items-center space-y-2">
+            <div className="flex items-center space-x-2">
+              <GraduationCapIcon className="w-6 h-6 text-blue-900" />
+              <h2 className="text-2xl font-semibold text-blue-900">Education</h2>
+            </div>
+            <Input
+              name="education"
+              placeholder="MBBS, MD"
+              value={updatedProfile.education.join(", ")}
+              onChange={(newValue) => handleInputChange("education", newValue)}
+              inputClassName="w-[300px]"
+            />
+          </div>
+
+          <div className="flex flex-col items-center space-y-2">
+            <div className="flex items-center space-x-2">
+              <GraduationCapIcon className="w-6 h-6 text-blue-900" />
+              <h2 className="text-2xl font-semibold text-blue-900">Certifications</h2>
+            </div>
+            <Input
+              name="certifications"
+              placeholder="XYZ Certification"
+              value={updatedProfile.certifications.join(", ")}
+              onChange={(newValue) => handleInputChange("certifications", newValue)}
+              inputClassName="w-[300px]"
+            />
+          </div>
+        </div>
       </div>
     </div>
-
-    {/* Responsive Grid Section */}
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-4">
-      <div className="flex flex-col items-center space-y-2">
-        <div className="flex items-center space-x-2">
-          <StethoscopeIcon className="w-6 h-6 text-blue-900" />
-          <h2 className="text-2xl font-semibold text-blue-900">Specialization</h2>
-        </div>
-        <Input
-          name="specialization"
-          placeholder="Cardiologist"
-          value={user?.specialization?.join(", ")}
-          onChange={(newValue) => handleInputChange("specialization", newValue)}
-          inputClassName="w-[300px]"
-        />
-      </div>
-
-      <div className="flex flex-col items-center space-y-2">
-        <div className="flex items-center space-x-2">
-          <Clock10Icon className="w-6 h-6 text-blue-900" />
-          <h2 className="text-2xl font-semibold text-blue-900">Working Hours</h2>
-        </div>
-        <Input
-          name="workingHours"
-          placeholder="9:00 AM - 5:00 PM"
-          value={user?.workingHours}
-          onChange={(newValue) => handleInputChange("workingHours", newValue)}
-          inputClassName="w-[300px]"
-        />
-      </div>
-
-      <div className="flex flex-col items-center space-y-2">
-        <div className="flex items-center space-x-2">
-          <GraduationCapIcon className="w-6 h-6 text-blue-900 flex-shrink-0" />
-          <h2 className="text-2xl font-semibold text-blue-900">Experience</h2>
-        </div>
-        <Input
-          name="experience"
-          placeholder="15 years"
-          value={user?.experience}
-          onChange={(newValue) => handleInputChange("experience", newValue)}
-          inputClassName="w-40"
-        />
-      </div>
-
-      <div className="flex flex-col items-center space-y-2">
-        <div className="flex items-center space-x-2">
-          <DollarSign className="w-6 h-6 text-blue-900 flex-shrink-0" />
-          <h2 className="text-2xl font-semibold text-blue-900">Consultation Fees</h2>
-        </div>
-        <Input
-          name="fees"
-          placeholder="Rs. 500"
-          value={user?.fees}
-          onChange={(newValue) => handleInputChange("fees", newValue)}
-          inputClassName="w-40"
-        />
-      </div>
-
-      <div className="flex flex-col items-center space-y-2">
-        <div className="flex items-center space-x-2">
-          <GraduationCapIcon className="w-6 h-6 text-blue-900" />
-          <h2 className="text-2xl font-semibold text-blue-900">Education</h2>
-        </div>
-        <Input
-          name="education"
-          placeholder="MBBS, MD"
-          value={user?.education?.join(", ")}
-          onChange={(newValue) => handleInputChange("education", newValue)}
-          inputClassName="w-[300px]"
-        />
-      </div>
-
-      <div className="flex flex-col items-center space-y-2">
-        <div className="flex items-center space-x-2">
-          <GraduationCapIcon className="w-6 h-6 text-blue-900" />
-          <h2 className="text-2xl font-semibold text-blue-900">Certifications</h2>
-        </div>
-        <Input
-          name="certifications"
-          placeholder="XYZ Certification"
-          value={user?.certifications?.join(", ")}
-          onChange={(newValue) => handleInputChange("certifications", newValue)}
-          inputClassName="w-[300px]"
-        />
-      </div>
-    </div>
-  </div>
-</div>
-
   );
 }

@@ -105,7 +105,6 @@ export default function Signup({ setUser }) {
         return;
       }
       if(!isDoctor){
-
                try {
             const response = await axios.post('http://localhost:5000/api/user/login', {
               email: formData.email,
@@ -114,19 +113,13 @@ export default function Signup({ setUser }) {
             ,{withCredentials:true},
 
           );
-
             console.log('Response received:', response);
-            
-      
             if (response.status === 200) { 
-               setUser(response.data.user);             
+               setUser(response.data.user);   
+               localStorage.setItem('userType', 'user');          
                 navigate('/profile');
-              
-
-                            
-
+                          
             }
-
 
           } catch (error) {
             if (error.response) {
@@ -151,12 +144,10 @@ export default function Signup({ setUser }) {
             }
             ,{withCredentials:true}
           );
-
-
-            console.log('Response received:', response);
           
             if (response.status === 200) {
               setUser(response.data.user);
+              localStorage.setItem('userType', 'doctor');
               navigate('/doctor-profile');
             }
           } catch (error) {
@@ -174,10 +165,7 @@ export default function Signup({ setUser }) {
     };
 
 
-
-
-
-        const handleRegisterSubmit = async (e) => {
+       const handleRegisterSubmit = async (e) => {
           e.preventDefault();
         
           if (!validateForm()) {

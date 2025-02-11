@@ -17,9 +17,9 @@ export default function Navbar({ user, setUser }) {
             })
             .then(res => {
                 setUser("loading");
+                localStorage.removeItem('userType');
             })
             .catch(err => console.log(err));
-            setUser("loading");
 
         }
        

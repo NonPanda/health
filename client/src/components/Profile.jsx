@@ -46,7 +46,7 @@ const Input = ({ name, placeholder, value: initialValue, onChange, inputClassNam
   );
 };
 
-export default function Profile({ user , setUser}) {
+export default function Profile({ user}) {
   const [updateProfile, setUpdateProfile] = useState({
     name: "",
     email: "",
@@ -198,7 +198,7 @@ export default function Profile({ user , setUser}) {
 
 
         <div className="hidden lg:flex flex-col md:flex-row py-6 space-y-8 md:space-y-0 md:space-x-8">
-          <div className="flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-[15%] w-full">
+          <div className="flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-[16%] w-full">
             <div className="flex flex-col items-center space-y-2">
               <div className="flex items-center space-x-3">
                 <WeightIcon className="w-6 h-6 text-blue-900" />
