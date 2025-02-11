@@ -30,11 +30,32 @@ const doctorSchema = new mongoose.Schema({
       experience: Number,
       workingHours: String,
       },
-      location: {
-        type: { type: String, enum: ["Point"], required: true, default: "Point" },
-        coordinates: { type: [Number], required: true, default: [0, 0] },
-        formattedAddress: { type: String, default: "Unknown" }
+    //   location: {
+    //     type: { type: String, enum: ["Point"], required: true, default: "Point" },
+    //     coordinates: { type: [Number], required: true, default: [0, 0] },
+    //     formattedAddress: { type: String, default: "Unknown" }
+    // },
+    location: {
+    type: { 
+        type: String, 
+        enum: ["Point"], 
+        required: true, 
+        default: "Point" 
     },
+    coordinates: { 
+        type: [Number], 
+        required: true,
+        validate: {
+            validator: function(v) {
+                return v.length === 2 && 
+                       v[0] >= -180 && v[0] <= 180 &&
+                       v[1] >= -90 && v[1] <= 90;
+            },
+            message: "Invalid coordinates"
+        }
+    },
+    formattedAddress: String
+},
       rating: { type: Number, default: 0 },
       reviews: [{
         user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

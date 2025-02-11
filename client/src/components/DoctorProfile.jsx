@@ -44,12 +44,13 @@ const Input = ({ name, placeholder, value: initialValue, onChange, inputClassNam
 };
 
 export default function DoctorProfile({ user }) {
+  console.log(user);
   const [updatedProfile, setUpdatedProfile] = useState({
     name: "",
     email: "",
     phone: "",
     specialization: [],
-    workingHours: "", // Now a string
+    workingHours: "",
     experience: "",
     fees: "",
     education: [],
@@ -102,7 +103,7 @@ export default function DoctorProfile({ user }) {
         profile: {
           phone: updatedProfile.phone,
           specialization: updatedProfile.specialization,
-          workingHours: updatedProfile.workingHours, // Now a string
+          workingHours: updatedProfile.workingHours, 
           experience: updatedProfile.experience,
           fees: updatedProfile.fees,
           education: updatedProfile.education,
@@ -148,7 +149,6 @@ export default function DoctorProfile({ user }) {
       </div>
 
       <div className="w-full px-4 md:px-24 py-12">
-        {/* Top Section */}
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 mb-8 justify-between sm:-pr-4 sm:pr-4">
           <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
             <img
@@ -173,14 +173,13 @@ export default function DoctorProfile({ user }) {
             <Input
               name="phone"
               placeholder="XXXXXXXXXX"
-              value={updatedProfile.phone}
+              value={user?.profile?.phone}
               onChange={(newValue) => handleInputChange("phone", newValue)}
               inputClassName="text-xl w-[175px]"
             />
           </div>
         </div>
 
-        {/* Responsive Grid Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-4">
           <div className="flex flex-col items-center space-y-2">
             <div className="flex items-center space-x-2">
@@ -190,7 +189,7 @@ export default function DoctorProfile({ user }) {
             <Input
               name="specialization"
               placeholder="Cardiologist"
-              value={updatedProfile.specialization.join(", ")}
+              value={user?.profile?.specialization.join(", ")}
               onChange={(newValue) => handleInputChange("specialization", newValue)}
               inputClassName="w-[300px]"
             />
@@ -204,7 +203,7 @@ export default function DoctorProfile({ user }) {
             <Input
               name="workingHours"
               placeholder="9:00 AM - 5:00 PM"
-              value={updatedProfile.workingHours} // Now a string
+              value={user?.profile?.workingHours} // Now a string
               onChange={(newValue) => handleInputChange("workingHours", newValue)}
               inputClassName="w-[300px]"
             />
@@ -218,7 +217,7 @@ export default function DoctorProfile({ user }) {
             <Input
               name="experience"
               placeholder="15 years"
-              value={updatedProfile.experience}
+              value={user?.profile?.experience}
               onChange={(newValue) => handleInputChange("experience", newValue)}
               inputClassName="w-40"
             />
@@ -232,7 +231,7 @@ export default function DoctorProfile({ user }) {
             <Input
               name="fees"
               placeholder="Rs. 500"
-              value={updatedProfile.fees}
+              value={user?.profile?.fees}
               onChange={(newValue) => handleInputChange("fees", newValue)}
               inputClassName="w-40"
             />
@@ -246,7 +245,7 @@ export default function DoctorProfile({ user }) {
             <Input
               name="education"
               placeholder="MBBS, MD"
-              value={updatedProfile.education.join(", ")}
+              value={user?.profile?.education.join(", ")}
               onChange={(newValue) => handleInputChange("education", newValue)}
               inputClassName="w-[300px]"
             />
@@ -260,7 +259,7 @@ export default function DoctorProfile({ user }) {
             <Input
               name="certifications"
               placeholder="XYZ Certification"
-              value={updatedProfile.certifications.join(", ")}
+              value={user?.profile?.certifications.join(", ")}
               onChange={(newValue) => handleInputChange("certifications", newValue)}
               inputClassName="w-[300px]"
             />

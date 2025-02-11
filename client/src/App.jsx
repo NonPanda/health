@@ -17,8 +17,10 @@ function App() {
 
   useEffect(() => {
     const role=localStorage.getItem('userType');
-    if (!user==="loading"&&user!==null) {
+    console.log(role);
+    console.log("user",user);
 
+    if (user!=="loading"&&user==null) {
       if(role==="user"){
       axios.get('http://localhost:5000/api/user/getprofile', {
         withCredentials: true,
@@ -27,6 +29,7 @@ function App() {
       .catch(err => console.log(err));
     }
     else if(role==="doctor"){
+    
       axios.get('http://localhost:5000/api/doctor/getprofile', {
         withCredentials: true,
       })
