@@ -6,7 +6,7 @@ const {GoogleGenerativeAI}= require('@google/generative-ai');
 // const {userlocate}=require('../controllers/usercontroller.js');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// main shit
+// main thing
 
 const search= TryCatch(async(req,res,next)=>{
     const {search}= req.query;
@@ -15,10 +15,11 @@ const search= TryCatch(async(req,res,next)=>{
     const maxDistance=req.query.maxDistance || 50000;
 
     const model=genAI.getGenerativeModel({model:'gemini-1.5-flash'});
-    const prompt= `Convert to medical specialities:${search}.You must respond with commq-separated specialities. Include 'General Physician' if generic .`
+    const prompt= `Convert to medical specializations:${search}.You must respond with comma-separated specializations. Include 'General Physician' if generic .`
     const result=await model.generateContent(prompt);
-    const specialities= (await result.response.text()).split(',').map(data=>data.trim().toLowerCase());
-    console.log("specialities",specialities);
+    console.log(result);
+    const specialization= (await result.response.text()).split(',').map(data=>data.trim().toLowerCase());
+    console.log("specializations",specialization);
     if (!req.searchLocation || !req.searchLocation.coordinates) {
         return next(new ErrorHandler("Location coordinates not available", 400));
     }
@@ -38,21 +39,22 @@ const search= TryCatch(async(req,res,next)=>{
         },
         {
             $match:{
-                "profile.specialities":{ $in: specialities}
+                "profile.specialization":{ $in: specialization}
             }
         },
         {
             $project:{
                 _id:1,
                 name:1,
-                specialities:1,
+                "specialization": "$profile.specialization",
                 distance:1,
                 rating:1,
-                experience:1,
-                fees:1,
-                formattedAddress:`$location.formattedAddress`,
+                "experience": "$profile.experience",
+                "fees": "$profile.fees",
+                "formattedAddress": "$location.formattedAddress",
+            }
         }
-    }
+        
     ]);
     
 console.log("doctor",doctors);

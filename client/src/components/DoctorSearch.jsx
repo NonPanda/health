@@ -1,29 +1,36 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const DoctorSearch = () => {
   const [searchType, setSearchType] = useState('specialty');
   const [query, setQuery] = useState('');
   const [maxDistance, setMaxDistance] = useState(10);
-  const navigate = useNavigate();
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
+    
     const params = new URLSearchParams({
-      [searchType]: query,
-      maxDistance: maxDistance * 1000
+      search: query, 
+      maxDistance: maxDistance * 1000, 
     });
 
     try {
-      const response = await fetch(`/api/doctors/search?${params}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        }
+      const { data } = await axios.get(`http://localhost:5000/api/doctor/search?${params.toString()}`, {
+        withCredentials: true,
       });
-      const data = await response.json();
-      navigate('/doctors', { state: data.doctors });
-    } catch (error) {
-      console.error('Search failed:', error);
+
+      console.log("Doctors found:", data);
+      setDoctors(data.data || []);
+    } catch (err) {
+      console.error('Search error:', err);
+      setError('Failed to fetch doctors. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,7 +59,7 @@ const DoctorSearch = () => {
           onChange={(e) => setQuery(e.target.value)}
           className="w-full p-2 border rounded-md"
         />
-        
+
         <div className="flex items-center gap-4">
           <label>Maximum Distance (km):</label>
           <input
@@ -67,10 +74,36 @@ const DoctorSearch = () => {
         <button
           type="submit"
           className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          disabled={loading}
         >
-          Search Doctors
+          {loading ? 'Searching...' : 'Search Doctors'}
         </button>
       </form>
+
+      {error && <p className="text-red-500 mt-4">{error}</p>}
+
+      <div className="mt-6">
+        {doctors.length > 0 ? (
+          <div>
+            <h2 className="text-xl font-semibold mb-2">Doctors Found:</h2>
+            <ul className="space-y-2">
+              {doctors.map((doctor) => (
+                <li key={doctor._id} className="p-4 border rounded-md shadow-sm">
+                  <p><strong>Name:</strong> {doctor.name}</p>
+                  <p><strong>Specialization:</strong> {doctor.specialization?.join(', ') || 'Not Available'}</p>
+                  <p><strong>Distance:</strong> {(doctor.distance / 1000).toFixed(2)} km</p>
+                  <p><strong>Rating:</strong> {doctor.rating || 'N/A'}</p>
+                  <p><strong>Experience:</strong> {doctor.experience ? `${doctor.experience} years` : 'Not Available'}</p>
+                  <p><strong>Fees:</strong> {doctor.fees ? `$${doctor.fees}` : 'Not Available'}</p>
+                  <p><strong>Address:</strong> {doctor.formattedAddress || 'Unknown'}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          !loading && <p className="text-gray-500 mt-4">No doctors found. Try a different search.</p>
+        )}
+      </div>
     </div>
   );
 };
