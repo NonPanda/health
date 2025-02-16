@@ -39,7 +39,8 @@ const search= TryCatch(async(req,res,next)=>{
         },
         {
             $match:{
-                "profile.specialization":{ $in: specialization}
+                "profile.specialization": {$elemMatch: { $in: specialization.map(s => new RegExp(`^${s}$`, "i")) }
+}
             }
         },
         {

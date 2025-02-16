@@ -41,7 +41,7 @@ export default function Navbar({ user, setUser }) {
 
     return (
         <>
-         <div className="w-full flex items-center justify-between px-4 md:px-6 py-2 bg-white border-b border-slate-200 md:shadow-md relative z-50">
+         <div className="w-full flex items-center justify-between px-4 md:px-6 py-2 bg-white border-b border-slate-200 md:shadow-sm relative z-50">
          <Link to="/" className="flex items-center group transition-colors">
             <img src={sethescope} alt="logo" className="w-8 h-8" />
 
