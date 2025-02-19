@@ -3,7 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel.js');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
-const {register, login, getProfile ,updateProfile,logout,userlocate,sendEmail}=require('../controllers/usercontroller.js');
+const {upload} = require('../constants/config.js');
+const {register, login, getProfile ,updateProfile,logout,userlocate,sendEmail,uploadProfilePicture} =require('../controllers/usercontroller.js');
 const { appendFile } = require('fs');
 const {isAuthenticated}=require('../middlewares/auth.js');
 const router = express.Router();
@@ -16,6 +17,8 @@ const router = express.Router();
   router.get('/logout',logout); 
   router.get("/getprofile",getProfile);
   router.put("/updateprofile",updateProfile);
+  router.put('/uploadpfp', upload.single('profilePicture'), uploadProfilePicture);
+
   router.get('/update-location',userlocate);
 
 

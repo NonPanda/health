@@ -58,7 +58,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword/>} />
         <Route path="/reset-password/:id/:token" element={<ResetPassword/>} />
         <Route path="profile" element={<Profile user={user} setUser={setUser} />} />
-        <Route path="doctor-profile" element={<DoctorProfile user={user} />} />
+        <Route path="doctor-profile" element={<DoctorProfile user={user} setUser={setUser} />} />
         <Route path="find-doctors" element={<DoctorSearch user={user} />} />
       
         </Routes>

@@ -2,7 +2,6 @@ import React from "react";
 import {useState} from "react";
 import { Link } from "react-router-dom";
 import pic from "../assets/pic.png";
-import Cookies from "js-cookie";
 import axios from "axios";
 import sethescope from "../assets/stethoscope.svg";
 
@@ -20,6 +19,8 @@ export default function Navbar({ user, setUser }) {
                 localStorage.removeItem('userType');
             })
             .catch(err => console.log(err));
+            localStorage.removeItem('userType');
+
 
         }
        
@@ -83,7 +84,7 @@ export default function Navbar({ user, setUser }) {
                     {user ? (
                         <div className="flex items-center space-x-4">
                             <img
-                                src={user.pfp || pic}
+                                src={user.profile.avatar || pic}
                                 alt="user"
                                 className="w-10 h-10 rounded-full border-2 border-blue-700"
                             />
@@ -107,7 +108,7 @@ export default function Navbar({ user, setUser }) {
         </div>
     </div>
 
-            <div className={`fixed top-[40px] left-0 w-full bg-white shadow-lg transition-all duration-300 transform z-40
+            <div className={`absolute left-0 w-full bg-white shadow-lg transition-all duration-300 transform z-40
     ${open ? 'translate-y-0 opacity-100 visible' : '-translate-y-full opacity-0 invisible'} 
     sm:hidden`}>
     <div className="flex flex-col p-4 space-y-4 w-full max-w-screen">
@@ -147,7 +148,7 @@ export default function Navbar({ user, setUser }) {
                         {user ? (
                             <div className="flex items-center justify-between w-full">
                                 <img
-                                    src={user.pfp || pic}
+                                    src={user.profile.avatar || pic}
                                     alt="user"
                                     className="w-10 h-10 rounded-full border-2 border-blue-700"
                                 />

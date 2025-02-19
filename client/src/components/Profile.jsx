@@ -3,7 +3,6 @@ import { CakeIcon, Pencil, WeightIcon, PhoneIcon, MapPin, Droplet, Ruler, Cake, 
 import pic from "../assets/pic.png";
 import MaleIcon from "../assets/male.svg";
 import axios from "axios";
-import Cookies from "js-cookie";
 
 
 const Input = ({ name, placeholder, value: initialValue, onChange, inputClassName = "" }) => {
@@ -30,12 +29,12 @@ const Input = ({ name, placeholder, value: initialValue, onChange, inputClassNam
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder={placeholder}
-          className={`lg:p-2 p-1 border border-gray-300 rounded-md focus:outline-none shadow-md text-lg lg:text-xl ${inputClassName} ${centered}`}
+          className={`lg:p-2 p-1 border border-gray-100 rounded-md focus:outline-none shadow-md text-lg lg:text-xl ${inputClassName} ${centered}`}
           autoFocus
         />
       ) : (
         <div
-          className={`p-1 lg:p-2 text-gray-800 cursor-pointer border border-white border-b-gray-200 hover:border-gray-400 rounded-md flex items-center justify-between group lg:text-xl text-lg ${inputClassName} ${centered}`}
+          className={`p-1 lg:p-2 text-gray-800 cursor-pointer border border-white border-b-gray-200 hover:shadow-sm rounded-md flex items-center justify-between group lg:text-xl text-lg ${inputClassName} ${centered}`}
           onClick={handleClick}
         >
           <div className={`${smallbox} w-full text-lg lg:text-xl ${centered}`}>{value || placeholder || "Click to edit"}</div>
@@ -46,9 +45,10 @@ const Input = ({ name, placeholder, value: initialValue, onChange, inputClassNam
   );
 };
 
-export default function Profile({ user}) {
+export default function Profile({ user, setUser }) {
   const [updateProfile, setUpdateProfile] = useState({
     name: "",
+    avatar: "",
     email: "",
     contact: "",
     weight: 0,
@@ -72,6 +72,7 @@ export default function Profile({ user}) {
     if (user) {
       setUpdateProfile({
         name: user?.name || "",
+        avatar: user?.profile?.avatar || "",
         email: user?.email || "",
         contact: user?.profile?.contact || "",
         weight: user?.profile?.weight || 0,
@@ -124,6 +125,7 @@ export default function Profile({ user}) {
       const profileUpdate = {
         userId: user._id,
         profile: {
+          avatar: updateProfile.avatar,
           contact: updateProfile.contact,
           weight: updateProfile.weight,
           height: updateProfile.height,
@@ -150,6 +152,44 @@ export default function Profile({ user}) {
     }
   };
 
+  const handleProfilePictureChange = async (e) => {
+    try {
+      const file = e.target.files[0];
+      console.log(file);
+      if(!file) return;
+
+      const formData = new FormData();
+      formData.append("profilePicture", file);
+      formData.append("userId", user._id);
+
+      const res = await axios.put(`http://localhost:5000/api/user/uploadpfp`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
+      console.log(res.data);
+      console.log(res.data.user);
+      if(res.data.success){
+        const updatedUser = res.data.user;
+        setUpdateProfile((prevState) => ({
+          ...prevState,
+          profilePicture: updatedUser.profile.avatar,
+        }));
+        setUser(updatedUser);
+        
+      }
+      
+
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  
+      
+
+
   if (!user || Object.keys(updateProfile).length === 0) {
     return <div>Loading...</div>;
   }
@@ -175,7 +215,35 @@ export default function Profile({ user}) {
       <div className="w-full px-4 md:px-24 py-4">
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 mb-8 justify-between -pr-4 sm:pr-4">
           <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-            <img src={user?.pfp || pic} alt="user" className="sm:ml-0 ml-4 w-32 h-32 rounded-full shadow-md" />
+          <div className="relative inline-block">
+            <img src={user?.profile?.avatar || pic} alt="user" className="sm:ml-0 ml-4 w-32 h-32 rounded-full shadow-md" />
+            <label
+              htmlFor="profilePictureInput"
+              className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 cursor-pointer hover:bg-blue-600"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M15.232 5H21a2 2 0 012 2v12a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h5.768M16 3l-4 4m0 0l-4-4m4 4V15"
+                />
+              </svg>
+            </label>
+            <input
+              id="profilePictureInput"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleProfilePictureChange}
+            />
+          </div>
             <div className="ml-10 text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start mb-4">
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-900">{user?.name || "Username"}</h1>

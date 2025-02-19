@@ -1,7 +1,6 @@
 const User = require('../models/userModel.js');
-const Doctor= require('../models/doctorModel.js');
 const { compare } = require('bcrypt');
-const {TryCatch, ErrorHandler,cookieOptions,sendToken}=require('../constants/config.js');
+const {TryCatch, ErrorHandler,cookieOptions,sendToken} =require('../constants/config.js');
 const {getcoordinates}=require('../middlewares/geo.js');
 
 const register = TryCatch(async (req, res, next) => {
@@ -53,6 +52,7 @@ const getProfile = TryCatch(async (req, res, next) => {
 
 const updateProfile = TryCatch(async (req, res, next) => {
   const { userId, profile } = req.body; 
+  
 
   if (!userId) {
     return next(new ErrorHandler("User ID is required", 400));
@@ -80,6 +80,27 @@ const updateProfile = TryCatch(async (req, res, next) => {
     success: true,
     user: updatedUser,
   });
+});
+
+const uploadProfilePicture = TryCatch(async (req, res, next) => {
+  const { userId } = req.body;
+
+  
+  if (!userId) {
+    return next(new ErrorHandler("User ID is required", 400));
+  }
+  if (!req.file) {
+    return next(new ErrorHandler("No file uploaded", 400));
+  }
+  const user = await User.findById(userId);
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+  const file = req.file.buffer.toString("base64");
+  user.profile.avatar = `data:${req.file.mimetype};base64,${file}`;
+  await user.save();
+
+  res.status(200).json({ success: true, user });
 });
 
 const userlocate = TryCatch(async (req, res, next) => {
@@ -136,4 +157,4 @@ async function sendEmail(to, subject, html) {
     }
 }
 
-module.exports = { register, login,logout,getProfile, updateProfile, userlocate };
+module.exports = { register, login,logout,getProfile, updateProfile, userlocate, uploadProfilePicture};

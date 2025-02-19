@@ -1,5 +1,9 @@
 // const TOEKN= "token";
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 const cookieOptions = {
     maxAge: 15 * 24 * 60 * 60 * 1000,
@@ -35,4 +39,4 @@ const TryCatch=(passedFunc)=> async (req,res,next) => {
         next(error);
     }
 };
-module.exports={ cookieOptions,sendToken,TryCatch,ErrorHandler};
+module.exports={ cookieOptions,sendToken,TryCatch,ErrorHandler,upload};

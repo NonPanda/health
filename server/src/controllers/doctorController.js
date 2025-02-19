@@ -2,8 +2,7 @@ const Doctor = require('../models/doctorModel.js');
 const {TryCatch, ErrorHandler,cookieOptions,sendToken}=require('../constants/config.js');
 const { compare } = require('bcrypt');
 const {GoogleGenerativeAI}= require('@google/generative-ai');
-// const { model } = require('mongoose');
-// const {userlocate}=require('../controllers/usercontroller.js');
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // main thing
@@ -17,9 +16,7 @@ const search= TryCatch(async(req,res,next)=>{
     const model=genAI.getGenerativeModel({model:'gemini-1.5-flash'});
     const prompt= `Convert to medical specializations:${search}.You must respond with comma-separated specializations. Include 'General Physician' if generic .`
     const result=await model.generateContent(prompt);
-    console.log(result);
     const specialization= (await result.response.text()).split(',').map(data=>data.trim().toLowerCase());
-    console.log("specializations",specialization);
     if (!req.searchLocation || !req.searchLocation.coordinates) {
         return next(new ErrorHandler("Location coordinates not available", 400));
     }
@@ -57,13 +54,6 @@ const search= TryCatch(async(req,res,next)=>{
         }
         
     ]);
-    
-console.log("doctor",doctors);
-
-    // const resultDoctor=[];
-    // if(doctors.length>0){
-    //     resultDoctor= [doctors[0], ...doctors.slice(1)];
-    // }
     
     res.status(200).json({
         success:true,
@@ -127,6 +117,24 @@ const updateProfile = TryCatch(async (req, res, next) => {
     
 });
 
+const uploadProfilePicture = TryCatch(async (req, res, next) => {
+  const { userId } = req.body;
+  if (!userId) {
+    return next(new ErrorHandler("User ID is required", 400));
+  }
+  if (!req.file) {
+    return next(new ErrorHandler("No file uploaded", 400));
+  }
+  const user = await Doctor.findById(userId);
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+  const file = req.file.buffer.toString("base64");
+  user.profile.avatar = `data:${req.file.mimetype};base64,${file}`;
+  await user.save();
+
+  res.status(200).json({ success: true, user });
+});
 
 
 
@@ -139,4 +147,4 @@ const updateProfile = TryCatch(async (req, res, next) => {
 
 
 
-module.exports = { updateProfile, getProfile, register, login, logout,search};
+module.exports = { updateProfile, getProfile, register, login, logout,search,uploadProfilePicture };

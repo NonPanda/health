@@ -27,12 +27,12 @@ const Input = ({ name, placeholder, value: initialValue, onChange, inputClassNam
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder={placeholder}
-          className={`p-2 border border-gray-300 rounded-md focus:outline-none shadow-md text-xl ${inputClassName} ${centered}`}
+          className={`p-2 border border-gray-100 rounded-md focus:outline-none shadow-md text-xl ${inputClassName} ${centered}`}
           autoFocus
         />
       ) : (
         <div
-          className={`p-2 text-gray-800 cursor-pointer border border-white border-b-gray-200 hover:border-gray-400 rounded-md flex items-center justify-between group text-xl ${inputClassName} ${centered}`}
+          className={`p-2 text-gray-800 cursor-pointer border border-white border-b-gray-200 hover:shadow-sm rounded-md flex items-center justify-between group text-xl ${inputClassName} ${centered}`}
           onClick={handleClick}
         >
           <div className={`${smallbox} w-full text-xl ${centered}`}>{value || placeholder || "Click to edit"}</div>
@@ -43,10 +43,11 @@ const Input = ({ name, placeholder, value: initialValue, onChange, inputClassNam
   );
 };
 
-export default function DoctorProfile({ user }) {
+export default function DoctorProfile({ user, setUser }) {
   console.log(user);
   const [updatedProfile, setUpdatedProfile] = useState({
     name: "",
+    avatar:"",
     email: "",
     phone: "",
     specialization: [],
@@ -63,10 +64,11 @@ export default function DoctorProfile({ user }) {
     if (user) {
       setUpdatedProfile({
         name: user?.name || "",
+        avatar: user?.profile?.avatar || "",
         email: user?.email || "",
         phone: user?.profile?.phone || "",
         specialization: Array.isArray(user?.profile?.specialization) ? user?.profile?.specialization : [],
-        workingHours: user?.profile?.workingHours || "", // Now a string
+        workingHours: user?.profile?.workingHours || "", 
         experience: user?.profile?.experience || "",
         fees: user?.profile?.fees || "",
         education: Array.isArray(user?.profile?.education) ? user?.profile?.education : [],
@@ -78,13 +80,10 @@ export default function DoctorProfile({ user }) {
   const handleInputChange = (name, newValue) => {
     setUpdatedProfile((prevState) => {
       let updatedValue = newValue;
-
-      // Handle arrays (specialization, education, certifications)
       if (name === "specialization" || name === "education" || name === "certifications") {
         updatedValue = typeof newValue === "string" ? newValue.split(",").map((item) => item.trim()) : newValue;
       }
 
-      // Check if the value has changed
       if (JSON.stringify(prevState[name]) !== JSON.stringify(updatedValue)) {
         setChanged(true);
       }
@@ -101,6 +100,7 @@ export default function DoctorProfile({ user }) {
       const profileUpdate = {
         userId: user._id,
         profile: {
+          avatar: updatedProfile.avatar,
           phone: updatedProfile.phone,
           specialization: updatedProfile.specialization,
           workingHours: updatedProfile.workingHours, 
@@ -125,9 +125,45 @@ export default function DoctorProfile({ user }) {
     }
   };
 
+  const handleProfilePictureChange = async (e) => {
+    try {
+      const file = e.target.files[0];
+      if(!file) return;
+
+      const formData = new FormData();
+      formData.append("profilePicture", file);
+      formData.append("userId", user._id);
+
+      const res = await axios.put(`http://localhost:5000/api/doctor/uploadpfp`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
+      console.log(res.data);
+      console.log(res.data.user);
+      if(res.data.success){
+        const updatedUser = res.data.user;
+        setUpdatedProfile((prevState) => ({
+          ...prevState,
+          profilePicture: updatedUser.profile.avatar,
+        }));
+        setUser(updatedUser);
+        
+      }
+      
+
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   if (!user || Object.keys(updatedProfile).length === 0) {
     return <div>Loading...</div>;
   }
+
+
 
   return (
     <div>
@@ -151,11 +187,35 @@ export default function DoctorProfile({ user }) {
       <div className="w-full px-4 md:px-24 py-12">
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 mb-8 justify-between sm:-pr-4 sm:pr-4">
           <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-            <img
-              src={user?.pfp || pic}
-              alt="user"
-              className="ml-4 w-32 h-32 rounded-full shadow-md"
-            />
+             <div className="relative inline-block">
+                        <img src={user?.profile?.avatar || pic} alt="user" className="sm:ml-0 ml-4 w-32 h-32 rounded-full shadow-md" />
+                        <label
+                          htmlFor="profilePictureInput"
+                          className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 cursor-pointer hover:bg-blue-600"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M15.232 5H21a2 2 0 012 2v12a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h5.768M16 3l-4 4m0 0l-4-4m4 4V15"
+                            />
+                          </svg>
+                        </label>
+                        <input
+                          id="profilePictureInput"
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleProfilePictureChange}
+                        />
+                      </div>
             <div className="ml-10 text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start mb-4">
                 <h1 className="text-4xl font-bold text-blue-900">
