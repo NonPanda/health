@@ -4,9 +4,14 @@ import { Link } from "react-router-dom";
 import pic from "../assets/pic.png";
 import axios from "axios";
 import sethescope from "../assets/stethoscope.svg";
+import { BsPersonFill } from "react-icons/bs";
+import { RiLoginCircleFill } from "react-icons/ri";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 export default function Navbar({ user, setUser }) {
     const [open, setOpen] = useState(false);
+    const location = useLocation();
 
     const handleSignOut = () => {
 
@@ -38,7 +43,11 @@ export default function Navbar({ user, setUser }) {
         setOpen(false);
     }
 
-
+    const [dropdown, toggleDropdown] = useState(false);
+    
+    useEffect(() => {
+        toggleDropdown(false);
+    }, [location]);
 
     return (
         <>
@@ -57,47 +66,73 @@ export default function Navbar({ user, setUser }) {
         <Link to="/specialties" className="text-sm font-medium text-slate-700 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-700">
             Specialties
         </Link>
-        <Link to="/chat" className="text-sm font-medium text-slate-700 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-700">
-            AI Chat
+        <Link to="/appointments" className="text-sm font-medium text-slate-700 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-700">
+            Appointments
         </Link>
-        {user && (
-        <>
-        {user.role=="user" && 
-    
-        (
-            <Link to="/profile" className="text-sm font-medium text-slate-700 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-700">
-                Profile
-            </Link>
-        )}
-        {user.role=="doctor" && (
-            <Link to="/doctor-profile" className="text-sm font-medium text-slate-700 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-700">    
-                Doctor Profile
-            </Link>
-
-        )}
-        </>
-        )}
+       
+       
 
     </div>
 
-                <div className="hidden sm:flex items-center space-x-4">
-                    {user ? (
-                        <div className="flex items-center space-x-4">
-                            <img
-                                src={user.profile.avatar || pic}
-                                alt="user"
-                                className="w-10 h-10 rounded-full border-2 border-blue-700"
-                            />
-                            <button className="bg-blue-700 text-white px-4 py-2 rounded font-medium hover:bg-blue-800 transition-all hover:-translate-y-0.5" onClick={handleSignOut}>
-                                Logout
-                            </button>
-                        </div>
-                    ) : (
-                        <Link to="/signup" className="bg-blue-700 text-white px-6 py-2 rounded font-medium hover:bg-blue-800 transition-all hover:-translate-y-0.5">
-                            Login
-                        </Link>
-                    )}
-                </div>
+    <div className="hidden sm:flex items-center space-x-4 mr-8">
+  {user ? (
+    <div className="flex items-center space-x-4">
+      <img
+        src={user.profile.avatar || pic}
+        alt="user"
+        className="w-11 h-11 rounded-full border-2 border-transparent hover:border-blue-700 transition-all duration-300 cursor-pointer transform"
+        onClick={() => toggleDropdown(!dropdown)}
+      />
+
+      <div
+        className={`absolute top-16 right-4 w-36 rounded-xl bg-white shadow-lg border border-gray-200 backdrop-blur-sm transition-all duration-200 ease-in-out transform ${dropdown ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1"}`}
+      >
+        <div className="px-4 py-[10px] border-b border-blue-200">
+          <p className="text-sm text-gray-700">Signed in as,</p>
+          <p className="text-sm font-medium text-blue-700">
+            {user.name || "User"}
+          </p>
+        </div>
+
+        <div className="flex flex-col">
+        {user.role=="doctor" ? (
+            <Link
+                to="/doctor-profile"
+                className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 group transition-all duration-200 hover:pl-2"
+                onClick={() => setDropdown(false)}
+            >
+                <BsPersonFill className="mr-3 h-5 w-5 text-blue-700" />
+                Profile
+            </Link>
+        ) : (
+          <Link
+            to="/profile"
+            className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 group transition-all duration-200 hover:pl-2"
+            onClick={() => setDropdown(false)}
+          >
+            <BsPersonFill className="mr-3 h-5 w-5 text-blue-700" />
+            Profile
+          </Link>
+        )}
+          <button
+            className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 group transition-all duration-200 hover:pl-2 rounded-b-xl" 
+            onClick={handleSignOut}
+          >
+            <RiLoginCircleFill className="mr-3 h-5 w-5 text-blue-700" />
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+    ) : (
+        <Link
+        to="/signup"
+        className="bg-blue-700 text-white px-6 py-2 rounded font-medium hover:bg-blue-800 transition-all duration-200"
+        >
+        Login
+        </Link>
+    )}
+    </div>
 
                 <div className="flex sm:hidden">
             <button className="p-2 rounded-lg" onClick={toggleNavbar}>
@@ -121,11 +156,11 @@ export default function Navbar({ user, setUser }) {
                     onClick={toggleNavbar}>
                         Specialties
                     </Link>
-                    <Link to="/chat" className="text-slate-700 text-lg font-medium py-2 px-4 hover:bg-blue-50 rounded-md"
+                    <Link to="/appointments" className="text-slate-700 text-lg font-medium py-2 px-4 hover:bg-blue-50 rounded-md"
                     onClick={toggleNavbar}>
-
-                     AI Chat
+                        Appointments
                     </Link>
+                    
                     {user &&(
                         <>
                         
