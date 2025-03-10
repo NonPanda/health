@@ -84,6 +84,8 @@ export default function Navbar({ user, setUser }) {
         onClick={() => toggleDropdown(!dropdown)}
       />
 
+      {dropdown && (
+
       <div
         className={`absolute top-16 right-4 w-36 rounded-xl bg-white shadow-lg border border-gray-200 backdrop-blur-sm transition-all duration-200 ease-in-out transform ${dropdown ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1"}`}
       >
@@ -123,6 +125,7 @@ export default function Navbar({ user, setUser }) {
           </button>
         </div>
       </div>
+    )}
     </div>
     ) : (
         <Link

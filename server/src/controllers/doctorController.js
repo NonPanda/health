@@ -12,6 +12,7 @@ const search= TryCatch(async(req,res,next)=>{
     if(!search) return next (new ErrorHandler("Search Something", 400));
 
     const maxDistance=req.query.maxDistance || 50000;
+    const review= req.query.minReviewRating || 0;
 
     const model=genAI.getGenerativeModel({model:'gemini-1.5-flash'});
     const prompt= `Convert to medical specializations:${search}.You must respond with comma-separated specializations. Include 'General Physician' if generic .`
@@ -37,9 +38,13 @@ const search= TryCatch(async(req,res,next)=>{
         {
             $match:{
                 "profile.specialization": {$elemMatch: { $in: specialization.map(s => new RegExp(`^${s}$`, "i")) }
+            },
+            "rating":{$gte:Number(review)
 }
             }
+
         },
+
         {
             $project:{
                 _id:1,
