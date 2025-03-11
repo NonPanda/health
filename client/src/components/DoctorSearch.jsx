@@ -13,19 +13,19 @@ const DoctorSearch = () => {
   const [minReviewRating, setMinReviewRating] = useState(0);
   const filterRef = useRef(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (filterRef.current && !filterRef.current.contains(event.target)&&filterdropdown) {
-        setFilterDropdown(false);
-      }
-    };
-    if (filterdropdown) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [filterdropdown]);
+  // useEffect(() => {
+  //   const handleClickOutside = (event) => {
+  //     if (filterdropdown&&filterRef.current && !filterRef.current.contains(event.target){
+  //       setFilterDropdown(false);
+  //     }
+  //   };
+  //   if (filterdropdown) {
+  //       document.addEventListener("mousedown", handleClickOutside);
+  //   }
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, [filterdropdown]);
 
 
   const handleSearch = async (e) => {
@@ -63,18 +63,21 @@ const DoctorSearch = () => {
     <div className="flex justify-center">
       <form onSubmit={handleSearch} className="space-y-6">
         <div className="w-full relative flex items-center justify-center">
-          <BsFunnel className={`absolute -start-2 sm:start-2 w-6 h-6 text-blue-600 hover:text-blue-700 ${filterdropdown?'scale-105':'cursor-pointer hover:scale-105 transition-transform'}
-          `} onClick={() => setFilterDropdown(!filterdropdown)}
+          <BsFunnel className={`absolute -start-2 sm:start-2 w-6 h-6 hover:text-blue-700 cursor-pointer ${filterdropdown?'scale-110 text-blue-700':'hover:scale-110 transition-transform duration-200 text-blue-600'}
+          `} onClick={(e)=>{
+            e.stopPropagation();
+            setFilterDropdown((prev)=>!prev);
+          }}
            />
-          <div ref={filterRef} className={`absolute start-0 top-12 sm:top-14 w-40 sm:w-52 bg-white border border-gray-200 rounded-lg shadow-md p-4 ${filterdropdown ? "block" : "hidden"}`}>
-            <label className="block text-sm font-medium text-gray-600">Max Distance (km):</label>
+          <div ref={filterRef} className={`absolute start-0 top-12 sm:top-14 w-40 sm:w-52 bg-white border border-blue-100 rounded-lg backdrop-blur-md shadow-sm transition-all p-4 duration-200 ease-in-out transform ${filterdropdown ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"}`}>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Max Distance (km):</label>
             <input
               type="text"
               value={maxDistance}
               onChange={(e) => setMaxDistance(e.target.value)}
               className="w-full p-2 text-sm text-gray-600 bg-gray-50 rounded-lg border border-gray-200 focus:outline-none"
             />
-            <label className="block mt-4 text-sm font-medium text-gray-600">Minimum Rating:</label>
+            <label className="block mt-4 text-sm font-medium text-gray-600 mb-1">Minimum Rating:</label>
             <select
               value={minReviewRating}
               onChange={(e) => setMinReviewRating(e.target.value)}
@@ -92,14 +95,14 @@ const DoctorSearch = () => {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="p-2.5 sm:w-full w-5/6 px-4 text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-200 focus:outline-none hover:bg-blue-50"
+            className="p-2.5 sm:w-full w-5/6 px-4 text-sm text-gray-900 bg-gray-50 rounded-full border border-gray-200 focus:outline-none hover:bg-blue-50 shadow-sm"
             placeholder="Describe your symptoms..."
             required
           />
   
           <button
             type="submit"
-            className="absolute end-4 w-10 p-2.5 text-sm font-medium h-full text-white bg-blue-700 rounded-e-xl border border-blue-800 hover:bg-blue-800 focus:ring-1 focus:outline-none focus:ring-blue-300"
+            className="absolute end-5 w-10 sm:w-12 p-2.5 sm:p-3.5 text-sm font-medium h-full text-white bg-blue-600 rounded-e-full border-l-1 border-blue-700 hover:bg-blue-700 focus:ring-1 focus:outline-none focus:ring-blue-300 shadow-sm"
           >
             <FaSearch className="w-4 h-4" />
           </button>
@@ -108,6 +111,11 @@ const DoctorSearch = () => {
     </div>
   
     {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
+    {loading === true && (
+        <div className="flex justify-center mt-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
+        </div>
+      )}
   
     <div className="mt-8">
       {(doctors.length > 0) ? (
@@ -177,34 +185,6 @@ const DoctorSearch = () => {
 
 export default DoctorSearch;
 
-{/* <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 w-full">
-  <div className="w-full sm:w-3/4">
-<input
-type="text"
-placeholder={"Describe your symptoms..."}
-value={query}
-onChange={(e) => setQuery(e.target.value)}
-className="w-full p-3 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
-/>
-</div>
 
-<div className="flex items-center gap-2 w-full sm:w-1/4">
-  <label className="text-gray-600 font-medium whitespace-nowrap">
-    Max Distance (km):
-  </label>
-  <input
-    type="text"
-    value={maxDistance}
-    onChange={(e) => setMaxDistance(e.target.value)}
-    className="w-20 p-2 border rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
-    />
-  </div>
-</div>
+{/* <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div> */}
 
-  <button
-    type="submit"
-    className="w-full py-3 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transition disabled:bg-blue-400"
-    disabled={loading}
-  >
-    {loading ? "Searching..." : "Search Doctors"}
-  </button> */}
