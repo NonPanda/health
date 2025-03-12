@@ -15,9 +15,10 @@ const search= TryCatch(async(req,res,next)=>{
     const review= req.query.minReviewRating || 0;
 
     const model=genAI.getGenerativeModel({model:'gemini-1.5-flash'});
-    const prompt= `Convert to medical specializations:${search}.You must respond with comma-separated specializations. Include 'General Physician' if generic .`
+    const prompt= `Convert to medical specializations:${search}.You must respond with comma-separated specialists (ending with ist such as dentist, cardiologist, neurologist, etc). Include 'General Physician' if generic .`
     const result=await model.generateContent(prompt);
     const specialization= (await result.response.text()).split(',').map(data=>data.trim().toLowerCase());
+    console.log("specialization",specialization);
     if (!req.searchLocation || !req.searchLocation.coordinates) {
         return next(new ErrorHandler("Location coordinates not available", 400));
     }

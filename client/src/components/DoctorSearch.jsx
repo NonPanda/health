@@ -2,6 +2,7 @@ import React, { useState,useRef,useEffect } from "react";
 import axios from "axios";
 import { BsFunnel } from "react-icons/bs";
 import { FaSearch } from "react-icons/fa";
+import { FaStar } from "react-icons/fa";
 import pic from "../assets/pic.png";
 
 const DoctorSearch = () => {
@@ -13,6 +14,7 @@ const DoctorSearch = () => {
   const [filterdropdown, setFilterDropdown] = useState(false);
   const [minReviewRating, setMinReviewRating] = useState(0);
   const filterRef = useRef(null);
+  const [results, setResults] = useState(true);
 
   // useEffect(() => {
   //   const handleClickOutside = (event) => {
@@ -33,6 +35,7 @@ const DoctorSearch = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setResults(false);
 
     const params = new URLSearchParams({
       search: query,
@@ -48,6 +51,7 @@ const DoctorSearch = () => {
 
       console.log("Doctors found:", data);
       setDoctors(data.data || []);
+      setResults(true);
     } catch (err) {
       console.error("Search error:", err);
       setError("Failed to fetch doctors. Please try again.");
@@ -119,16 +123,17 @@ const DoctorSearch = () => {
         </div>
       )}
   
-    <div className="mt-8">
-      {(doctors.length > 0) ? (
+  <div className={`mt-8 backdrop-blur-md  transition-all duration-500 ease-in-out ${results ? "transform opacity-100" : "opacity-0 -translate-y-2 pointer-events-none"}`}>     
+  {(doctors.length > 0) ? (
        <div>
        <ul className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-6">
   {doctors.map((doctor) => (
+    
     <li
       key={doctor._id}
-      className="p-4 bg-blue-50 rounded-2xl shadow-sm hover:shadow-md shadow-blue-200 hover:shadow-blue-300 transition-shadow duration-300 w-full max-w-2xl"
+      className="mt-8 p-4 shadow-sm rounded-2xl border-blue-50 border-2 hover:shadow-md shadow-blue-200 hover:shadow-blue-300 transition-shadow duration-300"
     > 
-    
+    <div className="p-4 bg-blue-50 rounded-2xl shadow-sm w-full max-w-2xl shadow-primary">
       <div className="flex items-start gap-8">
         <div className="flex flex-col items-center border-r-2 border-accent pr-8">
           <img
@@ -138,7 +143,7 @@ const DoctorSearch = () => {
           />
           <div className="mt-8">
             <button
-              className="w-full bg-primary text-white py-[8px] px-[14px] text-md rounded-md hover:bg-blue-700 transition-colors duration-200"
+              className="w-full bg-accent text-white py-[8px] px-[14px] text-md rounded-md hover:bg-primary transition-colors duration-200"
               onClick={() => {
                 console.log("Book appointment with", doctor.name);
               }}
@@ -148,15 +153,21 @@ const DoctorSearch = () => {
           </div>
         </div>
 
-        {/* Doctor Details */}
         <div className="flex-1 space-y-2">
+          <div className="flex items-center justify-between mb-6">
           <div className="flex flex-col sm:flex-row text-md text-blue-900 gap-4">
-            <span className="font-medium sm:w-24">Name:</span>
-            <span className="flex-1">{doctor.name}</span>
+            <span className="font-bold text-xl">{doctor.name}</span>
           </div>
-          <div className="flex flex-col sm:flex-row text-md text-blue-900 gap-4">
+          <span className="flex items-center gap-1 text-secondary">
+            <FaStar className="w-4 h-4" />
+            {doctor.rating || "N/A"}
+          </span>
+          </div>
+          
+          <div className=" flex flex-col sm:flex-row text-md text-blue-900 gap-4">
             <span className="font-medium sm:w-24">Specialization:</span>
             <span className="flex-1">
+              
               {doctor.profile.specialization?.join(", ") || "General Physician"}
             </span>
           </div>
@@ -164,10 +175,7 @@ const DoctorSearch = () => {
             <span className="font-medium sm:w-24">Distance:</span>
             <span className="flex-1">{(doctor.distance / 1000).toFixed(2)} km</span>
           </div>
-          <div className="flex flex-col sm:flex-row text-md text-blue-900 gap-4">
-            <span className="font-medium sm:w-24">Rating:</span>
-            <span className="flex-1">{doctor.rating || "N/A"}</span>
-          </div>
+         
           <div className="flex flex-col sm:flex-row text-md text-blue-900 gap-4">
             <span className="font-medium sm:w-24">Fees:</span>
             <span className="flex-1">
@@ -190,6 +198,7 @@ const DoctorSearch = () => {
           </div>
         </div>
       </div>
+    </div>
     </li>
   ))}
 </ul>
