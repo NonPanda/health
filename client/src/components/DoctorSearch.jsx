@@ -2,6 +2,7 @@ import React, { useState,useRef,useEffect } from "react";
 import axios from "axios";
 import { BsFunnel } from "react-icons/bs";
 import { FaSearch } from "react-icons/fa";
+import pic from "../assets/pic.png";
 
 const DoctorSearch = () => {
   const [query, setQuery] = useState("");
@@ -63,13 +64,13 @@ const DoctorSearch = () => {
     <div className="flex justify-center">
       <form onSubmit={handleSearch} className="space-y-6">
         <div className="w-full relative flex items-center justify-center">
-          <BsFunnel className={`absolute -start-2 sm:start-2 w-6 h-6 hover:text-blue-700 cursor-pointer ${filterdropdown?'scale-110 text-blue-700':'hover:scale-110 transition-transform duration-200 text-blue-600'}
+          <BsFunnel className={`absolute -start-2 sm:start-2 w-6 h-6 hover:text-blue-700 cursor-pointer ${filterdropdown?'scale-110 text-blue-800':'hover:scale-110 transition-transform duration-200 text-blue-600'}
           `} onClick={(e)=>{
             e.stopPropagation();
             setFilterDropdown((prev)=>!prev);
           }}
            />
-          <div ref={filterRef} className={`absolute start-0 top-12 sm:top-14 w-40 sm:w-52 bg-white border border-blue-100 rounded-lg backdrop-blur-md shadow-sm transition-all p-4 duration-200 ease-in-out transform ${filterdropdown ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"}`}>
+          <div ref={filterRef} className={`absolute start-0 top-12 sm:top-14 w-40 sm:w-52 bg-white border border-blue-100 rounded-lg backdrop-blur-md shadow-sm transition-all p-4 duration-200 ease-in-out transform ${filterdropdown ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
             <label className="block text-sm font-medium text-gray-600 mb-1">Max Distance (km):</label>
             <input
               type="text"
@@ -90,6 +91,7 @@ const DoctorSearch = () => {
               <option value="5">5 Stars</option>
             </select>
           </div>
+
   
           <input
             type="text"
@@ -119,48 +121,79 @@ const DoctorSearch = () => {
   
     <div className="mt-8">
       {(doctors.length > 0) ? (
-        <div>
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-            Doctors Found:
-          </h2>
-          <ul className="space-y-4">
-            {doctors.map((doctor) => (
-              <li
-                key={doctor._id}
-                className="p-5 border rounded-lg shadow-md bg-gray-50"
-              >
-                <p className="text-lg font-semibold text-gray-900">
-                  {doctor.name}
-                </p>
-                <p className="text-gray-700">
-                  <strong>Specialization:</strong>{" "}
-                  {doctor.specialization?.join(", ") || "Not Available"}
-                </p>
-                <p className="text-gray-700">
-                  <strong>Distance:</strong>{" "}
-                  {(doctor.distance / 1000).toFixed(2)} km
-                </p>
-                <p className="text-gray-700">
-                  <strong>Rating:</strong> {doctor.rating || "N/A"}
-                </p>
-                <p className="text-gray-700">
-                  <strong>Experience:</strong>{" "}
-                  {doctor.experience
-                    ? `${doctor.experience} years`
-                    : "Not Available"}
-                </p>
-                <p className="text-gray-700">
-                  <strong>Fees:</strong>{" "}
-                  {doctor.fees ? `$${doctor.fees}` : "Not Available"}
-                </p>
-                <p className="text-gray-700">
-                  <strong>Address:</strong>{" "}
-                  {doctor.formattedAddress || "Unknown"}
-                </p>
-              </li>
-            ))}
-          </ul>
+       <div>
+       <ul className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-6">
+  {doctors.map((doctor) => (
+    <li
+      key={doctor._id}
+      className="p-4 bg-blue-50 rounded-2xl shadow-sm hover:shadow-md shadow-blue-200 hover:shadow-blue-300 transition-shadow duration-300 w-full max-w-2xl"
+    > 
+    
+      <div className="flex items-start gap-8">
+        <div className="flex flex-col items-center border-r-2 border-accent pr-8">
+          <img
+            src={doctor.profile.avatar || pic}
+            alt={doctor.name}
+            className="w-36 h-40 object-cover border-2 border-accent rounded-md"
+          />
+          <div className="mt-8">
+            <button
+              className="w-full bg-primary text-white py-[8px] px-[14px] text-md rounded-md hover:bg-blue-700 transition-colors duration-200"
+              onClick={() => {
+                console.log("Book appointment with", doctor.name);
+              }}
+            >
+              Book Appointment
+            </button>
+          </div>
         </div>
+
+        {/* Doctor Details */}
+        <div className="flex-1 space-y-2">
+          <div className="flex flex-col sm:flex-row text-md text-blue-900 gap-4">
+            <span className="font-medium sm:w-24">Name:</span>
+            <span className="flex-1">{doctor.name}</span>
+          </div>
+          <div className="flex flex-col sm:flex-row text-md text-blue-900 gap-4">
+            <span className="font-medium sm:w-24">Specialization:</span>
+            <span className="flex-1">
+              {doctor.profile.specialization?.join(", ") || "General Physician"}
+            </span>
+          </div>
+          <div className="flex flex-col sm:flex-row text-md text-blue-900 gap-4">
+            <span className="font-medium sm:w-24">Distance:</span>
+            <span className="flex-1">{(doctor.distance / 1000).toFixed(2)} km</span>
+          </div>
+          <div className="flex flex-col sm:flex-row text-md text-blue-900 gap-4">
+            <span className="font-medium sm:w-24">Rating:</span>
+            <span className="flex-1">{doctor.rating || "N/A"}</span>
+          </div>
+          <div className="flex flex-col sm:flex-row text-md text-blue-900 gap-4">
+            <span className="font-medium sm:w-24">Fees:</span>
+            <span className="flex-1">
+              {doctor.profile.fees ? `$${doctor.profile.fees}` : "Not Available"}
+            </span>
+          </div>
+          <div className="flex flex-col sm:flex-row text-md text-blue-900 gap-4">
+            <span className="font-medium sm:w-24">Experience:</span>
+            <span className="flex-1">
+              {doctor.profile.experience
+                ? `${doctor.profile.experience} years`
+                : "Not Available"}
+            </span>
+          </div>
+          <div className="flex flex-col sm:flex-row text-md text-blue-900 gap-4">
+            <span className="font-medium sm:w-24">Address:</span>
+            <span className="flex-1">
+              {doctor.location.formattedAddress || "Unknown"}
+            </span>
+          </div>
+        </div>
+      </div>
+    </li>
+  ))}
+</ul>
+     </div>
       ) : (
       loading!=="initial" ?
       (
@@ -186,5 +219,4 @@ const DoctorSearch = () => {
 export default DoctorSearch;
 
 
-{/* <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div> */}
 

@@ -44,19 +44,6 @@ const search= TryCatch(async(req,res,next)=>{
             }
 
         },
-
-        {
-            $project:{
-                _id:1,
-                name:1,
-                "specialization": "$profile.specialization",
-                distance:1,
-                rating:1,
-                "experience": "$profile.experience",
-                "fees": "$profile.fees",
-                "formattedAddress": "$location.formattedAddress",
-            }
-        }
         
     ]);
     
