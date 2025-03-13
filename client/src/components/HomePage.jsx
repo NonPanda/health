@@ -1,38 +1,81 @@
 import { Link } from 'react-router-dom';
 import { Stethoscope, Search, Star, Calendar, Heart } from 'lucide-react';
+import doc from '../assets/doc.png';
+import React from 'react';
+
 
 export default function HomePage() {
+  const changingtext=["Perfect", "Ideal", "Personalized", "Ultimate", "Optimal", "Trusted"];
+  const [index, setIndex] = React.useState(0);
+  const [currentText, setCurrentText] = React.useState(changingtext[0]);
+  const [animationClass, setAnimationClass] = React.useState('animate-slide-in');
+  
+  React.useEffect(() => {
+    const intervalTime = 3000;
+    const animationDuration = 500;
+    
+    const interval = setInterval(() => {
+      setAnimationClass('animate-slide-out');
+      
+      setTimeout(() => {
+        const nextIndex = (index + 1) % changingtext.length;
+        setIndex(nextIndex);
+        setCurrentText(changingtext[nextIndex]);
+        setAnimationClass('animate-slide-in');
+      }, animationDuration);
+      
+    }, intervalTime);
+    
+    return () => clearInterval(interval);
+  }, [index]);
+  
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50">
+    <div className="flex flex-col min-h-screen">
+      <style>
+        {`
+          @keyframes slideIn {
+            from { transform: translateY(40px); opacity: 0; filter: blur(2px); }
+            to { transform: translateY(0); opacity: 1; filter: blur(0); }
+          }
+          
+          @keyframes slideOut {
+            from { transform: translateY(0); opacity: 1; filter: blur(0); }
+            to { transform: translateY(-40px); opacity: 0; filter: blur(2px); }
+          }
+          
+          .animate-slide-in {
+            animation: slideIn 0.5s ease forwards;
+          }
+          
+          .animate-slide-out {
+            animation: slideOut 0.5s ease forwards;
+          }
+        `}
+      </style>
       
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="flex flex-col items-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none text-blue-900">
-                  Find the Right Doctor, Right Now
+        <section className="w-full py-12">
+          <div className="container mx-auto px-4 md:px-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div className="px-24 space-y-4">
+                <h1 className="flex flex-col text-4xl sm:text-6xl font-bold tracking-tighter text-blue-900 mb-12 gap-6">
+                  Discover Your 
+                    <span className={`text-blue-500 inline-block ${animationClass}`}>
+                      {currentText}
+                    </span>
+               
+                  Healthcare Match
                 </h1>
-                <p className="mx-auto max-w-[700px] text-slate-700 md:text-xl">
-                  Instantly connect with top-rated doctors in your area. Quality healthcare is just a search away.
+                <div className="flex gap-4 flex-col">
+                <p className="text-lg text-sky-800">
+                  Connect with the best healthcare professionals in your area and book an appointment in minutes.
                 </p>
+                <Link to="/signup" className="w-44 bg-blue-500 text-white px-10 py-4 rounded-xl font-bold hover:bg-blue-600 shadow-sm shadow-blue-500/40 text-xl transition-all duration-300 ease-in-out">
+                  Join Now
+                </Link>
+                </div>
               </div>
-              <div className="w-full max-w-sm space-y-2">
-                <form className="flex space-x-2">
-                  <input
-                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="Search for doctors or specialties"
-                    type="text"
-                  />
-                  <button
-                    type="submit"
-                    className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none bg-blue-700 text-white hover:bg-blue-800 h-10 py-2 px-4"
-                  >
-                    <Search className="h-4 w-4 mr-2" />
-                    Search
-                  </button>
-                </form>
-              </div>
+              <img src={doc} alt="Doctor" className="w-full h-full scale- object-cover rounded-lg" />
             </div>
           </div>
         </section>

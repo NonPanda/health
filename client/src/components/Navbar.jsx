@@ -51,22 +51,22 @@ export default function Navbar({ user, setUser }) {
 
     return (
         <>
-         <div className="w-full flex items-center justify-between px-4 md:px-6 py-2 bg-white border-b border-slate-200 md:shadow-sm relative z-50">
+         <div className="w-full flex items-center justify-between px-4 md:px-6 py-[10px] bg-white border-b border-slate-200 md:shadow-sm relative z-50">
          <Link to="/" className="flex items-center group transition-colors">
             <img src={sethescope} alt="logo" className="w-8 h-8" />
 
             
-            <span className="ml-2 text-2xl font-bold text-blue-700 group-hover:text-blue-800">DoctorWho</span>
+            <span className="ml-3 text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-teal-300 to-blue-700 group-hover:from-sky-600 group-hover:to-blue-800 group-hover:scale-105 transition-all duration-300">DoctorWho</span>
         </Link>
 
                 <div className="hidden sm:flex items-center space-x-4">
-                <Link to="/find-doctors" className="text-sm font-medium text-slate-700 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-700">
+                <Link to="/find-doctors" className="text-md font-semibold text-sky-800 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-600">
             Find Doctors
         </Link>
-        <Link to="/specialties" className="text-sm font-medium text-slate-700 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-700">
+        <Link to="/specialties" className="text-md font-semibold text-sky-800 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-600">
             Specialties
         </Link>
-        <Link to="/appointments" className="text-sm font-medium text-slate-700 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-700">
+        <Link to="/appointments" className="text-md font-semibold text-sky-800 relative after:content-[''] after:block after:w-full after:h-[2px] after:bg-blue-700 after:scale-x-0 after:origin-left after:transition-transform hover:after:scale-x-100 hover:text-blue-600">
             Appointments
         </Link>
        
@@ -87,10 +87,10 @@ export default function Navbar({ user, setUser }) {
   
 
       <div
-        className={`absolute top-16 right-4 w-36 rounded-xl bg-white shadow-lg border border-gray-200 backdrop-blur-sm transition-all duration-200 ease-in-out transform ${dropdown ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1 pointer-events-none"}`}
+        className={`absolute top-16 right-2 w-36 rounded-xl bg-white shadow-lg border border-gray-200 backdrop-blur-sm transition-all duration-200 ease-in-out transform ${dropdown ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1 pointer-events-none"}`}
       >
         <div className="px-4 py-[10px] border-b border-blue-200">
-          <p className="text-sm text-gray-700">Signed in as,</p>
+          <p className="text-sm text-sky-700">Signed in as,</p>
           <p className="text-sm font-medium text-blue-700">
             {user.name || "User"}
           </p>
@@ -100,7 +100,7 @@ export default function Navbar({ user, setUser }) {
         {user.role=="doctor" ? (
             <Link
                 to="/doctor-profile"
-                className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 group transition-all duration-200 hover:pl-2"
+                className="flex items-center px-4 py-3 text-sm text-sky-700 hover:bg-blue-50 hover:text-blue-600 group transition-all duration-200 hover:pl-2"
                 onClick={() => setDropdown(false)}
             >
                 <BsPersonFill className="mr-3 h-5 w-5 text-blue-700" />
@@ -109,7 +109,7 @@ export default function Navbar({ user, setUser }) {
         ) : (
           <Link
             to="/profile"
-            className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 group transition-all duration-200 hover:pl-2"
+            className="flex items-center px-4 py-3 text-sm text-sky-700 hover:bg-blue-50 hover:text-blue-600 group transition-all duration-200 hover:pl-2"
             onClick={() => setDropdown(false)}
           >
             <BsPersonFill className="mr-3 h-5 w-5 text-blue-700" />
@@ -117,7 +117,7 @@ export default function Navbar({ user, setUser }) {
           </Link>
         )}
           <button
-            className="w-full flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 group transition-all duration-200 hover:pl-2 rounded-b-xl" 
+            className="w-full flex items-center px-4 py-3 text-sm text-sky-700 hover:bg-blue-50 hover:text-blue-600 group transition-all duration-200 hover:pl-2 rounded-b-xl" 
             onClick={handleSignOut}
           >
             <RiLoginCircleFill className="mr-3 h-5 w-5 text-blue-700" />
@@ -130,7 +130,7 @@ export default function Navbar({ user, setUser }) {
     ) : (
         <Link
         to="/signup"
-        className="bg-blue-700 text-white px-6 py-2 rounded font-medium hover:bg-blue-800 transition-all duration-200"
+        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-2 rounded font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-sm shadow-blue-500/40"
         >
         Login
         </Link>
@@ -150,16 +150,16 @@ export default function Navbar({ user, setUser }) {
     ${open ? 'translate-y-0 opacity-100 visible' : '-translate-y-full opacity-0 invisible'} 
     sm:hidden`}>
     <div className="flex flex-col p-4 space-y-4 w-full max-w-screen">
-                    <Link to="/find-doctors" className="text-slate-700 text-lg font-medium py-2 px-4 hover:bg-blue-50 rounded-md"
+                    <Link to="/find-doctors" className="text-sky-700 text-lg font-medium py-2 px-4 hover:bg-blue-50 rounded-md"
                     onClick={toggleNavbar}
                     >
                         Find Doctors
                     </Link>
-                    <Link to="/specialties" className="text-slate-700 text-lg font-medium py-2 px-4 hover:bg-blue-50 rounded-md"
+                    <Link to="/specialties" className="text-sky-700 text-lg font-medium py-2 px-4 hover:bg-blue-50 rounded-md"
                     onClick={toggleNavbar}>
                         Specialties
                     </Link>
-                    <Link to="/appointments" className="text-slate-700 text-lg font-medium py-2 px-4 hover:bg-blue-50 rounded-md"
+                    <Link to="/appointments" className="text-sky-700 text-lg font-medium py-2 px-4 hover:bg-blue-50 rounded-md"
                     onClick={toggleNavbar}>
                         Appointments
                     </Link>
@@ -190,12 +190,12 @@ export default function Navbar({ user, setUser }) {
                                     alt="user"
                                     className="w-10 h-10 rounded-full border-2 border-blue-700"
                                 />
-                                <button className="bg-blue-700 text-white px-4 py-2 rounded font-medium hover:bg-blue-800" onClick={handleSignOut}>
+                                <button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-2 rounded font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-sm shadow-blue-500/40 w-full text-center" onClick={handleSignOut}>
                                     Logout
                                 </button>
                             </div>
                         ) : (
-                            <Link to="/signup" className="bg-blue-700 text-white px-4 py-2 rounded font-medium hover:bg-blue-800 w-full text-center" onClick={toggleNavbar}>
+                            <Link to="/signup" className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-2 rounded font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-sm shadow-blue-500/40 w-full text-center" onClick={toggleNavbar}>
                                 Login
                             </Link>
                         )}

@@ -25,12 +25,33 @@
 
 }
 
+@layer utilities {
+  @keyframes blurFade {
+    0% {
+      opacity: 0;
+      transform: translateY(20px) scale(0.98);
+      filter: blur(10px);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(0px) scale(1);
+      filter: blur(0px);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.98);
+      filter: blur(10px);
+    }
+  }
 
+  .animate-blur-fade {
+    animation: blurFade 2s ease-in-out infinite;
+  }
+}
 
 
 body {
-  background-color: var(--background);
   color: var(--text);
+  background-color: var(--background);
 }
-
 

@@ -20,7 +20,7 @@ const CustomInput = ({
         onChange={onChange}
         value={value}
         className={`p-2 border rounded-md w-full ${
-          error ? 'border-red-500' : 'border-gray-300 focus:outline-gray-400'
+          error ? 'border-red-500' : 'border-gray-300 focus:outline-gray-300'
         }`}
       />
       {error && (
@@ -223,7 +223,7 @@ export default function Signup({ setUser }) {
     <div className={`w-[90%] mr-0 md:mr-8 md:w-2/5 perspective ${isLoginForm ? "" : "flipped"}`}>
     <div className="flipper">
       <div className="front flex flex-1 flex-col justify-center items-center bg-white">
-      <h1 className="text-4xl font-bold py-4 text-center">
+      <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-t from-blue-500 to-blue-700 py-4 text-center">
         Hello!<br />Welcome Back
       </h1>
       <form className="w-full flex justify-center items-center" onSubmit={handleLoginSubmit}>
@@ -263,7 +263,7 @@ export default function Signup({ setUser }) {
   </Link>
 </div>
 
-        <button className="w-full bg-black text-white p-4 text-xl font-bold rounded-md hover:bg-gray-800">
+        <button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-sm shadow-blue-500/40 text-center text-xl font-bold rounded-md">
           Log In
         </button>
         </div>
@@ -282,7 +282,7 @@ export default function Signup({ setUser }) {
       </div>
 
       <div className="back flex flex-1 flex-col justify-center items-center bg-white">
-      <h1 className="text-4xl font-bold mb-8 text-center">Register Now</h1>
+      <h1 className="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-t from-blue-500 to-blue-700  text-center">Register Now</h1>
       <form className="w-full flex justify-center items-center" onSubmit={handleRegisterSubmit}>
         <div className="w-full max-w-[25rem]">
         <CustomInput
@@ -311,7 +311,7 @@ export default function Signup({ setUser }) {
         />
         <button
           type="submit"
-          className="w-full bg-black text-white p-4 text-xl font-bold rounded-md hover:bg-gray-800"
+          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-sm shadow-blue-500/40 text-center text-xl font-bold rounded-md"
         >
           Sign Up
         </button>

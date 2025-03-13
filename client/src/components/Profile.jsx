@@ -191,7 +191,7 @@ export default function Profile({ user, setUser }) {
 
 
   if (!user || Object.keys(updateProfile).length === 0) {
-    return <div>Loading...</div>;
+    return <div className="flex items-center justify-center h-96">Loading...</div>;
   }
   return (
     <div>
