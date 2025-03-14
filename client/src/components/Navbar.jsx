@@ -9,7 +9,7 @@ import { RiLoginCircleFill } from "react-icons/ri";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
-export default function Navbar({ user, setUser }) {
+export default function Navbar({ user, setUser,role }) {
     const [open, setOpen] = useState(false);
     const location = useLocation();
 
@@ -97,7 +97,7 @@ export default function Navbar({ user, setUser }) {
         </div>
 
         <div className="flex flex-col">
-        {user.role=="doctor" ? (
+        {localStorage.getItem('userType')=="doctor" ? (
             <Link
                 to="/doctor-profile"
                 className="flex items-center px-4 py-3 text-sm text-sky-700 hover:bg-blue-50 hover:text-blue-600 group transition-all duration-200 hover:pl-2"
@@ -184,7 +184,7 @@ export default function Navbar({ user, setUser }) {
 
                     <div className="flex items-center justify-between pt-2 pb-0 px-2 border-t border-slate-200">
                         {user ? (
-                            <div className="flex items-center justify-between w-full">
+                            <div className="flex items-center justify-between w-full gap-4">
                                 <img
                                     src={user.profile.avatar || pic}
                                     alt="user"

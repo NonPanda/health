@@ -32,13 +32,5 @@
     transform: rotateY(180deg);
   }
   
-  input, button {
-    width: 80%; 
-    max-width: 400px;  
-  }
-  
-  form {
-    width: 100%;
-    max-width: 500px; 
-  }
+
   

@@ -223,7 +223,7 @@ export default function Signup({ setUser }) {
     <div className={`w-[90%] mr-0 md:mr-8 md:w-2/5 perspective ${isLoginForm ? "" : "flipped"}`}>
     <div className="flipper">
       <div className="front flex flex-1 flex-col justify-center items-center bg-white">
-      <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-t from-blue-500 to-blue-700 py-4 text-center">
+      <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-t from-blue-600 to-blue-800 py-4 text-center">
         Hello!<br />Welcome Back
       </h1>
       <form className="w-full flex justify-center items-center" onSubmit={handleLoginSubmit}>
@@ -270,19 +270,20 @@ export default function Signup({ setUser }) {
       </form>
 
       <div className="mt-4">
-      <p className=" text-gray-400">Don't have an account?</p>
+      <p className=" text-gray-400">Don't have an account? {' '}
       <button
       type="button"
       onClick={handleToggleForm}
-      className="ml-2 text-sm text-blue-600 hover:underline"
+      className="text-sm text-blue-600 hover:underline"
       >
       Register here
       </button>
+      </p>
     </div>
       </div>
 
       <div className="back flex flex-1 flex-col justify-center items-center bg-white">
-      <h1 className="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-t from-blue-500 to-blue-700  text-center">Register Now</h1>
+      <h1 className="text-4xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-t from-blue-600 to-blue-800  text-center">Register Now</h1>
       <form className="w-full flex justify-center items-center" onSubmit={handleRegisterSubmit}>
         <div className="w-full max-w-[25rem]">
         <CustomInput

@@ -66,15 +66,15 @@ const DoctorSearch = () => {
   return (
     <div className="mt-8 max-w-7xl mx-auto p-10 rounded-xl">
     <div className="flex justify-center">
-      <form onSubmit={handleSearch} className="space-y-6">
+      <form onSubmit={handleSearch} className="w-1/2 space-y-6 scale-110">
         <div className="w-full relative flex items-center justify-center">
-          <BsFunnel className={`absolute -start-2 sm:start-2 w-6 h-6 hover:text-sky-700 cursor-pointer ${filterdropdown?'scale-110 text-blue-800':'hover:scale-110 transition-transform duration-200 text-blue-600'}
+          <BsFunnel className={`absolute -ml-12 start-2 w-7 h-7 hover:text-sky-700 cursor-pointer ${filterdropdown?'scale-110 text-blue-800':'hover:scale-110 transition-transform duration-200 text-blue-600'}
           `} onClick={(e)=>{
             e.stopPropagation();
             setFilterDropdown((prev)=>!prev);
           }}
            />
-          <div ref={filterRef} className={`z-10 absolute start-0 top-12 sm:top-14 w-40 sm:w-52 bg-white border border-blue-100 rounded-lg backdrop-blur-md shadow-sm transition-all p-4 duration-200 ease-in-out transform ${filterdropdown ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
+          <div ref={filterRef} className={`z-10 absolute -start-32 top-12 sm:top-14 w-40 sm:w-52 bg-white border border-blue-100 rounded-lg backdrop-blur-md shadow-sm transition-all p-4 duration-200 ease-in-out transform ${filterdropdown ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"}`}>
             <label className="block text-sm font-medium text-gray-600 mb-1">Max Distance (km):</label>
             <input
               type="text"
@@ -101,14 +101,14 @@ const DoctorSearch = () => {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="p-2.5 sm:w-full w-5/6 px-4 text-sm text-gray-900 bg-gray-50 rounded-full border border-gray-200 focus:outline-gray-200 hover:bg-blue-50 shadow-sm"
+            className="p-2.5 w-full px-4 text-sm text-gray-900 bg-gray-50 rounded-full border border-gray-200 focus:outline-gray-200 hover:bg-blue-50 shadow-sm"
             placeholder="Describe your symptoms..."
             required
           />
   
           <button
             type="submit"
-            className="absolute end-5 w-10 sm:w-12 p-2.5 sm:p-3.5 text-sm font-medium h-full bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-2 rounded  hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-sm shadow-blue-500/40 text-center rounded-e-full border-l-1 border-blue-700 hover:bg-blue-700 focus:ring-1 focus:outline-none focus:ring-blue-300"
+            className="absolute end-0 p-3.5 w-12 text-sm font-medium h-full bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-2 rounded  hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-sm shadow-blue-500/40 text-center rounded-e-full border-l-1 border-blue-700 hover:bg-blue-700 focus:ring-1 focus:outline-none focus:ring-blue-300"
           >
             <FaSearch className="w-4 h-4" />
           </button>
