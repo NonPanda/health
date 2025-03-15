@@ -96,6 +96,36 @@ const getProfile = TryCatch(async (req, res, next) => {
     });
 });
 
+const getDoctorInfo = TryCatch(async (req, res, next) => {
+    const doctor = await Doctor.findById(req.params.id);
+    if (!doctor) return next(new ErrorHandler("User not found", 404));
+
+    const doctorData = {
+        name: doctor.name || "Unknown",
+        specialization: doctor.profile.specialization || [],
+        rating: doctor.rating || 0,
+        totalReviews: doctor.totalReviews || 0,
+        about: doctor.profile.about || "No information available",
+        experience: doctor.profile.experience || 0,
+        totalPatients: doctor.profile.totalPatients || 0,
+        languages: doctor.profile.languages || [],
+        education: doctor.profile.education || [],
+        location: doctor.location.formattedAddress|| { formattedAddress: "Unknown" },
+        phone: doctor.profile.phone || "Not available",
+        email: doctor.email || "Not available",
+        fees: doctor.profile.fees || 0,
+        isVerified: doctor.profile.isVerified || false,
+        avatar: doctor.profile.avatar || null,
+    };
+
+    res.status(200).json({
+        success: true,
+        doctor: doctorData,
+    });
+}
+);
+
+
 const updateProfile = TryCatch(async (req, res, next) => {
        const updateddoctor = await Doctor.findByIdAndUpdate(
         req.user,
@@ -140,4 +170,4 @@ const uploadProfilePicture = TryCatch(async (req, res, next) => {
 
 
 
-module.exports = { updateProfile, getProfile, register, login, logout,search,uploadProfilePicture };
+module.exports = { updateProfile, getProfile, register, login, logout,search,uploadProfilePicture, getDoctorInfo };

@@ -1,14 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaStar, FaMapMarkerAlt, FaPhone, FaEnvelope, FaStethoscope, FaUserMd, FaClock, FaCalendar, FaGraduationCap, FaAward, FaHospital } from 'react-icons/fa';
 import { MdVerified, MdHealthAndSafety } from 'react-icons/md';
 import pic from '../assets/pic.png';
+import { useParams } from 'react-router-dom';
 
 const PublicProfile = () => {
   const navigate = useNavigate();
-  
-  // Demo data
-  const doctor = {
+  const [doctor, setDoctor] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { id } = useParams();
+
+
+  useEffect(() => {
+    const fetchDoctorProfile = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/doctor/doc/${id}`, {
+          withCredentials: true,
+        });
+        setDoctor(response.data.doctor);
+      } catch (err) {
+        setError(err.message || 'An error occurred while fetching the doctor profile.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctorProfile();
+  }, []);
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="min-h-screen flex items-center justify-center text-red-500">{error}</div>;
+  }
+
+  const placeholderDoctor = {
     name: "Dr. Sarah Wilson",
     specialization: ["Cardiologist", "Internal Medicine"],
     rating: 4.8,
@@ -44,6 +75,8 @@ const PublicProfile = () => {
     avatar: null
   };
 
+  const doctorData = doctor || placeholderDoctor;
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -68,11 +101,11 @@ const PublicProfile = () => {
                 <div className="relative group">
                   <div className="absolute -inset-2 bg-white rounded-2xl shadow-2xl"></div>
                   <img
-                    src={doctor.avatar || pic}
-                    alt={doctor.name}
+                    src={doctorData.avatar || pic}
+                    alt={doctorData.name}
                     className="relative w-48 h-48 rounded-xl object-cover shadow-md transition duration-300 group-hover:shadow-lg"
                   />
-                  {doctor.isVerified && (
+                  {doctorData.isVerified && (
                     <div className="absolute -right-3 -top-3 bg-white rounded-full p-2.5 shadow-lg">
                       <MdVerified className="w-7 h-7 text-blue-600" />
                     </div>
@@ -80,36 +113,33 @@ const PublicProfile = () => {
                 </div>
               </div>
               
-              {/* Doctor Info */}
               <div className="flex-1 space-y-6">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900">{doctor.name}</h1>
+                  <h1 className="text-3xl font-bold text-gray-900">{doctorData.name}</h1>
                   <div className="flex flex-wrap items-center gap-2 mt-3">
-                    <span className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-800">
-                      <FaStethoscope className="mr-1.5 h-4 w-4 text-gray-600" />
-                      {doctor.specialization[0]}
+                  <span className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-800">
+                    <FaStethoscope className="mr-1.5 h-4 w-4 text-gray-600" />
+                    {doctorData.specialization?.[0] || "General Practitioner"}
+                  </span>
+                  {doctorData.specialization?.[1] && (
+                    <span className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-50 text-gray-800">
+                      {doctorData.specialization[1]}
                     </span>
-                    {doctor.specialization[1] && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-50 text-gray-800">
-                        {doctor.specialization[1]}
-                      </span>
-                    )}
-                  </div>
+                  )}
+                </div>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-4">
-                  {/* Rating */}
                   <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-md">
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
-                        <FaStar key={i} className={`w-4 h-4 ${i < Math.floor(doctor.rating) ? 'text-yellow-400' : 'text-gray-200'}`} />
+                        <FaStar key={i} className={`w-4 h-4 ${i < Math.floor(doctorData.rating) ? 'text-yellow-400' : 'text-gray-200'}`} />
                       ))}
                     </div>
-                    <span className="font-medium text-gray-900">{doctor.rating}</span>
-                    <span className="text-gray-500 text-sm">({doctor.totalReviews} reviews)</span>
+                    <span className="font-medium text-gray-900">{doctorData.rating}</span>
+                    <span className="text-gray-500 text-sm">({doctorData.totalReviews} reviews)</span>
                   </div>
                   
-                  {/* Book Button */}
                   <button
                     onClick={() => console.log('Book appointment')}
                     className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-md hover:shadow-xl active:scale-95"
@@ -136,16 +166,16 @@ const PublicProfile = () => {
                 <h2 className="text-3xl font-bold text-gray-900">About</h2>
               </div>
               <p className="text-gray-600 leading-relaxed text-lg">
-                {doctor.about}
+                {doctorData.about}
               </p>
               
               {/* Stats Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-10">
                 {[
-                  { label: "Experience", value: `${doctor.experience} years`, icon: FaUserMd, gradient: "from-blue-500 to-blue-400" },
-                  { label: "Patients", value: `${doctor.totalPatients}+`, icon: FaHospital, gradient: "from-green-500 to-emerald-400" },
+                  { label: "Experience", value: `${doctorData.experience} years`, icon: FaUserMd, gradient: "from-blue-500 to-blue-400" },
+                  { label: "Patients", value: `${doctorData.totalPatients}+`, icon: FaHospital, gradient: "from-green-500 to-emerald-400" },
                   { label: "Response Time", value: "Less than 2 hours", icon: FaClock, gradient: "from-purple-500 to-pink-400" },
-                  { label: "Languages", value: doctor.languages.join(", "), icon: FaAward, gradient: "from-indigo-500 to-blue-400" }
+                  // { label: "Languages", value: doctorData.languages.join(", "), icon: FaAward, gradient: "from-indigo-500 to-blue-400" }
                 ].map((stat, index) => (
                   <div key={index} 
                     className="group relative transform hover:-translate-y-1 transition-all duration-300 cursor-pointer">
@@ -162,7 +192,6 @@ const PublicProfile = () => {
               </div>
             </div>
 
-            {/* Education & Experience */}
             <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-xl p-8 border border-blue-100/20">
               <div className="flex items-center gap-4 mb-8">
                 <div className="p-4 bg-blue-50 rounded-xl">
@@ -172,38 +201,38 @@ const PublicProfile = () => {
               </div>
               
               <div className="grid gap-6">
-                {doctor.education.map((edu, index) => (
-                  <div key={index} 
-                    className="group bg-gradient-to-r from-white to-blue-50/30 rounded-xl p-6 hover:shadow-lg transition-all duration-300 border border-blue-100/20 hover:border-blue-200/50 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-300"></div>
+              {(doctorData.education?.length > 0 ? doctorData.education : placeholderDoctor.education).map((edu, index) => (
+                <div key={index} 
+                  className="group bg-gradient-to-r from-white to-blue-50/30 rounded-xl p-6 hover:shadow-lg transition-all duration-300 border border-blue-100/20 hover:border-blue-200/50 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-300"></div>
+                  
+                  <div className="relative">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-xl font-bold text-gray-900">{edu.degree}</h3>
+                      <span className="px-4 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-semibold group-hover:bg-blue-100 transition-colors duration-300">
+                        {edu.year}
+                      </span>
+                    </div>
                     
-                    <div className="relative">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-xl font-bold text-gray-900">{edu.degree}</h3>
-                        <span className="px-4 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-semibold group-hover:bg-blue-100 transition-colors duration-300">
-                          {edu.year}
-                        </span>
+                    <div className="flex items-center gap-2 mb-4">
+                      <FaHospital className="w-5 h-5 text-blue-500" />
+                      <span className="text-lg font-medium text-gray-700">{edu.institution}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <div className="flex items-center gap-1.5">
+                        <FaClock className="w-4 h-4 text-blue-500" />
+                        <span>Program Duration: 2 years</span>
                       </div>
-                      
-                      <div className="flex items-center gap-2 mb-4">
-                        <FaHospital className="w-5 h-5 text-blue-500" />
-                        <span className="text-lg font-medium text-gray-700">{edu.institution}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-1.5">
-                          <FaClock className="w-4 h-4 text-blue-500" />
-                          <span>Program Duration: 2 years</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <FaAward className="w-4 h-4 text-blue-500" />
-                          <span>Full-time</span>
-                        </div>
+                      <div className="flex items-center gap-1.5">
+                        <FaAward className="w-4 h-4 text-blue-500" />
+                        <span>Full-time</span>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
+            </div>
             </div>
           </div>
 
@@ -218,9 +247,9 @@ const PublicProfile = () => {
                 </div>
                 <div className="space-y-3">
                   {[
-                    { icon: FaMapMarkerAlt, value: doctor.location.formattedAddress, label: "Address" },
-                    { icon: FaPhone, value: doctor.phone, label: "Phone" },
-                    { icon: FaEnvelope, value: doctor.email, label: "Email" }
+                    { icon: FaMapMarkerAlt, value: doctorData.location, label: "Address" },
+                    { icon: FaPhone, value: doctorData.phone, label: "Phone" },
+                    { icon: FaEnvelope, value: doctorData.email, label: "Email" }
                   ].map((contact, index) => (
                     <div key={index} className="flex items-center gap-3 p-3 bg-blue-50/50 rounded-xl">
                       <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -284,7 +313,7 @@ const PublicProfile = () => {
                     <div className="flex-1">
                       <p className="text-sm font-medium text-gray-500">Consultation Fee</p>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-2xl font-bold text-blue-600">${doctor.fees}</span>
+                        <span className="text-2xl font-bold text-blue-600">${doctorData.fees}</span>
                         <span className="text-gray-500">/visit</span>
                       </div>
                     </div>

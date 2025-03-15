@@ -47,24 +47,14 @@ export default function Navbar({ user, setUser, role }) {
     <nav className={`relative bg-white border-b z-50 ${
       scrolled ? "shadow-sm border-transparent" : "border-gray-100"
     }`}>
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="relative w-9 h-9 flex items-center justify-center">
-              <img 
-                src={sethescope} 
-                alt="logo" 
-                className="w-7 h-7 relative z-10 transition-transform duration-300 group-hover:scale-110" 
-              />
-              <div className="absolute inset-0 bg-blue-500/10 rounded-lg group-hover:bg-blue-500/20 transition-colors duration-300"></div>
-            </div>
-            <span className="text-xl font-bold text-[#3A8EF6]">
-              DoctorWho
-            </span>
-          </Link>
+      <div className="w-full">
+        <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 relative z-50">
+        <Link to="/" className="flex items-center group transition-colors">
+            <img src={sethescope} alt="logo" className="w-8 h-8 group-hover:scale-105 transition-all duration-300" />
 
-          {/* Desktop Navigation */}
+            
+            <span className="ml-3 text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-cyan-300 to-blue-700 group-hover:from-sky-600 group-hover:to-blue-800 group-hover:scale-105 transition-all duration-300">DoctorWho</span>
+        </Link>
           <div className="hidden md:flex items-center gap-6">
             <Link 
               to="/find-doctors" 
@@ -89,7 +79,6 @@ export default function Navbar({ user, setUser, role }) {
             </Link>
           </div>
 
-          {/* User Menu */}
           <div className="hidden md:flex items-center">
             {user ? (
               <div className="relative">
@@ -109,26 +98,25 @@ export default function Navbar({ user, setUser, role }) {
                   </span>
                 </button>
 
-                {/* Dropdown Menu */}
-                <div className={`absolute right-0 mt-2 w-48 transition-all duration-200 z-50 ${
-                  dropdown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 pointer-events-none"
-                }`}>
+                <div
+        className={`absolute top-14 -right-6 w-42 rounded-xl bg-white shadow-lg border border-gray-200 backdrop-blur-sm transition-all duration-200 ease-in-out transform ${dropdown ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-1 pointer-events-none"}`}
+      >
                   <div className="rounded-lg bg-white shadow-lg ring-1 ring-black/5 overflow-hidden">
                     <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-xs text-gray-500">Signed in as</p>
+                      <p className="text-xs text-gray-500">Signed in using,</p>
                       <p className="text-sm font-medium text-gray-900 truncate">{user.email}</p>
                     </div>
-                    <div className="py-1">
+                    <div className="flex flex-col gap-1">
                       <Link
-                        to={user.role === "doctor" ? "/doctor-profile" : "/profile"}
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#3A8EF6] transition-all duration-200"
+                        to={localStorage.getItem('userType')=="doctor" ?"/doctor-profile" : "/profile"}
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-sky-50 hover:text-[#3A8EF6] transition-all duration-200 hover:pl-2"
                       >
                         {user.role === "doctor" ? <FaUserMd className="w-4 h-4 mr-2" /> : <BsPersonFill className="w-4 h-4 mr-2" />}
                         Profile
                       </Link>
                       <button
                         onClick={handleSignOut}
-                        className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#3A8EF6] transition-all duration-200"
+                        className="w-full flex items-center px-4 py-[9px] text-sm text-gray-700 hover:bg-sky-50 hover:text-[#3A8EF6] transition-all duration-200 hover:pl-2"
                       >
                         <RiLoginCircleFill className="w-4 h-4 mr-2" />
                         Sign Out
@@ -147,11 +135,10 @@ export default function Navbar({ user, setUser, role }) {
             )}
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden">
             <button
               onClick={() => setOpen(!open)}
-              className="p-2 rounded-lg hover:bg-gray-50 transition-colors duration-200 focus:outline-none"
+              className="p-2 rounded-lg transition-colors duration-200 focus:outline-none"
             >
               <div className="w-6 flex flex-col items-end gap-1.5">
                 <span className={`block h-0.5 bg-gray-600 transition-all duration-300 ${open ? 'w-6 rotate-45 translate-y-2' : 'w-6'}`}></span>
@@ -163,10 +150,8 @@ export default function Navbar({ user, setUser, role }) {
         </div>
       </div>
 
-      {/* Mobile menu */}
-      <div className={`md:hidden transition-all duration-300 ease-in-out ${
-        open ? 'opacity-100 max-h-96' : 'opacity-0 max-h-0 pointer-events-none'
-      }`}>
+      <div className={`absolute left-0 w-full bg-white shadow-lg transition-all duration-300 transform z-40
+    ${open ? 'translate-y-0 opacity-100 visible' : '-translate-y-5 opacity-0 invisible'} md:hidden`}>
         <div className="px-4 py-2 space-y-1 border-t border-gray-100">
           <Link
             to="/find-doctors"

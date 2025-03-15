@@ -135,28 +135,27 @@ export default function HomePage() {
 
       <main className="flex-1">
         <div className="relative min-h-screen">
-          {/* Hero Section */}
           <div className="w-full relative flex flex-col items-center justify-center min-h-[70vh] py-8 text-center bg-gradient-to-b from-white via-blue-50/50 to-white">
-            <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
+          
             
-            <div className="relative z-10 max-w-5xl mx-auto px-6 -mt-20">
+            <div className="relative z-10 max-w-6xl mx-auto px-6 -mt-20">
               <h1 className="py-[8px] text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-blue-600 to-blue-800 flex items-center justify-center leading-tight">
                 Welcome to {displayText}
                 {!typingComplete && <span className="typing-cursor ml-4"></span>}
                 {typingComplete && <span className="ml-1">{' '}</span>}
               </h1>
 
-              <p className={`text-xl text-gray-600 mt-6 mb-12 max-w-2xl mx-auto transform transition-all duration-1000 ease-in-out ${typingComplete ? "opacity-100 " : "opacity-0 translate-y-8"}`}>
+              <p className={`text-xl text-gray-600 mt-6 mb-12 mx-auto transform transition-all duration-1000 ease-in-out ${typingComplete ? "opacity-100 " : "opacity-0 translate-y-8"}`}>
                 Meet all the healthcare experts you'll ever need in one place with a single click.
               </p>
 
-              <form onSubmit={handleSearch} className="w-full max-w-3xl mx-auto">
+              <form onSubmit={handleSearch} className="w-full max mx-auto">
                 <div className="flex items-center w-full relative group">
                   <input
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    className="w-full px-8 py-6 pr-16 text-xl text-gray-600 bg-white rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="lg:w-[820px] w-full px-8 py-6 pr-16 text-xl text-gray-600 bg-white rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-lg hover:shadow-xl transition-all duration-300"
                     placeholder="Search doctors, specialties, symptoms..."
                     required
                   />
@@ -170,7 +169,6 @@ export default function HomePage() {
               </form>
             </div>
 
-            {/* Features Section */}
             <div className="absolute bottom-0 left-0 right-0 w-full max-w-6xl mx-auto px-6 transform translate-y-1/2">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 group hover:-translate-y-1">
@@ -212,7 +210,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Main Content Section */}
           <div className="bg-gradient-to-b from-white via-blue-50/30 to-white pt-48 pb-24">
             <div className="max-w-6xl mx-auto px-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -229,7 +226,7 @@ export default function HomePage() {
                   </p>
                   <Link
                     to="/signup"
-                    className="inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                    className="inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:from-blue-600 hover:to-blue-700 hover:-translate-y-1"
                   >
                     <MessageCircle className="w-6 h-6 mr-2" />
                     Get Started Now
@@ -250,8 +247,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Services Section */}
-          <div className="bg-gradient-to-b from-blue-50 to-white py-32">
+          <div className="bg-gradient-to-b from-white via-blue-50 to-white py-32">
             <div className="max-w-7xl mx-auto px-6">
               <div className="text-center mb-20">
                 <h2 className="text-5xl font-bold text-gray-900 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-800">Our Medical Specialties</h2>
@@ -259,7 +255,6 @@ export default function HomePage() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-                {/* General Medicine */}
                 <div className="group relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 rounded-[2rem] transform transition-transform group-hover:scale-[1.02] group-hover:rotate-1"></div>
                   <div className="relative bg-white rounded-[2rem] p-8 shadow-lg transition-all duration-300 group-hover:-translate-y-2">
@@ -277,7 +272,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Pediatrics */}
                 <div className="group relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-600 rounded-[2rem] transform transition-transform group-hover:scale-[1.02] group-hover:rotate-1"></div>
                   <div className="relative bg-white rounded-[2rem] p-8 shadow-lg transition-all duration-300 group-hover:-translate-y-2">
@@ -295,7 +289,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Nutritional */}
                 <div className="group relative">
                   <div className="absolute inset-0 bg-gradient-to-r  from-blue-500 to-blue-600 rounded-[2rem] transform transition-transform group-hover:scale-[1.02] group-hover:rotate-1"></div>
                   <div className="relative bg-white rounded-[2rem] p-8 shadow-lg transition-all duration-300 group-hover:-translate-y-2">
@@ -313,7 +306,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Cardiology */}
                 <div className="group relative">
                   <div className="absolute inset-0 bg-gradient-to-r  from-blue-500 to-blue-600 rounded-[2rem] transform transition-transform group-hover:scale-[1.02] group-hover:rotate-1"></div>
                   <div className="relative bg-white rounded-[2rem] p-8 shadow-lg transition-all duration-300 group-hover:-translate-y-2">
@@ -331,7 +323,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Ophthalmology */}
                 <div className="group relative">
                   <div className="absolute inset-0 bg-gradient-to-r  from-blue-500 to-blue-600 rounded-[2rem] transform transition-transform group-hover:scale-[1.02] group-hover:rotate-1"></div>
                   <div className="relative bg-white rounded-[2rem] p-8 shadow-lg transition-all duration-300 group-hover:-translate-y-2">
@@ -349,7 +340,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Orthopedics */}
                 <div className="group relative">
                   <div className="absolute inset-0 bg-gradient-to-r  from-blue-500 to-blue-600 rounded-[2rem] transform transition-transform group-hover:scale-[1.02] group-hover:rotate-1"></div>
                   <div className="relative bg-white rounded-[2rem] p-8 shadow-lg transition-all duration-300 group-hover:-translate-y-2">
@@ -370,16 +360,14 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Additional Features Section */}
           <div className="bg-white py-24">
             <div className="max-w-6xl mx-auto px-6">
               <div className="text-center mb-16">
-                <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose DoctorWho?</h2>
+                <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-800 mb-4">Why Choose DoctorWho?</h2>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">Experience healthcare like never before with our comprehensive platform designed for your needs.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                {/* Left Column */}
                 <div className="space-y-8">
                   <div className="flex items-start gap-6 group">
                     <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white group-hover:scale-110 transition-transform duration-300">
@@ -412,7 +400,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Right Column - Image */}
                 <div className="relative">
                     <img 
                       src={visual} 
@@ -422,7 +409,6 @@ export default function HomePage() {
                   </div>
               </div>
 
-              {/* Bottom Stats */}
               <div className="mt-24 grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div className="text-center">
                   <div className="text-4xl font-bold text-blue-600 mb-2">10k+</div>
@@ -444,16 +430,14 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Testimonials Section */}
           <div className="bg-gradient-to-b from-white via-blue-50/30 to-white py-24">
             <div className="max-w-6xl mx-auto px-6">
               <div className="text-center mb-16">
-                <h2 className="text-4xl font-bold text-gray-900 mb-4">What Our Users Say</h2>
+                <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-800 mb-4">What Our Users Say</h2>
                 <p className="text-xl text-gray-600 max-w-2xl mx-auto">Real experiences from people who have transformed their healthcare journey with DoctorWho.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Testimonial Card 1 */}
                 <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white text-2xl font-bold">
@@ -479,7 +463,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Testimonial Card 2 */}
                 <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group md:translate-y-8">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
@@ -505,7 +488,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Testimonial Card 3 */}
                 <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 group">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center text-white text-2xl font-bold">

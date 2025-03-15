@@ -4,6 +4,9 @@ import axios from "axios";
 import { FaSearch, FaStar } from "react-icons/fa";
 import pic from "../assets/pic.png";
  import { BsFunnel } from "react-icons/bs";
+import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
+
 
 
 const DoctorSearch = () => {
@@ -174,10 +177,10 @@ const DoctorSearch = () => {
                 {doctors.map((doctor) => (
                   <div
                     key={doctor._id}
-                    className="group backdrop-brightness-90 bg-white/70 shadow-sm rounded-2xl border-blue-50 border-2 hover:shadow-lg shadow-blue-200 hover:shadow-blue-300/40 transition-all duration-700 hover:translate-y-[-2px]"
+                    className="group bg-white/70 shadow-sm rounded-2xl border-blue-50 border-2 hover:shadow-lg shadow-blue-200 hover:shadow-blue-300/40 transition-all duration-700 hover:translate-y-[-2px] relative"
                   >
                     <div className="absolute top-4 right-4">
-                      <div className="flex items-center gap-1.5 px-4 py-2 bg-white shadow-md rounded-full transition-all duration-300 group-hover:shadow-lg shadow-blue-200 group-hover:shadow-blue-300/40">
+                      <div className="flex items-center gap-1.5 px-4 py-2 bg-white shadow-md rounded-full transition-all duration-100 group-hover:shadow-lg shadow-blue-200 group-hover:shadow-blue-300/40">
                         <FaStar className="w-5 h-5 text-[#3A8EF6]" />
                         <span className="text-[#3A8EF6] font-bold text-lg">{doctor.rating || "N/A"}</span>
                       </div>
@@ -195,9 +198,10 @@ const DoctorSearch = () => {
 
                         <div className="flex-1 min-w-0">
                           <div className="flex flex-col">
-                            <h3 className="text-2xl font-bold text-gray-900 truncate group-hover:text-blue-700 transition-colors duration-300">
+                            <Link className="text-2xl font-bold text-gray-900 truncate group-hover:text-blue-700 transition-colors duration-300" to={`/doctor/${doctor._id}`}>
                               {doctor.name}
-                            </h3>
+                            </Link>
+                            
                             <p className="text-blue-600 text-base font-semibold mb-4">
                               {doctor.profile.specialization?.join(", ") || "General Physician"}
                             </p>

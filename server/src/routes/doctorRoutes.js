@@ -1,5 +1,5 @@
 const express = require('express');
-const {getProfile,updateProfile,login,logout,register,search,uploadProfilePicture} = require('../controllers/doctorController.js');
+const {getProfile,updateProfile,login,logout,register,search,uploadProfilePicture,getDoctorInfo} = require('../controllers/doctorController.js');
 const router=express.Router();
 const {upload}=require('../constants/config.js');
 const {isAuthenticated}=require('../middlewares/auth.js');
@@ -15,6 +15,7 @@ router.get('/logout',logout);
 router.get('/getprofile',getProfile);
 router.put('/updateprofile', updateProfile);
 router.put('/uploadpfp', upload.single('profilePicture'), uploadProfilePicture);
+router.get('/doc/:id',getDoctorInfo);
 
 router.get('/search',geoMiddleware,search);
 
