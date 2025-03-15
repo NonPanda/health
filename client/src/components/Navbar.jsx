@@ -44,7 +44,7 @@ export default function Navbar({ user, setUser, role }) {
   };
 
   return (
-    <nav className={`relative bg-white border-b ${
+    <nav className={`relative bg-white border-b z-50 ${
       scrolled ? "shadow-sm border-transparent" : "border-gray-100"
     }`}>
       <div className="max-w-7xl mx-auto">
@@ -110,7 +110,7 @@ export default function Navbar({ user, setUser, role }) {
                 </button>
 
                 {/* Dropdown Menu */}
-                <div className={`absolute right-0 mt-2 w-48 transition-all duration-200 ${
+                <div className={`absolute right-0 mt-2 w-48 transition-all duration-200 z-50 ${
                   dropdown ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 pointer-events-none"
                 }`}>
                   <div className="rounded-lg bg-white shadow-lg ring-1 ring-black/5 overflow-hidden">
