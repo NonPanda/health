@@ -31,7 +31,7 @@ const DoctorSearch = () => {
     "Gynecologist",
   ];
 
-  // Fetch all doctors when component mounts
+  
   useEffect(() => {
     fetchDoctors();
   }, []);
@@ -120,7 +120,7 @@ const DoctorSearch = () => {
                   className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 ${
                     minReviewRating === rating
                       ? "bg-[#3A8EF6] text-white shadow-lg scale-110"
-                      : "bg-white text-gray-600 hover:bg-sky-100 shadow-sm"
+                      : "bg-white text-gray-600 hover:bg-sky-100 shadow-md"
                   }`}
                 >
                   {rating}
@@ -146,7 +146,7 @@ const DoctorSearch = () => {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full p-5 pl-8 pr-14 text-xl text-gray-900 border border-gray-200 rounded-2xl shadow-md focus:outline-none focus:ring-2 focus:ring-[#3A8EF6] focus:border-[#3A8EF6] bg-white/50 backdrop-blur-sm transition-all duration-300 group-hover:bg-sky-50"
+                className="w-full p-5 pl-8 pr-14 text-xl text-gray-900 border border-gray-200 rounded-2xl shadow-md focus:outline-none focus:ring-2 focus:ring-[#3A8EF6] focus:border-[#3A8EF6] bg-white/50 backdrop-blur-sm transition-all duration-300 hover:border-[#3A8EF6]/40 hover:shadow-lg"
                 placeholder="Search by symptoms, specialization, or doctor name..."
                 required
               />

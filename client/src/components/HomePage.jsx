@@ -88,8 +88,9 @@ export default function HomePage() {
   }, [index]);
 
   const handleSearch = (e) => {
+    window.location.href = `/find-doctors?q=${query}`;
     e.preventDefault();
-    console.log("searching for:", query);
+    
   };
 
   return (
