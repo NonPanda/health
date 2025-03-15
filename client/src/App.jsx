@@ -10,7 +10,8 @@ import axios from 'axios'
 import Profile from './components/Profile'
 import DoctorProfile from './components/DoctorProfile'
 import Cookies from 'js-cookie'
-import DoctorSearch from './components/doctorsearch'
+import DoctorSearch from './components/DoctorSearch'
+import PublicProfile from './components/PublicProfile'
 
 function App() {
   const [user,setUser] = useState(null);
@@ -43,32 +44,23 @@ function App() {
 
   }, []);
 
-
-
-
-
-  
   return (
     <>
       <Router>
         <Navbar user={user} setUser={setUser}/>
         <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/signup" element={<SignUp setUser={setUser}  />} />
-        <Route path="/forgot-password" element={<ForgotPassword/>} />
-        <Route path="/reset-password/:id/:token" element={<ResetPassword/>} />
-        <Route path="profile" element={<Profile user={user} setUser={setUser} />} />
-        <Route path="doctor-profile" element={<DoctorProfile user={user} setUser={setUser} />} />
-        <Route path="find-doctors" element={<DoctorSearch user={user} />} />
-      
+          <Route path="/" element={<HomePage />} />
+          <Route path="/signup" element={<SignUp setUser={setUser}  />} />
+          <Route path="/forgot-password" element={<ForgotPassword/>} />
+          <Route path="/reset-password/:id/:token" element={<ResetPassword/>} />
+          <Route path="profile" element={<Profile user={user} setUser={setUser} />} />
+          <Route path="doctor-profile" element={<DoctorProfile user={user} setUser={setUser} />} />
+          <Route path="find-doctors" element={<DoctorSearch user={user} />} />
+          <Route path="doctor/:id" element={<PublicProfile />} />
         </Routes>
-
-
       </Router>
-
-      
     </>
-  )
+  );
 }
 
 export default App
