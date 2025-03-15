@@ -10,7 +10,7 @@ import axios from 'axios'
 import Profile from './components/Profile'
 import DoctorProfile from './components/DoctorProfile'
 import Cookies from 'js-cookie'
-import DoctorSearch from './components/doctorsearch'
+import DoctorSearch from './components/DoctorSearch'
 
 function App() {
   const [user,setUser] = useState(null);
