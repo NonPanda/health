@@ -11,7 +11,10 @@ import Profile from './components/Profile'
 import DoctorProfile from './components/DoctorProfile'
 import Cookies from 'js-cookie'
 import DoctorSearch from './components/DoctorSearch'
+<<<<<<< HEAD
 import PublicProfile from './components/PublicProfile'
+=======
+>>>>>>> e675c0b146a88493915f92a55a2678455b85e089
 
 function App() {
   const [user,setUser] = useState(null);

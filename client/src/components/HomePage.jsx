@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Stethoscope, Search, Star, Calendar, Heart } from 'lucide-react';
+import { Stethoscope, Search, Star, Calendar, Heart,MessageCircle, CheckCircle,Clock, AudioWaveform } from 'lucide-react';
 import doc from '../assets/doc.png';
+import docs from '../assets/docs.svg';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaSearch } from 'react-icons/fa';
 
@@ -125,14 +126,14 @@ export default function HomePage() {
       </style>
 
       <main className="flex-1">
-        <div className="w-full relative flex flex-col items-center justify-center py-20 text-center bg-gradient-to-t from-white via-sky-50 to-white">
+        <div className="w-full relative flex flex-col items-center justify-center py-12 text-center bg-gradient-to-t from-white via-sky-50 to-white">
           <h1 className="py-[8px] text-7xl font-bold z-10 bg-clip-text text-transparent bg-gradient-to-b from-sky-500 to-blue-700 flex items-center justify-center leading-tight overflow-visible">
             Welcome to {displayText}
             {!typingComplete && <span className="typing-cursor ml-4"></span>}
             {typingComplete && <span className="ml-1">{' '}</span>}
           </h1>
 
-          <p className={`text-lg text-sky-800 mb-6 z-10 backdrop-blur-sm transform transition-all duration-1000 ease-in-out ${typingComplete ? "opacity-100 " : "opacity-0 translate-y-8"}`}>
+          <p className={`text-lg text-gray-500 mb-6 z-10 backdrop-blur-sm transform transition-all duration-1000 ease-in-out ${typingComplete ? "opacity-100 " : "opacity-0 translate-y-8"}`}>
             Meet all the healthcare experts you'll ever need in one place with a single click.
           </p>
           <form onSubmit={handleSearch} className="w-1/2 z-10">
@@ -147,105 +148,90 @@ export default function HomePage() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full px-8 py-6 pr-16 text-xl text-gray-600 bg-white rounded-lg border border-gray-200 focus:outline-none hover:shadow-md transition-shadow duration-300"
+                className="w-full px-8 py-6 pr-16 text-xl text-gray-600 bg-white rounded-md border border-gray-200 focus:outline-none hover:shadow-md transition-shadow duration-300"
                 placeholder="Describe your symptoms..."
                 required
               />
               <button
                 type="submit"
-                className="w-32 absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center justify-center bg-gradient-to-br from-sky-500 to-blue-500 text-white rounded-md hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl px-6 py-3"
+                className="w-14 absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center justify-center bg-gradient-to-br from-sky-500 to-blue-500 text-white hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl py-4 rounded-lg"
               >
-                <FaSearch className="w-4 h-4 mr-2" />
-                <span>Search</span>
+                <FaSearch className="w-6 h-6" />
               </button>
             </div>
           </form>
-        <hr className="mt-32 mx-auto w-4/5 border border-sky-100 opacity-85" />
+        <hr className="mt-20 mx-auto w-4/5 border border-sky-100 opacity-85" />
         </div>
 
 
-        <section className="py-12 w-full bg-gradient-to-b from-white via-sky-50 to-white">
+        <section className="pb-32 w-full bg-gradient-to-b from-white via-sky-50 to-white">
           <div className="container mx-auto px-4 md:px-12">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div className="px-24 space-y-4">
-                <h1 className="flex flex-col text-4xl sm:text-6xl font-bold tracking-tighter text-sky-600 mb-12 gap-6">
+                <h1 className="flex flex-col text-4xl sm:text-6xl font-bold tracking-tighter text-blue-950 mb-12 gap-6">
                   Discover Your
-                  <span className={`text-sky-500 inline-block ${animationClass}`}>
+                  <span className={`text-blue-800 inline-block ${animationClass}`}>
                     {currentText}
                   </span>
                   Medical Match
                 </h1>
                 <div className="flex gap-4 flex-col">
-                  <p className="text-lg text-sky-800">
+                  <p className="text-lg text-gray-600">
                     Connect with the best healthcare professionals in your area and book an appointment in minutes.
                   </p>
-                  <Link to="/signup" className="w-44 text-white px-10 py-4 rounded-xl font-bold bg-gradient-to-br from-sky-500 to-blue-600 shadow-sm shadow-blue-500/40 text-xl transition-all duration-300 ease-in-out">
-                    Join Now
+                  
+                  <Link to="/signup" className="w-60 text-white px-6 py-4 rounded-3xl font-bold bg-gradient-to-br from-sky-500 to-blue-600 shadow-md shadow-blue-500/40 text-xl transition-all duration-300 ease-in-out">
+                  <div className="flex items-center justify-center">
+                  <MessageCircle className="w-6 h-6 mr-2" />
+                    Get Started Now
+                  </div>
                   </Link>
+
                 </div>
               </div>
               <img
                 ref={imageRef}
-                src={doc}
+                src={docs}
                 alt="Doctor"
                 className={`w-full h-full object-cover rounded-lg transition-transform duration-500 ease-in-out ${
                   isImageInView ? 'scale-100' : 'scale-90'
                 }`}
               />
             </div>
+            <div className="mt-24 grid grid-cols-1 md:grid-cols-3 max-w-[1100px] mx-auto gap-8">
+      <div className="max-w-[350px] flex space-x-4 bg-gradient-to-tl from-sky-500 to-blue-500 shadow-md shadow-blue-500/40 rounded-2xl px-4 flex-row items-center transition-all duration-500 ease-in-out transform hover:-translate-y-2 hover:shadow-lg hover:shadow-blue-500/60">
+        <div className="flex-shrink-0">
+          <Clock className="w-12 h-12 text-white" />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-white">24 Hour Service</h2>
+          <p className="text-md text-gray-100" style={{ lineHeight: '1.3'}}> Our search engine is available 24/7 to help you find the right doctor.</p>
+        </div>
+      </div>
+      <div className="max-w-[350px] flex space-x-4 bg-gradient-to-tl from-sky-500 to-blue-500 shadow-md shadow-blue-500/40 rounded-2xl px-4 py-3 flex-row items-center transition-all duration-500 ease-in-out transform hover:-translate-y-2 hover:shadow-lg hover:shadow-blue-500/60">
+        <div className="flex-shrink-0">
+          <CheckCircle className="w-12 h-12 text-white" />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-white">Book Appointments</h2>
+          <p className="text-md text-gray-100" style={{ lineHeight: '1.3'}}> Book an appointment with your doctor in just a few clicks.</p>
+        </div>
+      </div>
+      <div className="max-w-[350px] flex space-x-4 bg-gradient-to-tl from-sky-500 to-blue-500 shadow-md shadow-blue-500/40 rounded-2xl px-4 py-3 flex-row items-center transition-all duration-500 ease-in-out transform hover:-translate-y-2 hover:shadow-lg hover:shadow-blue-500/60">
+        <div className="flex-shrink-0">
+          <Heart className="w-12 h-12 text-white" />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold text-white">High Quality Care</h2>
+          <p className="text-md text-gray-100 " style={{ lineHeight: '1.3' }}> We provide the best healthcare providers to our patients.</p>
+        </div>
+      </div>
+    </div>
           </div>
-        <hr className="mt-24 mx-auto w-4/5 border border-sky-50" />
         </section>
 
 
-        <section className="py-12 pb-24 w-full bg-gradient-to-b from-white via-sky-50 to-white">
-          <div className="container mx-auto px-4 md:px-6">
-            <h2 className="text-4xl font-bold tracking-tighter sm:text-6xl text-center mb-16 text-sky-600">
-              Why Choose Us
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                {
-                  title: "Top-Rated Doctors",
-                  icon: Star,
-                  color: "text-sky-500",
-                  description: "Access to a network of highly qualified and vetted healthcare professionals.",
-                  hoverColor: "hover:bg-sky-50",
-                  gradient: "from-white to-sky-100",
-                },
-                {
-                  title: "Easy Scheduling",
-                  icon: Calendar,
-                  color: "text-blue-500",
-                  description: "Book appointments quickly and easily, 24/7, at your convenience.",
-                  hoverColor: "hover:bg-blue-50",
-                  gradient: "from-white to-sky-100",
-                },
-                {
-                  title: "Patient-Centered Care",
-                  icon: Heart,
-                  color: "text-sky-500",
-                  description: "We prioritize your health and well-being with personalized care options.",
-                  hoverColor: "hover:bg-sky-50",
-                  gradient: "from-white to-sky-100",
-                },
-              ].map((feature, index) => (
-                <div
-                  key={index}
-                  className={`bg-gradient-to-b ${feature.gradient} border border-cyan-200 rounded-2xl shadow-md p-8 transition-all duration-300 ease-in-out transform hover:-translate-y-4 hover:shadow-lg hover:shadow-blue-200 shadow-sky-200 ${feature.hoverColor}`}
-                >
-                  <div className="flex items-center justify-center w-20 h-20 mb-6 mx-auto rounded-full bg-gradient-to-t from-white to-sky-100 shadow-md shadow-sky-200">
-                    <feature.icon className={`h-10 w-10 ${feature.color}`} />
-                  </div>
-                  <h3 className="text-2xl font-semibold text-blue-900 mb-4 text-center">
-                    {feature.title}
-                  </h3>
-                  <p className="text-slate-600 text-center">{feature.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+       
       </main>
 
       <footer className="w-full py-6 bg-white border-t border-slate-200">
