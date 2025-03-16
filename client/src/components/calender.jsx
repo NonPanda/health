@@ -477,8 +477,21 @@ const CalendarPopup = ({ isOpen, onClose, doctorName, doctorFees }) => {
                   A confirmation has been sent to your email.
                 </p>
               </div>
+<<<<<<< HEAD
             )}
           </div>
+=======
+              
+              <button
+                onClick={confirmAppointment}
+                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3.5 rounded-xl hover:from-blue-600 hover:to-blue-700 transform hover:translate-y-[-4px] active:translate-y-0 transition-all duration-500 font-semibold text-lg shadow-lg hover:shadow-xl flex items-center justify-center gap-2 mt-6"
+              >
+                <FaCheck className="h-5 w-5" />
+                Confirm Appointment
+              </button>
+            </>
+          )}
+>>>>>>> d6b20c61df455ae95003444d7aed3e6cd9496bac
         </div>
       </div>
     );
