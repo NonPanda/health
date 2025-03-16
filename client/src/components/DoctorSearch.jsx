@@ -1,13 +1,10 @@
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaSearch, FaStar } from "react-icons/fa";
 import pic from "../assets/pic.png";
- import { BsFunnel } from "react-icons/bs";
+import { BsFunnel } from "react-icons/bs";
 import { Link } from "react-router-dom";
-import { useParams } from "react-router-dom";
-
-
 
 const DoctorSearch = () => {
   const [query, setQuery] = useState("");
@@ -18,6 +15,7 @@ const DoctorSearch = () => {
   const [minReviewRating, setMinReviewRating] = useState(0);
   const [specialization, setSpecialization] = useState("all");
   const [results, setResults] = useState(true);
+  const [filtersChanged, setFiltersChanged] = useState(false);
 
   const specializations = [
     "All",
@@ -31,13 +29,20 @@ const DoctorSearch = () => {
     "Gynecologist",
   ];
 
-  
   useEffect(() => {
     fetchDoctors();
   }, []);
 
+  useEffect(() => {
+    if(specialization !== "all" || minReviewRating !== 0 || maxDistance !== 50) {
+    setFiltersChanged(true);
+    } 
+    
+
+  }, [specialization, minReviewRating, maxDistance]);
+
   const fetchDoctors = async (searchParams = {}) => {
-    if(query=="") return;
+    if (query === "") return;
     setLoading(true);
     setError("");
     setResults(false);
@@ -76,13 +81,20 @@ const DoctorSearch = () => {
     });
   };
 
+  const resetFilters = () => {
+    setSpecialization("all");
+    setMinReviewRating(0);
+    setMaxDistance(50);
+    setFiltersChanged(false);
+  };
+
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="w-72 bg-white/80 backdrop-blur-xl p-8 space-y-8 border-r border-gray-100 shadow-lg sticky top-0 h-screen">
+      <div className="w-72 bg-white/80 p-8 space-y-8 border-r border-gray-100 shadow-lg sticky top-0 h-screen">
         <div className="space-y-6">
           <div className="flex gap-3 pb-4 border-b border-gray-100">
-          <BsFunnel className="w-8 h-8 text-blue-500" />
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-[#3a72f6] to-[#3A8EF6]/80 text-transparent bg-clip-text">Filters</h2>
+            <BsFunnel className="w-8 h-8 text-blue-500" />
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#3a72f6] to-[#3A8EF6]/80 text-transparent bg-clip-text">Filters</h2>
           </div>
           <div className="space-y-3">
             <label className="block text-sm font-semibold text-gray-700">Specialization</label>
@@ -105,9 +117,7 @@ const DoctorSearch = () => {
               onChange={(e) => setMaxDistance(e.target.value)}
               className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3A8EF6] focus:border-[#3A8EF6] bg-white/50 backdrop-blur-sm transition-all duration-200"
               placeholder="Distance in km"
-              >
-
-              </input>
+            />
           </div>
 
           <div className="space-y-3">
@@ -129,14 +139,16 @@ const DoctorSearch = () => {
             </div>
           </div>
         </div>
-
-        <button
-          onClick={handleSearch}
-          className="w-full bg-[#3A8EF6] text-white py-3.5 px-6 rounded-xl hover:bg-blue-600 transition-all duration-200 shadow-lg hover:shadow-xl hover: active:scale-95 font-medium text-lg"
-        >
-          Apply Filters
-        </button>
+        
+            <button
+              onClick={resetFilters}
+              className={`w-full bg-[#3A8EF6] text-white py-3.5 px-6 rounded-xl hover:bg-blue-600 transition-all duration-500 shadow-lg hover:shadow-xl active:scale-95 font-medium text-lg ${filtersChanged ? "transform opacity-100 backdrop-blur-md" : "opacity-0 -translate-y-2 pointer-events-none"}`}
+            >
+              Reset Filters
+            </button>
+        
       </div>
+
 
       <div className="flex-1 p-10">
         <div className="max-w-[1400px] mx-auto">
@@ -171,7 +183,7 @@ const DoctorSearch = () => {
             </div>
           )}
 
-          <div className={`mt-8 transition-all duration-500 ease-in-out ${results ? "transform opacity-100 backdrop-blur-md" : "opacity-0 -translate-y-4 pointer-events-none"}`}> 
+          <div className={`mt-8 transition-all duration-500 ease-in-out ${results ? "transform opacity-100 backdrop-blur-xl" : "opacity-0 -translate-y-4 pointer-events-none"}`}> 
             {doctors.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {doctors.map((doctor) => (
@@ -207,10 +219,14 @@ const DoctorSearch = () => {
                             </p>
                             
                             <div className="grid grid-cols-2 gap-4 mb-4">
-                              <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-3 group-hover:bg-[#3A8EF6]/5 transition-colors duration-300">
-                                <span className="text-gray-500 text-sm font-medium">Distance</span>
-                                <p className="font-semibold text-gray-900 mt-1">{(doctor.distance / 1000).toFixed(1)} km</p>
-                              </div>
+                            <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-3 group-hover:bg-[#3A8EF6]/5 transition-colors duration-300">
+                              <span className="text-gray-500 text-sm font-medium">Distance</span>
+                              <p className="font-semibold text-gray-900 mt-1">
+                                {doctor.distance < 1000 
+                                  ? `${doctor.distance.toFixed(0)} m` 
+                                  : `${(doctor.distance / 1000).toFixed(1)} km`}
+                              </p>
+                            </div>
                               <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-3 group-hover:bg-[#3A8EF6]/5 transition-colors duration-300">
                                 <span className="text-gray-500 text-sm font-medium">Consultation Fee</span>
                                 <p className="font-semibold text-gray-900 mt-1">${doctor.profile.fees || "N/A"}</p>

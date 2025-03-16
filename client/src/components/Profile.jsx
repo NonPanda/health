@@ -20,7 +20,7 @@ const Input = ({ name, placeholder, value: initialValue, onChange, inputClassNam
   const smallbox = ["weight", "height", "age"].includes(name) ? "ml-[15.8px]" : "ml-[17px]";
 
   return (
-    <div className="relative">
+    <div className="relative group">
       {isEditing ? (
         <input
           type="text"
@@ -29,16 +29,16 @@ const Input = ({ name, placeholder, value: initialValue, onChange, inputClassNam
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder={placeholder}
-          className={`lg:p-2 p-1 border border-gray-100 rounded-md focus:outline-none shadow-md text-lg lg:text-xl ${inputClassName} ${centered}`}
+          className={`lg:p-2 p-1 border border-[#3A8EF6]/20 rounded-md focus:outline-none focus:border-[#3A8EF6] focus:ring-2 focus:ring-[#3A8EF6]/20 shadow-md text-lg lg:text-xl ${inputClassName} ${centered} bg-white`}
           autoFocus
         />
       ) : (
         <div
-          className={`p-1 lg:p-2 text-gray-800 cursor-pointer border border-white border-b-gray-200 hover:shadow-sm rounded-md flex items-center justify-between group lg:text-xl text-lg ${inputClassName} ${centered}`}
+          className={`p-1 lg:p-2 text-gray-800 cursor-pointer border border-transparent hover:border-[#3A8EF6]/20 hover:shadow-lg rounded-md flex items-center justify-between group lg:text-xl text-lg transition-all duration-300 hover:bg-[#3A8EF6]/5 ${inputClassName} ${centered} border-b-[2px] border-b-[#3A8EF6]/10`}
           onClick={handleClick}
         >
           <div className={`${smallbox} w-full text-lg lg:text-xl ${centered}`}>{value || placeholder || "Click to edit"}</div>
-          <Pencil className="w-5 h-5 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+          <Pencil className="w-5 h-5 text-[#3A8EF6] opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
       )}
     </div>
@@ -144,11 +144,16 @@ export default function Profile({ user, setUser }) {
         },
         withCredentials: true,
       });
-      setChanged(false);
-  
-     
+
+      if (res.data.success) {
+        setChanged(false);
+        setUser(res.data.user); 
+      } else {
+        throw new Error(res.data.message || "Failed to update profile");
+      }
     } catch (err) {
-      console.log(err);
+      console.error("Error updating profile:", err);
+      alert(err.message || "Failed to update profile. Please try again.");
     }
   };
 
@@ -191,316 +196,208 @@ export default function Profile({ user, setUser }) {
 
 
   if (!user || Object.keys(updateProfile).length === 0) {
-    return <div className="flex items-center justify-center h-96">Loading...</div>;
+    return (
+      <div className="fixed inset-0 bg-[#3A8EF6]/90 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl">
+          <div className="animate-spin w-8 h-8 border-4 border-[#3A8EF6] border-t-transparent rounded-full mb-4"></div>
+          <p className="text-lg font-medium text-[#3A8EF6]">Loading your profile...</p>
+        </div>
+      </div>
+    );
   }
   return (
-    <div>
-          <div className={`py-1 sticky w-full bg-white/80 backdrop-blur-sm shadow-sm transform transition-all duration-1000 ease-in-out ${changed ? "opacity-100" : "opacity-0"}`}>
-        <div className={` mx-auto px-4 py-2 flex items-center justify-between`}>
-          <div className={`text-sm text-gray-500`}>
+    <div className="min-h-screen bg-[#3A8EF6]/5">
+      <div className={`py-1 sticky top-0 z-50 w-full bg-white/80 backdrop-blur-sm shadow-sm transform transition-all duration-1000 ease-in-out ${changed ? "opacity-100" : "opacity-0"}`}>
+        <div className="mx-auto px-4 py-2 flex items-center justify-between">
+          <div className={`text-sm font-medium ${changed ? 'text-[#3A8EF6]' : 'text-gray-500'}`}>
             {changed ? "Changes pending..." : "All changes saved"}
           </div>
           <button 
+            id="saveButton"
             onClick={handleSave} 
             className={`
               transform transition-all duration-700 ease-in-out px-6 py-2 rounded-lg font-medium w-[150px]
-              ${changed? 'bg-blue-500 hover:bg-blue-600 text-white translate-y-0 opacity-100 shadow-md': 'bg-gray-100 text-gray-400 opacity-0 pointer-events-none'
+              ${changed ? 'bg-[#3A8EF6] hover:bg-[#3A8EF6]/90 text-white translate-y-0 opacity-100 shadow-md hover:shadow-lg active:scale-95': 'bg-gray-100 text-gray-400 opacity-0 pointer-events-none'
               }
             `}
+            disabled={!changed}
           >
             {changed ? 'Save Changes' : 'Saved'}
           </button>
         </div>
       </div>
+
       <div className="w-full px-4 md:px-24 py-4">
-        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 mb-8 justify-between -pr-4 sm:pr-4">
-          <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-          <div className="relative inline-block">
-            <img src={user?.profile?.avatar || pic} alt="user" className="sm:ml-0 ml-4 w-32 h-32 rounded-full shadow-md" />
-            <label
-              htmlFor="profilePictureInput"
-              className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 cursor-pointer hover:bg-blue-600"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M15.232 5H21a2 2 0 012 2v12a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h5.768M16 3l-4 4m0 0l-4-4m4 4V15"
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 hover:shadow-xl transition-shadow duration-300">
+          <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 justify-between">
+            <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+              <div className="relative inline-block">
+                <img src={user?.profile?.avatar || pic} alt="user" className="sm:ml-0 ml-4 w-32 h-32 rounded-full shadow-lg border-4 border-[#3A8EF6]/40" />
+                <label
+                  htmlFor="profilePictureInput"
+                  className="absolute bottom-0 right-0 bg-[#3A8EF6] text-white rounded-full p-2 cursor-pointer hover:bg-[#3A8EF6]/90 transition-opacity shadow-lg"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15.232 5H21a2 2 0 012 2v12a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h5.768M16 3l-4 4m0 0l-4-4m4 4V15"
+                    />
+                  </svg>
+                </label>
+                <input
+                  id="profilePictureInput"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleProfilePictureChange}
                 />
-              </svg>
-            </label>
-            <input
-              id="profilePictureInput"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleProfilePictureChange}
-            />
-          </div>
-            <div className="ml-10 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start mb-4">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-900">{user?.name || "Username"}</h1>
-                <img src={MaleIcon} className="w-10 h-10 ml-4" />
               </div>
-              <p className="pr-5 text-lg lg:text-xl text-slate-600">{user?.email || "email@example.com"}</p>
+              <div className="ml-10 text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start mb-4">
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#3A8EF6]">{user?.name || "Username"}</h1>
+                  <img src={MaleIcon} className="w-10 h-10 ml-4" />
+                </div>
+                <p className="pr-5 text-lg lg:text-xl text-slate-600">{user?.email || "email@example.com"}</p>
+              </div>
             </div>
-          </div>
-          <div className="sm:scale-100 scale-90 flex items-center space-x-2">
-            <PhoneIcon className="w-6 h-6 text-blue-900" />
-            <Input
-              name="contact"
-              placeholder="XXXXXXXXXX"
-              value={user?.profile.contact}
-              onChange={(newValue) => handleInputChange("contact", newValue)}
-              inputClassName="lg:text-lg w-[160px] mr-2 md:mr-0"
-            />
+            <div className="sm:scale-100 scale-90 flex items-center space-x-2">
+              <PhoneIcon className="w-6 h-6 text-[#3A8EF6]" />
+              <Input
+                name="contact"
+                placeholder="XXXXXXXXXX"
+                value={user?.profile?.contact}
+                onChange={(newValue) => handleInputChange("contact", newValue)}
+                inputClassName="lg:text-lg w-[160px] mr-2 md:mr-0"
+              />
+            </div>
           </div>
         </div>
 
-
-        <div className="hidden lg:flex flex-col md:flex-row py-6 space-y-8 md:space-y-0 md:space-x-8">
-          <div className="flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-[16%] w-full">
-            <div className="flex flex-col items-center space-y-2">
-              <div className="flex items-center space-x-3">
-                <WeightIcon className="w-6 h-6 text-blue-900" />
-                <h2 className="text-2xl font-semibold text-blue-900">Weight</h2>
-              </div>
-              <Input
-                name="weight"
-                placeholder="X kg"
-                value={user?.profile.weight}
-                onChange={(newValue) => handleInputChange("weight", newValue)}
-                inputClassName="w-full md:w-36"
-              />
-            </div>
-            <div className="flex flex-col items-center space-y-2">
-              <div className="flex items-center space-x-3">
-                <Ruler className="w-6 h-6 text-blue-900" />
-                <h2 className="text-2xl font-semibold text-blue-900">Height</h2>
-              </div>
-              <Input
-                name="height"
-                placeholder="X cm"
-                value={user?.profile.height}
-                onChange={(newValue) => handleInputChange("height", newValue)}
-                inputClassName="w-full md:w-36"
-              />
-            </div>
-            <div className="flex flex-col items-center space-y-2">
-              <div className="flex items-center space-x-3">
-                <Cake className="w-6 h-6 text-blue-900" />
-                <h2 className="text-2xl font-semibold text-blue-900">Age</h2>
-              </div>
-              <Input
-                name="age"
-                placeholder="XX"
-                value={user?.profile.age}
-                onChange={(newValue) => handleInputChange("age", newValue)}
-                inputClassName="w-full md:w-36"
-              />
-            </div>
-          </div>
-          <div className="flex flex-col items-center space-y-2 w-full md:w-auto">
-            <div className="flex items-center space-x-3">
-              <Droplet className="w-6 h-6 text-blue-900" />
-              <h2 className="text-2xl font-semibold text-blue-900">Allergic Reactions</h2>
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-shadow duration-300">
+            <div className="flex flex-col space-y-6">
+              <div className="flex flex-col items-center space-y-2">
+                <div className="flex items-center space-x-3">
+                  <WeightIcon className="w-6 h-6 text-[#3A8EF6]" />
+                  <h2 className="text-2xl font-semibold text-[#3A8EF6]">Weight</h2>
+                </div>
                 <Input
-            name="allergies"
-            placeholder="Peanuts, Shellfish"
-            value={Array.isArray(user?.profile.allergies) ? user.profile.allergies.join(", ") : ""}
-            onChange={(newValue) => {
-              const allergyArray = newValue.split(",").map((item) => item.trim());
-              handleInputChange("allergies", allergyArray);
-            }}
-            inputClassName="w-full md:min-w-[300px]"
-          />
-          </div>
-        </div>
-
-        <div className="hidden lg:flex flex-col md:flex-row items-center justify-between w-full space-y-8 md:space-y-0">
-          <div className="flex flex-col items-center space-y-2 w-full md:w-auto">
-            <div className="flex items-center space-x-3">
-              <PhoneIcon className="w-6 h-6 text-blue-900" />
-              <h2 className="text-2xl font-semibold text-blue-900">Emergency Contact</h2>
+                  name="weight"
+                  placeholder="X kg"
+                  value={user?.profile?.weight}
+                  onChange={(newValue) => handleInputChange("weight", newValue)}
+                  inputClassName="w-full md:w-36"
+                />
+              </div>
+              <div className="flex flex-col items-center space-y-2">
+                <div className="flex items-center space-x-3">
+                  <Ruler className="w-6 h-6 text-[#3A8EF6]" />
+                  <h2 className="text-2xl font-semibold text-[#3A8EF6]">Height</h2>
+                </div>
+                <Input
+                  name="height"
+                  placeholder="X cm"
+                  value={user?.profile?.height}
+                  onChange={(newValue) => handleInputChange("height", newValue)}
+                  inputClassName="w-full md:w-36"
+                />
+              </div>
+              <div className="flex flex-col items-center space-y-2">
+                <div className="flex items-center space-x-3">
+                  <Cake className="w-6 h-6 text-[#3A8EF6]" />
+                  <h2 className="text-2xl font-semibold text-[#3A8EF6]">Age</h2>
+                </div>
+                <Input
+                  name="age"
+                  placeholder="XX"
+                  value={user?.profile?.age}
+                  onChange={(newValue) => handleInputChange("age", newValue)}
+                  inputClassName="w-full md:w-36"
+                />
+              </div>
             </div>
-            <Input
-              name="emergency"
-              placeholder="XXXXXXXXXX"
-              value={user?.profile.emergency}
-              onChange={(newValue) => handleInputChange("emergency", newValue)}
-              inputClassName="w-full md:min-w-[300px]"
-            />
           </div>
-          <div className="flex flex-col items-center space-y-2 w-full md:w-auto">
-            <div className="flex items-center space-x-3">
-              <SyringeIcon className="w-6 h-6 text-blue-900" />
-              <h2 className="text-2xl font-semibold text-blue-900">Medications</h2>
+
+          <div className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-shadow duration-300">
+            <div className="flex flex-col space-y-6">
+              <div className="flex flex-col items-center space-y-2">
+                <div className="flex items-center space-x-3">
+                  <Droplet className="w-6 h-6 text-[#3A8EF6]" />
+                  <h2 className="text-2xl font-semibold text-[#3A8EF6]">Allergies</h2>
+                </div>
+                <Input
+                  name="allergies"
+                  placeholder="Peanuts, Shellfish"
+                  value={Array.isArray(user?.profile?.allergies) ? user.profile.allergies.join(", ") : ""}
+                  onChange={(newValue) => {
+                    const allergyArray = newValue.split(",").map((item) => item.trim());
+                    handleInputChange("allergies", allergyArray);
+                  }}
+                  inputClassName="w-full"
+                />
+              </div>
+              <div className="flex flex-col items-center space-y-2">
+                <div className="flex items-center space-x-3">
+                  <SyringeIcon className="w-6 h-6 text-[#3A8EF6]" />
+                  <h2 className="text-2xl font-semibold text-[#3A8EF6]">Medications</h2>
+                </div>
+                <Input
+                  name="medications"
+                  placeholder="Aspirin, Ibuprofen"
+                  value={Array.isArray(user?.profile?.medications) ? user?.profile?.medications.join(", ") : ""}
+                  onChange={(newValue) => {
+                    const medicationArray = newValue.split(",").map((item) => item.trim());
+                    handleInputChange("medications", medicationArray);
+                  }}
+                  inputClassName="w-full"
+                />
+              </div>
             </div>
-            <Input
-              name="medications"
-              placeholder="Aspirin, Ibuprofen"
-              value={Array.isArray(user?.profile.medications) ? user?.profile.medications.join(", ") : ""}
-              onChange={(newValue) => {
-                const medicationArray = newValue.split(",").map((item) => item.trim());
-                handleInputChange("medications", medicationArray);
-              }}
-              inputClassName="w-full md:min-w-[300px]"
-            />
           </div>
-          <div className="flex flex-col items-center space-y-2 w-full md:w-auto">
-            <div className="flex items-center space-x-3">
-              <CakeIcon className="w-6 h-6 text-blue-900" />
-              <h2 className="text-2xl font-semibold text-blue-900">Diet Preferences</h2>
+
+          <div className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-shadow duration-300">
+            <div className="flex flex-col space-y-6">
+              <div className="flex flex-col items-center space-y-2">
+                <div className="flex items-center space-x-3">
+                  <PhoneIcon className="w-6 h-6 text-[#3A8EF6]" />
+                  <h2 className="text-2xl font-semibold text-[#3A8EF6]">Emergency</h2>
+                </div>
+                <Input
+                  name="emergency"
+                  placeholder="XXXXXXXXXX"
+                  value={user?.profile?.emergency}
+                  onChange={(newValue) => handleInputChange("emergency", newValue)}
+                  inputClassName="w-full min-w-48"
+                />
+              </div>
+              <div className="flex flex-col items-center space-y-2">
+                <div className="flex items-center space-x-3">
+                  <CakeIcon className="w-6 h-6 text-[#3A8EF6]" />
+                  <h2 className="text-2xl font-semibold text-[#3A8EF6]">Diet</h2>
+                </div>
+                <Input
+                  name="dietPreferences"
+                  placeholder="Vegan, Vegetarian"
+                  value={Array.isArray(user?.profile?.dietPreference) ? user?.profile?.dietPreference.join(", ") : ""}
+                  onChange={(newValue) => {
+                    const dietPreferenceArray = newValue.split(",").map((item) => item.trim());
+                    handleInputChange("dietPreferences", dietPreferenceArray);
+                  }}
+                  inputClassName="w-full"
+                />
+              </div>
             </div>
-            <Input
-              name="dietPreferences"
-              placeholder="Vegan, Vegetarian"
-              value={Array.isArray(user?.profile.dietPreference) ? user?.profile.dietPreference.join(", ") : ""}
-              onChange={(newValue) => {
-                const dietPreferenceArray = newValue.split(",").map((item) => item.trim());
-                handleInputChange("dietPreferences", dietPreferenceArray);
-              }}
-              inputClassName="w-full md:min-w-[300px]"
-            />
           </div>
-        </div>
-
-        <div className="[@media(max-width:390px)]:scale-75 [@media(max-width:390px)]:-mt-16 flex lg:hidden flex-col space-y-8">
-    <div className="flex justify-center space-x-8">
-      <div className="flex flex-col items-center space-y-2">
-        <div className="flex items-center space-x-3">
-          <Cake className="w-6 h-6 text-blue-900" />
-          <h2 className="text-2xl font-semibold text-blue-900">Age</h2>
-        </div>
-        <Input
-          name="age"
-          placeholder="XX"
-          value={user?.profile.age}
-          onChange={(newValue) => handleInputChange("age", newValue)}
-          inputClassName="w-24"
-        />
-      </div>
-      <div className="flex flex-col items-center space-y-2">
-        <div className="flex items-center space-x-3">
-          <WeightIcon className="w-6 h-6 text-blue-900" />
-          <h2 className="text-2xl font-semibold text-blue-900">Weight</h2>
-        </div>
-        <Input
-          name="weight"
-          placeholder="X kg"
-          value={user?.profile.weight}
-          onChange={(newValue) => handleInputChange("weight", newValue)}
-          inputClassName="w-24"
-        />
-      </div>
-      <div className="flex flex-col items-center space-y-2">
-        <div className="flex items-center space-x-3">
-          <Ruler className="w-6 h-6 text-blue-900" />
-          <h2 className="text-2xl font-semibold text-blue-900">Height</h2>
-        </div>
-        <Input
-          name="height"
-          placeholder="X cm"
-          value={user?.profile.height}
-          onChange={(newValue) => handleInputChange("height", newValue)}
-          inputClassName="w-24"
-        />
-      </div>
-    </div>
-
-      <div className="flex flex-col md:flex-row justify-center md:space-x-8 md:space-y-0 space-y-8">
-        <div className="flex flex-col items-center space-y-2">
-          <div className="flex items-center space-x-3">
-            <Droplet className="w-6 h-6 text-blue-900" />
-            <h2 className="text-2xl font-semibold text-blue-900">Allergic Reactions</h2>
-          </div>
-          <Input
-            name="allergies"
-            placeholder="Peanuts, Shellfish"
-            value={Array.isArray(user?.profile.allergies) ? user?.profile.allergies.join(", ") : ""}
-            onChange={(newValue) => {
-              const allergyArray = newValue.split(",").map((item) => item.trim());
-              handleInputChange("allergies", allergyArray);
-            }}
-            inputClassName="w-full min-w-[300px]"
-          />
-        </div>
-        <div className="flex flex-col items-center space-y-2">
-          <div className="flex items-center space-x-3">
-            <PhoneIcon className="w-6 h-6 text-blue-900" />
-            <h2 className="text-2xl font-semibold text-blue-900">Emergency Contact</h2>
-          </div>
-          <Input
-            name="emergency"
-            placeholder="XXXXXXXXXX"
-            value={user?.profile.emergency}
-            onChange={(newValue) => handleInputChange("emergency", newValue)}
-            inputClassName="w-full min-w-[300px]"
-          />
-        </div>
-      </div>
-
-      <div className="flex flex-col md:flex-row justify-center md:space-x-8 md:space-y-0 space-y-8">
-        <div className="flex flex-col items-center space-y-2">
-          <div className="flex items-center space-x-3">
-            <SyringeIcon className="w-6 h-6 text-blue-900" />
-            <h2 className="text-2xl font-semibold text-blue-900">Medications</h2>
-          </div>
-          <Input
-            name="medications"
-            placeholder="Aspirin, Ibuprofen"
-            value={Array.isArray(user?.profile.medications) ? user?.profile.medications.join(", ") : ""}
-            onChange={(newValue) => {
-              const medicationArray = newValue.split(",").map((item) => item.trim());
-              handleInputChange("medications", medicationArray);
-            }}
-            inputClassName="w-full min-w-[300px]"
-          />
-        </div>
-        <div className="flex flex-col items-center space-y-2">
-          <div className="flex items-center space-x-3">
-            <CakeIcon className="w-6 h-6 text-blue-900" />
-            <h2 className="text-2xl font-semibold text-blue-900">Diet Preferences</h2>
-          </div>
-          <Input
-            name="dietPreferences"
-            placeholder="Vegan, Vegetarian"
-            value={Array.isArray(user?.profile.dietPreference) ? user?.profile.dietPreference.join(", ") : ""}
-            onChange={(newValue) => {
-              const dietPreferenceArray = newValue.split(",").map((item) => item.trim());
-              handleInputChange("dietPreferences", dietPreferenceArray);
-            }}
-            inputClassName="w-full min-w-[300px]"
-          />
         </div>
       </div>
     </div>
-
-        
-
-        {/* <div className="scale-75 sm:scale-100 space-y-2">
-          <div className="flex items-center space-x-3">
-            <MapPin className="w-6 h-6 text-blue-900" />
-            <h2 className="text-2xl font-semibold text-blue-900">Location</h2>
-          </div>
-          <Input
-            name="location"
-            placeholder="ABC City, XYZ"
-            value={user?.location}
-            onChange={(newValue) => handleInputChange("location", newValue)}
-            inputClassName="w-full"
-          />
-        </div> */}
-      </div>
-    </div>
-    
   );
 }

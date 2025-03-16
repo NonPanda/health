@@ -13,9 +13,11 @@ const search= TryCatch(async(req,res,next)=>{
 
     const maxDistance=req.query.maxDistance || 50000;
     const review= req.query.minReviewRating || 0;
+    console.log(req.query.specialization);
+    const specializationfilter= req.query.specialization || "All";
 
     const model=genAI.getGenerativeModel({model:'gemini-1.5-flash'});
-    const prompt= `Convert to medical specializations:${search}.You must respond with comma-separated specialists (ending with ist such as dentist, cardiologist, neurologist, etc). Include 'General Physician' if generic .`
+    const prompt= `Convert to medical specializations:${search}.You must respond with comma-separated specialists (ending with ist such as dentist, cardiologist, neurologist, etc). Include 'General Physician' if generic. Please don't include any escape characters in your prompts`
     const result=await model.generateContent(prompt);
     const specialization= (await result.response.text()).split(',').map(data=>data.trim().toLowerCase());
     console.log("specialization",specialization);
@@ -37,14 +39,31 @@ const search= TryCatch(async(req,res,next)=>{
             }
         },
         {
-            $match:{
-                "profile.specialization": {$elemMatch: { $in: specialization.map(s => new RegExp(`^${s}$`, "i")) }
-            },
-            "rating":{$gte:Number(review)
-}
-            }
+            $match: {
+                $and: [
+                  {
+                    "profile.specialization": {
+                      $elemMatch: {
+                        $in: specialization.map(s => new RegExp(`^${s}$`, "i"))
+                      }
+                    }
+                  },
+                  {
+                    "profile.specialization": specializationfilter === "All"
+                      ? { $exists: true } 
+                      : { $in: [new RegExp(`^${specializationfilter}$`, "i")] } 
+                  },
+                  { "rating": { $gte: Number(review) } }
+                ]
+              }
 
         },
+        {
+            $sort: {
+                rating: -1 
+            }
+        }
+        
         
     ]);
     

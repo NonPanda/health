@@ -44,7 +44,7 @@ const PublicProfile = () => {
     specialization: ["Cardiologist", "Internal Medicine"],
     rating: 4.8,
     totalReviews: 124,
-    about: "Dr. Sarah Wilson is a board-certified cardiologist with over 15 years of experience in treating cardiovascular diseases. She specializes in preventive cardiology and heart failure management. Her patient-centered approach and dedication to providing comprehensive care have earned her numerous accolades in the medical community.",
+    about: "A highly skilled and experienced specialist with a passion for helping patients lead healthier lives.",
     experience: 15,
     totalPatients: 5000,
     languages: ["English", "Spanish"],
@@ -117,15 +117,13 @@ const PublicProfile = () => {
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900">{doctorData.name}</h1>
                   <div className="flex flex-wrap items-center gap-2 mt-3">
-                  <span className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-800">
-                    <FaStethoscope className="mr-1.5 h-4 w-4 text-gray-600" />
-                    {doctorData.specialization?.[0] || "General Practitioner"}
+                  <span className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-800"
+                  >
+                    <FaStethoscope className="w-4 h-4 mr-1" />
+                    {doctorData.specialization.join(", ")}
                   </span>
-                  {doctorData.specialization?.[1] && (
-                    <span className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-50 text-gray-800">
-                      {doctorData.specialization[1]}
-                    </span>
-                  )}
+                  
+                
                 </div>
                 </div>
                 
@@ -137,7 +135,7 @@ const PublicProfile = () => {
                       ))}
                     </div>
                     <span className="font-medium text-gray-900">{doctorData.rating}</span>
-                    <span className="text-gray-500 text-sm">({doctorData.totalReviews} reviews)</span>
+                    <span className="text-gray-500 text-sm">({placeholderDoctor.totalReviews} reviews)</span>
                   </div>
                   
                   <button
@@ -166,26 +164,26 @@ const PublicProfile = () => {
                 <h2 className="text-3xl font-bold text-gray-900">About</h2>
               </div>
               <p className="text-gray-600 leading-relaxed text-lg">
-                {doctorData.about}
+                {placeholderDoctor.about}
               </p>
               
               {/* Stats Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mt-10">
                 {[
                   { label: "Experience", value: `${doctorData.experience} years`, icon: FaUserMd, gradient: "from-blue-500 to-blue-400" },
-                  { label: "Patients", value: `${doctorData.totalPatients}+`, icon: FaHospital, gradient: "from-green-500 to-emerald-400" },
+                  { label: "Patients", value: `${placeholderDoctor.totalPatients}+`, icon: FaHospital, gradient: "from-green-500 to-emerald-400" },
                   { label: "Response Time", value: "Less than 2 hours", icon: FaClock, gradient: "from-purple-500 to-pink-400" },
-                  // { label: "Languages", value: doctorData.languages.join(", "), icon: FaAward, gradient: "from-indigo-500 to-blue-400" }
+                   { label: "Languages", value: placeholderDoctor.languages.join(", "), icon: FaAward, gradient: "from-indigo-500 to-blue-400" }
                 ].map((stat, index) => (
                   <div key={index} 
                     className="group relative transform hover:-translate-y-1 transition-all duration-300 cursor-pointer">
                     <div className="absolute -inset-0.5 bg-gradient-to-r rounded-xl blur opacity-30 group-hover:opacity-100 transition duration-500"></div>
-                    <div className="relative bg-white p-6 rounded-xl border border-gray-100 group-hover:border-transparent transition duration-300 shadow-lg group-hover:shadow-xl">
+                    <div className="relative bg-white p-4 rounded-xl border border-gray-100 group-hover:border-transparent transition duration-300 shadow-lg group-hover:shadow-xl">
                       <div className={`w-12 h-12 mb-4 rounded-lg bg-gradient-to-r ${stat.gradient} p-2.5 shadow-lg group-hover:scale-110 transition duration-300`}>
                         <stat.icon className="w-full h-full text-white" />
                       </div>
                       <p className="text-gray-500 text-sm font-medium">{stat.label}</p>
-                      <p className="text-gray-900 font-bold mt-1 text-lg">{stat.value}</p>
+                      <p className="text-gray-900 font-bold mt-1 text-md">{stat.value}</p>
                     </div>
                   </div>
                 ))}
