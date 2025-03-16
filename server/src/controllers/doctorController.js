@@ -11,13 +11,14 @@ const search= TryCatch(async(req,res,next)=>{
     const {search}= req.query;
     if(!search) return next (new ErrorHandler("Search Something", 400));
 
-    const maxDistance=req.query.maxDistance || 50000;
+    const maxDistance=req.query.maxDistance || 999999999999;
     const review= req.query.minReviewRating || 0;
     console.log(req.query.specialization);
     const specializationfilter= req.query.specialization || "All";
 
     const model=genAI.getGenerativeModel({model:'gemini-1.5-flash'});
-    const prompt= `Convert to medical specializations:${search}.You must respond with comma-separated specialists (ending with ist such as dentist, cardiologist, neurologist, etc). Include 'General Physician' if generic. Please don't include any escape characters in your prompts`
+    const prompt = `Convert to medical specializations: ${search}. Respond with ONLY comma-separated specialists (ending with ist such as dentist, cardiologist, neurologist, etc). Include 'General Physician' if generic. Do not include any explanations, newlines, or other text.`;
+
     const result=await model.generateContent(prompt);
     const specialization= (await result.response.text()).split(',').map(data=>data.trim().toLowerCase());
     console.log("specialization",specialization);

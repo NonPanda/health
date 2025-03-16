@@ -5,10 +5,16 @@ import { FaSearch, FaStar } from "react-icons/fa";
 import pic from "../assets/pic.png";
 import { BsFunnel } from "react-icons/bs";
 import { Link } from "react-router-dom";
+import {useLocation} from "react-router-dom";
 
 const DoctorSearch = () => {
-  const [query, setQuery] = useState("");
-  const [maxDistance, setMaxDistance] = useState(50);
+
+  const { search } = useLocation();
+  const searchParams = new URLSearchParams(search);
+  const searchQuery = searchParams.get('q') || "";
+  
+  const [query, setQuery] = useState(searchQuery);
+  const [maxDistance, setMaxDistance] = useState("");
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState("initial");
   const [error, setError] = useState("");
@@ -30,11 +36,28 @@ const DoctorSearch = () => {
   ];
 
   useEffect(() => {
-    fetchDoctors();
+    if (searchQuery) {
+      fetchDoctors({
+        search: searchQuery,
+        maxDistance,
+        minReviewRating,
+        specialization
+      });
+    }
+    if(loading === "initial"&&searchQuery===""){ {
+      fetchDoctors({
+        search: "General Physicians",
+        maxDistance,
+        minReviewRating,
+        specialization
+      }); 
+    }
+    }
   }, []);
 
+
   useEffect(() => {
-    if(specialization !== "all" || minReviewRating !== 0 || maxDistance !== 50) {
+    if(specialization !== "all" || minReviewRating !== 0 || maxDistance !== "") {
     setFiltersChanged(true);
     } 
     
@@ -42,7 +65,6 @@ const DoctorSearch = () => {
   }, [specialization, minReviewRating, maxDistance]);
 
   const fetchDoctors = async (searchParams = {}) => {
-    if (query === "") return;
     setLoading(true);
     setError("");
     setResults(false);
@@ -50,7 +72,7 @@ const DoctorSearch = () => {
     try {
       const params = new URLSearchParams({
         search: searchParams.search || "",
-        maxDistance: (searchParams.maxDistance || maxDistance) * 1000,
+        maxDistance: searchParams.maxDistance === "" ? "" : (searchParams.maxDistance || maxDistance) * 1000,
         minReviewRating: searchParams.minReviewRating || minReviewRating,
         specialization: searchParams.specialization === "all" ? "" : (searchParams.specialization || specialization),
       });
@@ -84,7 +106,7 @@ const DoctorSearch = () => {
   const resetFilters = () => {
     setSpecialization("all");
     setMinReviewRating(0);
-    setMaxDistance(50);
+    setMaxDistance("");
     setFiltersChanged(false);
   };
 
@@ -158,7 +180,7 @@ const DoctorSearch = () => {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full p-5 pl-8 pr-14 text-xl text-gray-900 border border-gray-200 rounded-2xl shadow-md focus:outline-none focus:ring-2 focus:ring-[#3A8EF6] focus:border-[#3A8EF6] bg-white/50 backdrop-blur-sm transition-all duration-300 hover:border-[#3A8EF6]/40 hover:shadow-lg"
+                className="w-full p-5 pl-8 pr-14 text-xl text-gray-900 border border-gray-200 rounded-2xl shadow-md focus:outline-none focus:ring-2 focus:ring-[#3A8EF6] focus:border-[#3A8EF6] bg-white/50 transition-all duration-300 hover:border-[#3A8EF6]/40 hover:shadow-lg"
                 placeholder="Search by symptoms, specialization, or doctor name..."
                 required
               />
@@ -183,7 +205,7 @@ const DoctorSearch = () => {
             </div>
           )}
 
-          <div className={`mt-8 transition-all duration-500 ease-in-out ${results ? "transform opacity-100 backdrop-blur-xl" : "opacity-0 -translate-y-4 pointer-events-none"}`}> 
+          <div className={`mt-8 transition-all duration-500 ease-in-out ${results ? "transform opacity-100 backdrop-blur-md" : "opacity-0 -translate-y-4 pointer-events-none"}`}> 
             {doctors.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {doctors.map((doctor) => (
@@ -194,8 +216,8 @@ const DoctorSearch = () => {
                     <div className="absolute top-4 right-4">
                       <div className="flex items-center gap-1.5 px-4 py-2 bg-white shadow-md rounded-full transition-all duration-100 group-hover:shadow-lg shadow-blue-200 group-hover:shadow-blue-300/40">
                         <FaStar className="w-5 h-5 text-[#3A8EF6]" />
-                        <span className="text-[#3A8EF6] font-bold text-lg">{doctor.rating || "N/A"}</span>
-                      </div>
+                        <span className="text-[#3A8EF6] font-bold text-lg">{doctor.rating ? doctor.rating.toFixed(1) : "N/A"}</span>
+                        </div>
                     </div>
 
                     <div className="p-6">

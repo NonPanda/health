@@ -44,7 +44,7 @@ const PublicProfile = () => {
     specialization: ["Cardiologist", "Internal Medicine"],
     rating: 4.8,
     totalReviews: 124,
-    about: "A highly skilled and experienced specialist with a passion for helping patients lead healthier lives.",
+    about: "A highly skilled and experienced specialist with a passion for helping patients lead healthier lives. A certified professional with a focus on patient care and satisfaction.",
     experience: 15,
     totalPatients: 5000,
     languages: ["English", "Spanish"],
@@ -199,7 +199,7 @@ const PublicProfile = () => {
               </div>
               
               <div className="grid gap-6">
-              {(doctorData.education?.length > 0 ? doctorData.education : placeholderDoctor.education).map((edu, index) => (
+              {(placeholderDoctor.education).map((edu, index) => (
                 <div key={index} 
                   className="group bg-gradient-to-r from-white to-blue-50/30 rounded-xl p-6 hover:shadow-lg transition-all duration-300 border border-blue-100/20 hover:border-blue-200/50 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-300"></div>

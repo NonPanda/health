@@ -18,28 +18,28 @@ const Input = ({ name, placeholder, value: initialValue, onChange, inputClassNam
   const smallbox = ["experience", "fees"].includes(name) ? "ml-[15.8px]" : "ml-[17px]";
 
   return (
-    <div className="relative">
-      {isEditing ? (
-        <input
-          type="text"
-          name={name}
-          value={value}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          placeholder={placeholder}
-          className={`p-2 border border-gray-100 rounded-md focus:outline-none shadow-md text-xl ${inputClassName} ${centered}`}
-          autoFocus
-        />
-      ) : (
-        <div
-          className={`p-2 text-gray-800 cursor-pointer border border-white border-b-gray-200 hover:shadow-sm rounded-md flex items-center justify-between group text-xl ${inputClassName} ${centered}`}
-          onClick={handleClick}
-        >
-          <div className={`${smallbox} w-full text-xl ${centered}`}>{value || placeholder || "Click to edit"}</div>
-          <Pencil className="w-5 h-5 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-        </div>
-      )}
-    </div>
+     <div className="relative group">
+         {isEditing ? (
+           <input
+             type="text"
+             name={name}
+             value={value}
+             onChange={handleChange}
+             onBlur={handleBlur}
+             placeholder={placeholder}
+             className={`lg:p-2 p-1 border border-[#3A8EF6]/20 rounded-md focus:outline-none focus:border-[#3A8EF6] focus:ring-2 focus:ring-[#3A8EF6]/20 shadow-md text-lg lg:text-xl ${inputClassName} ${centered} bg-white`}
+             autoFocus
+           />
+         ) : (
+           <div
+             className={`p-1 lg:p-2 text-gray-800 cursor-pointer border border-transparent hover:border-[#3A8EF6]/20 hover:shadow-lg rounded-md flex items-center justify-between group lg:text-xl text-lg transition-all duration-300 hover:bg-[#3A8EF6]/5 ${inputClassName} ${centered} border-b-[2px] border-b-[#3A8EF6]/10`}
+             onClick={handleClick}
+           >
+             <div className={`${smallbox} w-full text-lg lg:text-xl ${centered}`}>{value || placeholder || "Click to edit"}</div>
+             <Pencil className="w-5 h-5 text-[#3A8EF6] opacity-0 group-hover:opacity-100 transition-opacity" />
+           </div>
+         )}
+       </div>
   );
 };
 
@@ -166,166 +166,184 @@ export default function DoctorProfile({ user, setUser }) {
 
 
   return (
-    <div>
-      <div className={`py-1 sticky w-full bg-white/80 backdrop-blur-sm shadow-sm transform transition-all duration-1000 ease-in-out ${changed ? "opacity-100" : "opacity-0"}`}>
-        <div className={`mx-auto px-4 py-2 flex items-center justify-between`}>
-          <div className={`text-sm text-gray-500`}>
-            {changed ? "Changes pending..." : "All changes saved"}
-          </div>
-          <button
-            onClick={handleSave}
-            className={`
-              transform transition-all duration-700 ease-in-out px-6 py-2 rounded-lg font-medium w-[150px]
-              ${changed ? 'bg-blue-500 hover:bg-blue-600 text-white translate-y-0 opacity-100 shadow-md' : 'bg-gray-100 text-gray-400 opacity-0 pointer-events-none'}
-            `}
-          >
-            {changed ? 'Save Changes' : 'Saved'}
-          </button>
+    <div className="min-h-screen bg-[#3A8EF6]/5">
+    <div className={`py-1 sticky top-0 z-50 w-full bg-white/80 backdrop-blur-sm shadow-sm transform transition-all duration-1000 ease-in-out ${changed ? "opacity-100" : "opacity-0"}`}>
+      <div className="mx-auto px-4 py-2 flex items-center justify-between">
+        <div className={`text-sm font-medium ${changed ? 'text-[#3A8EF6]' : 'text-gray-500'}`}>
+          {changed ? "Changes pending..." : "All changes saved"}
         </div>
+        <button 
+          onClick={handleSave} 
+          className={`
+            transform transition-all duration-700 ease-in-out px-6 py-2 rounded-lg font-medium w-[150px]
+            ${changed ? 'bg-[#3A8EF6] hover:bg-[#3A8EF6]/90 text-white translate-y-0 opacity-100 shadow-md hover:shadow-lg active:scale-95': 'bg-gray-100 text-gray-400 opacity-0 pointer-events-none'
+            }
+          `}
+          disabled={!changed}
+        >
+          {changed ? 'Save Changes' : 'Saved'}
+        </button>
       </div>
-
-      <div className="w-full px-4 md:px-24 py-12">
-        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 mb-8 justify-between sm:-pr-4 sm:pr-4">
+    </div>
+  
+    <div className="w-full px-4 md:px-24 py-4">
+      <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 hover:shadow-xl transition-shadow duration-300">
+        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 justify-between">
           <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-             <div className="relative inline-block">
-                        <img src={user?.profile?.avatar || pic} alt="user" className="sm:ml-0 ml-4 w-32 h-32 rounded-full shadow-md" />
-                        <label
-                          htmlFor="profilePictureInput"
-                          className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 cursor-pointer hover:bg-blue-600"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-6 w-6"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M15.232 5H21a2 2 0 012 2v12a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h5.768M16 3l-4 4m0 0l-4-4m4 4V15"
-                            />
-                          </svg>
-                        </label>
-                        <input
-                          id="profilePictureInput"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={handleProfilePictureChange}
-                        />
-                      </div>
+            <div className="relative inline-block">
+              <img src={user?.profile?.avatar || pic} alt="user" className="sm:ml-0 ml-4 w-32 h-32 rounded-full shadow-lg border-4 border-[#3A8EF6]/40" />
+              <label
+                htmlFor="profilePictureInput"
+                className="absolute bottom-0 right-0 bg-[#3A8EF6] text-white rounded-full p-2 cursor-pointer hover:bg-[#3A8EF6]/90 transition-opacity shadow-lg"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M15.232 5H21a2 2 0 012 2v12a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h5.768M16 3l-4 4m0 0l-4-4m4 4V15"
+                  />
+                </svg>
+              </label>
+              <input
+                id="profilePictureInput"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleProfilePictureChange}
+              />
+            </div>
             <div className="ml-10 text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start mb-4">
-                <h1 className="text-4xl font-bold text-blue-900">
-                  {user?.name || "Username"}
-                </h1>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#3A8EF6]">{user?.name || "Username"}</h1>
                 <img src={MaleIcon} className="w-10 h-10 ml-4" />
               </div>
-              <p className="pr-5 text-xl text-slate-600">
-                {user?.email || "email@example.com"}
-              </p>
+              <p className="pr-5 text-lg lg:text-xl text-slate-600">{user?.email || "email@example.com"}</p>
             </div>
           </div>
           <div className="sm:scale-100 scale-90 flex items-center space-x-2">
-            <PhoneIcon className="w-6 h-6 text-blue-900" />
+            <PhoneIcon className="w-6 h-6 text-[#3A8EF6]" />
             <Input
               name="phone"
               placeholder="XXXXXXXXXX"
               value={user?.profile?.phone}
               onChange={(newValue) => handleInputChange("phone", newValue)}
-              inputClassName="text-xl w-[175px]"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 py-4">
-          <div className="flex flex-col items-center space-y-2">
-            <div className="flex items-center space-x-2">
-              <StethoscopeIcon className="w-6 h-6 text-blue-900" />
-              <h2 className="text-2xl font-semibold text-blue-900">Specialization</h2>
-            </div>
-            <Input
-              name="specialization"
-              placeholder="Cardiologist"
-              value={user?.profile?.specialization.join(", ")}
-              onChange={(newValue) => handleInputChange("specialization", newValue)}
-              inputClassName="w-[300px]"
-            />
-          </div>
-
-          <div className="flex flex-col items-center space-y-2">
-            <div className="flex items-center space-x-2">
-              <Clock10Icon className="w-6 h-6 text-blue-900" />
-              <h2 className="text-2xl font-semibold text-blue-900">Working Hours</h2>
-            </div>
-            <Input
-              name="workingHours"
-              placeholder="9:00 AM - 5:00 PM"
-              value={user?.profile?.workingHours} // Now a string
-              onChange={(newValue) => handleInputChange("workingHours", newValue)}
-              inputClassName="w-[300px]"
-            />
-          </div>
-
-          <div className="flex flex-col items-center space-y-2">
-            <div className="flex items-center space-x-2">
-              <GraduationCapIcon className="w-6 h-6 text-blue-900 flex-shrink-0" />
-              <h2 className="text-2xl font-semibold text-blue-900">Experience</h2>
-            </div>
-            <Input
-              name="experience"
-              placeholder="15 years"
-              value={user?.profile?.experience}
-              onChange={(newValue) => handleInputChange("experience", newValue)}
-              inputClassName="w-40"
-            />
-          </div>
-
-          <div className="flex flex-col items-center space-y-2">
-            <div className="flex items-center space-x-2">
-              <DollarSign className="w-6 h-6 text-blue-900 flex-shrink-0" />
-              <h2 className="text-2xl font-semibold text-blue-900">Consultation Fees</h2>
-            </div>
-            <Input
-              name="fees"
-              placeholder="Rs. 500"
-              value={user?.profile?.fees}
-              onChange={(newValue) => handleInputChange("fees", newValue)}
-              inputClassName="w-40"
-            />
-          </div>
-
-          <div className="flex flex-col items-center space-y-2">
-            <div className="flex items-center space-x-2">
-              <GraduationCapIcon className="w-6 h-6 text-blue-900" />
-              <h2 className="text-2xl font-semibold text-blue-900">Education</h2>
-            </div>
-            <Input
-              name="education"
-              placeholder="MBBS, MD"
-              value={user?.profile?.education.join(", ")}
-              onChange={(newValue) => handleInputChange("education", newValue)}
-              inputClassName="w-[300px]"
-            />
-          </div>
-
-          <div className="flex flex-col items-center space-y-2">
-            <div className="flex items-center space-x-2">
-              <GraduationCapIcon className="w-6 h-6 text-blue-900" />
-              <h2 className="text-2xl font-semibold text-blue-900">Certifications</h2>
-            </div>
-            <Input
-              name="certifications"
-              placeholder="XYZ Certification"
-              value={user?.profile?.certifications.join(", ")}
-              onChange={(newValue) => handleInputChange("certifications", newValue)}
-              inputClassName="w-[300px]"
+              inputClassName="lg:text-lg w-[160px] mr-2 md:mr-0"
             />
           </div>
         </div>
       </div>
+  
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-shadow duration-300">
+          <div className="flex flex-col space-y-6">
+            <div className="flex flex-col items-center space-y-2">
+              <div className="flex items-center space-x-3">
+                <StethoscopeIcon className="w-6 h-6 text-[#3A8EF6]" />
+                <h2 className="text-2xl font-semibold text-[#3A8EF6]">Specialization</h2>
+              </div>
+              <Input
+                name="specialization"
+                placeholder="Cardiologist"
+                value={Array.isArray(user?.profile?.specialization) ? user?.profile?.specialization.join(", ") : ""}
+                onChange={(newValue) => {
+                  const specializationArray = newValue.split(",").map((item) => item.trim());
+                  handleInputChange("specialization", specializationArray);
+                }}
+                inputClassName="w-full"
+              />
+            </div>
+            <div className="flex flex-col items-center space-y-2">
+              <div className="flex items-center space-x-3">
+                <Clock10Icon className="w-6 h-6 text-[#3A8EF6]" />
+                <h2 className="text-2xl font-semibold text-[#3A8EF6]">Working Hours</h2>
+              </div>
+              <Input
+                name="workingHours"
+                placeholder="9:00 AM - 5:00 PM"
+                value={user?.profile?.workingHours}
+                onChange={(newValue) => handleInputChange("workingHours", newValue)}
+                inputClassName="w-full"
+              />
+            </div>
+          </div>
+        </div>
+  
+        <div className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-shadow duration-300">
+          <div className="flex flex-col space-y-6">
+            <div className="flex flex-col items-center space-y-2">
+              <div className="flex items-center space-x-3">
+                <GraduationCapIcon className="w-6 h-6 text-[#3A8EF6]" />
+                <h2 className="text-2xl font-semibold text-[#3A8EF6]">Experience</h2>
+              </div>
+              <Input
+                name="experience"
+                placeholder="15 years"
+                value={user?.profile?.experience}
+                onChange={(newValue) => handleInputChange("experience", newValue)}
+                inputClassName="w-full md:w-36"
+              />
+            </div>
+            <div className="flex flex-col items-center space-y-2">
+              <div className="flex items-center space-x-3">
+                <DollarSign className="w-6 h-6 text-[#3A8EF6]" />
+                <h2 className="text-2xl font-semibold text-[#3A8EF6]">Consultation Fees</h2>
+              </div>
+              <Input
+                name="fees"
+                placeholder="Rs. 500"
+                value={user?.profile?.fees}
+                onChange={(newValue) => handleInputChange("fees", newValue)}
+                inputClassName="w-full md:w-36"
+              />
+            </div>
+          </div>
+        </div>
+  
+        <div className="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-shadow duration-300">
+          <div className="flex flex-col space-y-6">
+            <div className="flex flex-col items-center space-y-2">
+              <div className="flex items-center space-x-3">
+                <GraduationCapIcon className="w-6 h-6 text-[#3A8EF6]" />
+                <h2 className="text-2xl font-semibold text-[#3A8EF6]">Education</h2>
+              </div>
+              <Input
+                name="education"
+                placeholder="MBBS, MD"
+                value={Array.isArray(user?.profile?.education) ? user?.profile?.education.join(", ") : ""}
+                onChange={(newValue) => {
+                  const educationArray = newValue.split(",").map((item) => item.trim());
+                  handleInputChange("education", educationArray);
+                }}
+                inputClassName="w-full"
+              />
+            </div>
+            <div className="flex flex-col items-center space-y-2">
+              <div className="flex items-center space-x-3">
+                <GraduationCapIcon className="w-6 h-6 text-[#3A8EF6]" />
+                <h2 className="text-2xl font-semibold text-[#3A8EF6]">Certifications</h2>
+              </div>
+              <Input
+                name="certifications"
+                placeholder="XYZ Certification"
+                value={Array.isArray(user?.profile?.certifications) ? user?.profile?.certifications.join(", ") : ""}
+                onChange={(newValue) => {
+                  const certificationsArray = newValue.split(",").map((item) => item.trim());
+                  handleInputChange("certifications", certificationsArray);
+                }}
+                inputClassName="w-full"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
   );
 }
