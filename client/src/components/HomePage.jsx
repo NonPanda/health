@@ -157,7 +157,7 @@ export default function HomePage() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     className="lg:w-[820px] w-full px-8 py-6 pr-16 text-xl text-gray-600 bg-white rounded-2xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-lg hover:shadow-xl transition-all duration-300"
-                    placeholder="Search doctors, specialties, symptoms..."
+                    placeholder="Search for doctors based on specialties, symptoms..."
                     required
                   />
                   <button
