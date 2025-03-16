@@ -44,7 +44,7 @@ const PublicProfile = () => {
     specialization: ["Cardiologist", "Internal Medicine"],
     rating: 4.8,
     totalReviews: 124,
-    about: "A highly skilled and experienced specialist with a passion for helping patients lead healthier lives. A certified professional with a focus on patient care and satisfaction.",
+    about: "A highly skilled and experienced specialist with a passion for helping patients lead healthier lives. Trained in the latest medical techniques and practices to ensure the best outcomes for my patients.",
     experience: 15,
     totalPatients: 5000,
     languages: ["English", "Spanish"],
@@ -105,7 +105,7 @@ const PublicProfile = () => {
                     alt={doctorData.name}
                     className="relative w-48 h-48 rounded-xl object-cover shadow-md transition duration-300 group-hover:shadow-lg"
                   />
-                  {doctorData.isVerified && (
+                  {placeholderDoctor.isVerified && (
                     <div className="absolute -right-3 -top-3 bg-white rounded-full p-2.5 shadow-lg">
                       <MdVerified className="w-7 h-7 text-blue-600" />
                     </div>
@@ -131,10 +131,10 @@ const PublicProfile = () => {
                   <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-md">
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
-                        <FaStar key={i} className={`w-4 h-4 ${i < Math.floor(doctorData.rating) ? 'text-yellow-400' : 'text-gray-200'}`} />
+                        <FaStar key={i} className={`w-4 h-4 ${i < Math.ceil(doctorData.rating) ? 'text-yellow-400' : 'text-gray-200'}`} />
                       ))}
                     </div>
-                    <span className="font-medium text-gray-900">{doctorData.rating}</span>
+                    <span className="font-medium text-gray-900">{doctor.rating.toFixed(1)}</span>
                     <span className="text-gray-500 text-sm">({placeholderDoctor.totalReviews} reviews)</span>
                   </div>
                   

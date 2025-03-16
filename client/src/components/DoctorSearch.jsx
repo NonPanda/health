@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaSearch, FaStar } from "react-icons/fa";
@@ -16,6 +15,7 @@ const DoctorSearch = () => {
   const [query, setQuery] = useState(searchQuery);
   const [maxDistance, setMaxDistance] = useState("");
   const [doctors, setDoctors] = useState([]);
+  const [allDoctors, setAllDoctors] = useState([]); 
   const [loading, setLoading] = useState("initial");
   const [error, setError] = useState("");
   const [minReviewRating, setMinReviewRating] = useState(0);
@@ -23,46 +23,86 @@ const DoctorSearch = () => {
   const [results, setResults] = useState(true);
   const [filtersChanged, setFiltersChanged] = useState(false);
 
-  const specializations = [
-    "All",
-    "General Physician",
-    "Cardiologist",
-    "Dermatologist",
-    "Neurologist",
-    "Pediatrician",
-    "Psychiatrist",
-    "Orthopedist",
-    "Gynecologist",
-  ];
+  const getUniqueSpecializations = (doctors) => {
+    const uniqueSpecs = new Set(["all"]);
+    
+    doctors.forEach(doctor => {
+      if (doctor.profile.specialization && Array.isArray(doctor.profile.specialization)) {
+        doctor.profile.specialization.forEach(spec => {
+          uniqueSpecs.add(spec.toLowerCase());
+        });
+      }
+    });
+    
+    return ["all", ...Array.from(uniqueSpecs).filter(spec => spec !== "all").sort()];
+  };
+  
+  const [availableSpecializations, setAvailableSpecializations] = useState(["all"]);
+  
+  useEffect(() => {
+    if (allDoctors.length > 0) {
+      setAvailableSpecializations(getUniqueSpecializations(allDoctors));
+    }
+  }, [allDoctors]);
 
   useEffect(() => {
     if (searchQuery) {
       fetchDoctors({
         search: searchQuery,
-        maxDistance,
-        minReviewRating,
-        specialization
+        maxDistance: "",
+        minReviewRating: 0,
+        specialization: "all"
       });
     }
-    if(loading === "initial"&&searchQuery===""){ {
+    if(loading === "initial" && searchQuery === "") {
       fetchDoctors({
         search: "General Physicians",
-        maxDistance,
-        minReviewRating,
-        specialization
+        maxDistance: "",
+        minReviewRating: 0,
+        specialization: "all"
       }); 
-    }
     }
   }, []);
 
+  useEffect(() => {
+    if (allDoctors.length > 0) {
+      applyFilters();
+    }
+  }, [specialization, minReviewRating, maxDistance]);
 
   useEffect(() => {
     if(specialization !== "all" || minReviewRating !== 0 || maxDistance !== "") {
-    setFiltersChanged(true);
-    } 
-    
-
+      setFiltersChanged(true);
+    } else {
+      setFiltersChanged(false);
+    }
   }, [specialization, minReviewRating, maxDistance]);
+
+  const applyFilters = () => {
+    let filteredDoctors = [...allDoctors];
+    
+    if (specialization !== "all") {
+      filteredDoctors = filteredDoctors.filter(doctor => {
+        const doctorSpecializations = doctor.profile.specialization?.map(s => s.toLowerCase()) || [];
+        return doctorSpecializations.includes(specialization.toLowerCase());
+      });
+    }
+    
+    if (minReviewRating > 0) {
+      filteredDoctors = filteredDoctors.filter(doctor => 
+        doctor.rating >= minReviewRating
+      );
+    }
+    
+    if (maxDistance !== "") {
+      const maxDistanceMeters = parseFloat(maxDistance) * 1000;
+      filteredDoctors = filteredDoctors.filter(doctor => 
+        doctor.distance <= maxDistanceMeters
+      );
+    }
+    
+    setDoctors(filteredDoctors);
+  };
 
   const fetchDoctors = async (searchParams = {}) => {
     setLoading(true);
@@ -83,7 +123,9 @@ const DoctorSearch = () => {
       );
 
       console.log("Doctors found:", data);
-      setDoctors(data.data || []);
+      const fetchedDoctors = data.data || [];
+      setAllDoctors(fetchedDoctors); 
+      setDoctors(fetchedDoctors); 
       setResults(true);
     } catch (err) {
       console.error("Search error:", err);
@@ -95,11 +137,16 @@ const DoctorSearch = () => {
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    setSpecialization("all");
+    setMinReviewRating(0);
+    setMaxDistance("");
+    setFiltersChanged(false);
+    
     fetchDoctors({
       search: query,
-      maxDistance,
-      minReviewRating,
-      specialization,
+      maxDistance: "",
+      minReviewRating: 0,
+      specialization: "all",
     });
   };
 
@@ -108,6 +155,7 @@ const DoctorSearch = () => {
     setMinReviewRating(0);
     setMaxDistance("");
     setFiltersChanged(false);
+    setDoctors(allDoctors);
   };
 
   return (
@@ -125,10 +173,15 @@ const DoctorSearch = () => {
               onChange={(e) => setSpecialization(e.target.value.toLowerCase())}
               className="w-full p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#3A8EF6] focus:border-[#3A8EF6] bg-white/50 backdrop-blur-sm transition-all duration-200"
             >
-              {specializations.map((spec) => (
-                <option key={spec} value={spec.toLowerCase()}>{spec}</option>
-              ))}
-            </select>
+              {availableSpecializations.map((spec) => (
+    <option 
+      key={spec} 
+      value={spec.toLowerCase()}
+    >
+      {spec === "all" ? "All" : spec.charAt(0).toUpperCase() + spec.slice(1)}
+    </option>
+  ))}
+              </select>
           </div>
 
           <div className="space-y-3">
@@ -162,13 +215,12 @@ const DoctorSearch = () => {
           </div>
         </div>
         
-            <button
-              onClick={resetFilters}
-              className={`w-full bg-[#3A8EF6] text-white py-3.5 px-6 rounded-xl hover:bg-blue-600 transition-all duration-500 shadow-lg hover:shadow-xl active:scale-95 font-medium text-lg ${filtersChanged ? "transform opacity-100 backdrop-blur-md" : "opacity-0 -translate-y-2 pointer-events-none"}`}
-            >
-              Reset Filters
-            </button>
-        
+        <button
+          onClick={resetFilters}
+          className={`w-full bg-[#3A8EF6] text-white py-3.5 px-6 rounded-xl hover:bg-blue-600 transition-all duration-500 shadow-lg hover:shadow-xl active:scale-95 font-medium text-lg ${filtersChanged ? "transform opacity-100 backdrop-blur-md" : "opacity-0 -translate-y-2 pointer-events-none"}`}
+        >
+          Reset Filters
+        </button>
       </div>
 
 
@@ -181,7 +233,7 @@ const DoctorSearch = () => {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="w-full p-5 pl-8 pr-14 text-xl text-gray-900 border border-gray-200 rounded-2xl shadow-md focus:outline-none focus:ring-2 focus:ring-[#3A8EF6] focus:border-[#3A8EF6] bg-white/50 transition-all duration-300 hover:border-[#3A8EF6]/40 hover:shadow-lg"
-                placeholder="Search by symptoms, specialization, or doctor name..."
+                placeholder="Search by symptoms or specialization..."
                 required
               />
               <button
@@ -205,7 +257,7 @@ const DoctorSearch = () => {
             </div>
           )}
 
-          <div className={`mt-8 transition-all duration-500 ease-in-out ${results ? "transform opacity-100 backdrop-blur-md" : "opacity-0 -translate-y-4 pointer-events-none"}`}> 
+          <div className={`mt-8 transition-all duration-200 ease-in-out ${results ? "transform opacity-100 backdrop-blur-" : "opacity-0 -translate-y-4 pointer-events-none"}`}> 
             {doctors.length > 0 ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {doctors.map((doctor) => (
@@ -216,8 +268,8 @@ const DoctorSearch = () => {
                     <div className="absolute top-4 right-4">
                       <div className="flex items-center gap-1.5 px-4 py-2 bg-white shadow-md rounded-full transition-all duration-100 group-hover:shadow-lg shadow-blue-200 group-hover:shadow-blue-300/40">
                         <FaStar className="w-5 h-5 text-[#3A8EF6]" />
-                        <span className="text-[#3A8EF6] font-bold text-lg">{doctor.rating ? doctor.rating.toFixed(1) : "N/A"}</span>
-                        </div>
+                        <span className="text-[#3A8EF6] font-bold text-lg">{doctor.rating ? doctor.rating.toFixed(2) : "N/A"}</span>
+                      </div>
                     </div>
 
                     <div className="p-6">
@@ -241,14 +293,14 @@ const DoctorSearch = () => {
                             </p>
                             
                             <div className="grid grid-cols-2 gap-4 mb-4">
-                            <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-3 group-hover:bg-[#3A8EF6]/5 transition-colors duration-300">
-                              <span className="text-gray-500 text-sm font-medium">Distance</span>
-                              <p className="font-semibold text-gray-900 mt-1">
-                                {doctor.distance < 1000 
-                                  ? `${doctor.distance.toFixed(0)} m` 
-                                  : `${(doctor.distance / 1000).toFixed(1)} km`}
-                              </p>
-                            </div>
+                              <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-3 group-hover:bg-[#3A8EF6]/5 transition-colors duration-300">
+                                <span className="text-gray-500 text-sm font-medium">Distance</span>
+                                <p className="font-semibold text-gray-900 mt-1">
+                                  {doctor.distance < 1000 
+                                    ? `${doctor.distance.toFixed(0)} m` 
+                                    : `${(doctor.distance / 1000).toFixed(1)} km`}
+                                </p>
+                              </div>
                               <div className="bg-gray-50/80 backdrop-blur-sm rounded-xl p-3 group-hover:bg-[#3A8EF6]/5 transition-colors duration-300">
                                 <span className="text-gray-500 text-sm font-medium">Consultation Fee</span>
                                 <p className="font-semibold text-gray-900 mt-1">${doctor.profile.fees || "N/A"}</p>

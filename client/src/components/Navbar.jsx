@@ -128,7 +128,7 @@ export default function Navbar({ user, setUser, role }) {
             ) : (
               <Link
                 to="/signup"
-                className="inline-flex items-center px-4 py-2 rounded-lg text-white bg-[#3A8EF6] hover:bg-[#3A8EF6]/90 transition-all duration-300 shadow-sm hover:shadow"
+                className="inline-flex items-center px-4 py-2 rounded-lg text-white font-medium bg-[#3A8EF6] hover:bg-blue-600 hover:scale-105 transition-all duration-300 shadow-sm hover:shadow"
               >
                 Login
               </Link>
