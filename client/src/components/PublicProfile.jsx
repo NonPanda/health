@@ -5,6 +5,7 @@ import { FaStar, FaMapMarkerAlt, FaPhone, FaEnvelope, FaStethoscope, FaUserMd, F
 import { MdVerified, MdHealthAndSafety } from 'react-icons/md';
 import pic from '../assets/pic.png';
 import { useParams } from 'react-router-dom';
+import CalendarPopup from './calender'; // Import the calendar popup component
 
 const PublicProfile = () => {
   const navigate = useNavigate();
@@ -12,6 +13,8 @@ const PublicProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { id } = useParams();
+   // New state for calendar popup
+   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
 
   useEffect(() => {
@@ -75,10 +78,27 @@ const PublicProfile = () => {
     avatar: null
   };
 
+   // Function to open calendar popup
+   const handleOpenCalendar = () => {
+    setIsCalendarOpen(true);
+  };
+
+  // Function to close calendar popup
+  const handleCloseCalendar = () => {
+    setIsCalendarOpen(false);
+  };
+
   const doctorData = doctor || placeholderDoctor;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      {/* Calendar Popup Component */}
+      <CalendarPopup 
+        isOpen={isCalendarOpen}
+        onClose={handleCloseCalendar}
+        doctorName={doctorData.name}
+        doctorFees={doctorData.fees}
+      />
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="relative bg-white rounded-3xl shadow-lg overflow-hidden mb-12">
@@ -139,7 +159,7 @@ const PublicProfile = () => {
                   </div>
                   
                   <button
-                    onClick={() => console.log('Book appointment')}
+                    onClick={handleOpenCalendar}
                     className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium rounded-xl hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-md hover:shadow-xl active:scale-95"
                   >
                     <FaCalendar className="mr-2 h-4 w-4" />
