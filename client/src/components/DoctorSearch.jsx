@@ -59,7 +59,7 @@ const DoctorSearch = () => {
         search: "General Physicians",
         maxDistance: "",
         minReviewRating: 0,
-        specialization: "all"
+        specialization: "default"
       }); 
     }
   }, []);
