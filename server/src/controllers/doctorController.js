@@ -5,71 +5,80 @@ const {GoogleGenerativeAI}= require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// main thing
 
-const search= TryCatch(async(req,res,next)=>{
-    const {search}= req.query;
-    if(!search) return next (new ErrorHandler("Search Something", 400));
+const search = TryCatch(async(req, res, next) => {
+    const {search} = req.query;
+    if(!search) return next(new ErrorHandler("Search Something", 400));
 
-    const maxDistance=req.query.maxDistance || 999999999999;
-    const review= req.query.minReviewRating || 0;
+    const maxDistance = req.query.maxDistance || 999999999999;
+    const review = req.query.minReviewRating || 0;
     console.log(req.query.specialization);
-    const specializationfilter= req.query.specialization || "All";
+    const specializationfilter = req.query.specialization || "All";
 
-    const model=genAI.getGenerativeModel({model:'gemini-1.5-flash'});
+    const model = genAI.getGenerativeModel({model:'gemini-1.5-flash'});
     const prompt = `Convert to medical specializations: ${search}. Respond with ONLY comma-separated specialists (ending with ist such as dentist, cardiologist, neurologist, etc). Include 'General Physician' if generic or vague. Do not include any explanations, newlines, or other text.`;
 
-    const result=await model.generateContent(prompt);
-    const specialization= (await result.response.text()).replace(/\n/g, ',').split(',').map(data=>data.trim().toLowerCase());
-    console.log("specialization",specialization);
+    const result = await model.generateContent(prompt);
+    const specialization = (await result.response.text()).replace(/\n/g, ',').split(',').map(data => data.trim().toLowerCase());
+    console.log("specialization", specialization);
+    
     if (!req.searchLocation || !req.searchLocation.coordinates) {
         return next(new ErrorHandler("Location coordinates not available", 400));
     }
 
-    console.log("search and max dist", search,maxDistance);
-    const doctors=await Doctor.aggregate([
+    console.log("search and max dist", search, maxDistance);
+    
+    let specializationMatch;
+    
+    if (specializationfilter === "default") {
+        specializationMatch = {}; 
+    } else if (specializationfilter === "All") {
+        specializationMatch = {
+            "profile.specialization": { $exists: true }
+        };
+    } else {
+        specializationMatch = {
+            "profile.specialization": { $in: [new RegExp(`^${specializationfilter}$`, "i")] }
+        };
+    }
+    const matchQuery = {
+        $and: [
+            specializationfilter !== "default" ? {
+                "profile.specialization": {
+                    $elemMatch: {
+                        $in: specialization.map(s => new RegExp(`^${s}$`, "i"))
+                    }
+                }
+            } : {},
+            specializationMatch,
+            { "rating": { $gte: Number(review) } }
+        ].filter(condition => Object.keys(condition).length > 0) 
+    };
+
+    const doctors = await Doctor.aggregate([
         {
-            $geoNear:{
-                near:{
-                    type:"Point",
-                    coordinates:req.searchLocation.coordinates
+            $geoNear: {
+                near: {
+                    type: "Point",
+                    coordinates: req.searchLocation.coordinates
                 },
-                distanceField:'distance',
+                distanceField: 'distance',
                 maxDistance: Number(maxDistance),
-                spherical:true
+                spherical: true
             }
         },
         {
-            $match: {
-                $and: [
-                  {
-                    "profile.specialization": {
-                      $elemMatch: {
-                        $in: specialization.map(s => new RegExp(`^${s}$`, "i"))
-                      }
-                    }
-                  },
-                  {
-                    "profile.specialization": specializationfilter === "All"
-                      ? { $exists: true } 
-                      : { $in: [new RegExp(`^${specializationfilter}$`, "i")] } 
-                  },
-                  { "rating": { $gte: Number(review) } }
-                ]
-              }
-
+            $match: matchQuery
         },
         {
             $sort: {
                 rating: -1 
             }
         }
-        
-        
     ]);
-    
+
     res.status(200).json({
-        success:true,
+        success: true,
         location: req.searchLocation,
         count: doctors.length,
         data: doctors,
