@@ -8,6 +8,8 @@ connectDB();
 const userRoutes = require('./src/routes/userRoutes');
 const doctorRoutes = require('./src/routes/doctorRoutes.js');
 
+app.use(express.json({ limit: '10mb' })); 
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 app.use(express.json());
 app.use(cookieParser());

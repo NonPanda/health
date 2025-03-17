@@ -5,7 +5,7 @@ import { FaStar, FaMapMarkerAlt, FaPhone, FaEnvelope, FaStethoscope, FaUserMd, F
 import { MdVerified, MdHealthAndSafety } from 'react-icons/md';
 import pic from '../assets/pic.png';
 import { useParams } from 'react-router-dom';
-import CalendarPopup from './calender'; // Import the calendar popup component
+import CalendarPopup from './calender';
 
 const PublicProfile = () => {
   const navigate = useNavigate();
@@ -13,7 +13,6 @@ const PublicProfile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { id } = useParams();
-   // New state for calendar popup
    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
 
