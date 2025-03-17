@@ -16,18 +16,23 @@ const search = TryCatch(async(req, res, next) => {
     const specializationfilter = req.query.specialization || "All";
 
     const model = genAI.getGenerativeModel({model:'gemini-1.5-flash'});
-    const prompt = `Convert to medical specializations: ${search}. Respond with ONLY comma-separated specialists (ending with ist such as dentist, cardiologist, neurologist, etc). Include 'General Physician' if generic or vague. Do not include any explanations, newlines, or other text.`;
+    const prompt = `Convert to medical specializations: ${search}. Respond with ONLY comma-separated specialists (ending with ist such as dentist, cardiologist, neurologist, etc). Include 'General Physician' if generic or vague. Do not include any explanations, newlines, or other text. Also write it in the order of importance`;
 
     const result = await model.generateContent(prompt);
     const specialization = (await result.response.text()).replace(/\n/g, ',').split(',').map(data => data.trim().toLowerCase());
     console.log("specialization", specialization);
+    
     
     if (!req.searchLocation || !req.searchLocation.coordinates) {
         return next(new ErrorHandler("Location coordinates not available", 400));
     }
 
     console.log("search and max dist", search, maxDistance);
-    
+    const specializationPriority = {};
+    specialization.forEach((s, i) => {
+        specializationPriority[s] = i+1;
+    });
+
     let specializationMatch;
     
     if (specializationfilter === "default") {
@@ -40,6 +45,7 @@ const search = TryCatch(async(req, res, next) => {
         specializationMatch = {
             "profile.specialization": { $in: [new RegExp(`^${specializationfilter}$`, "i")] }
         };
+        
     }
     const matchQuery = {
         $and: [
@@ -76,6 +82,32 @@ const search = TryCatch(async(req, res, next) => {
             }
         }
     ]);
+
+    if (specializationfilter!=="default"&&doctors.length>0){
+        doctors.sort((a,b)=>{
+            const a1=Math.min(...a.profile.specialization
+                .map(spec=>{
+                    const matchingSpec=Object.keys(specializationPriority).find(
+                        s=>new RegExp(`^${s}$`,"i").test(spec)
+                    );
+                    return matchingSpec?specializationPriority[matchingSpec]:999;
+                }));
+            
+            const b1=Math.min(...b.profile.specialization
+                .map(spec=>{
+                    const matchingSpec=Object.keys(specializationPriority).find(
+                        s=>new RegExp(`^${s}$`,"i").test(spec)
+                    );
+                    return matchingSpec?specializationPriority[matchingSpec]:999;
+                }));
+            
+            if (a1!==b1){
+                return a1-b1; 
+            }
+            
+            return b.rating-a.rating; 
+        });
+    }
 
     res.status(200).json({
         success: true,
