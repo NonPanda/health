@@ -101,8 +101,12 @@ const DoctorSearch = () => {
       );
     }
     
+    
+    
     setDoctors(filteredDoctors);
   };
+
+
 
   const fetchDoctors = async (searchParams = {}) => {
     setLoading(true);

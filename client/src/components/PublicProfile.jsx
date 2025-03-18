@@ -153,7 +153,7 @@ const PublicProfile = () => {
                         <FaStar key={i} className={`w-4 h-4 ${i < Math.ceil(doctorData.rating) ? 'text-yellow-400' : 'text-gray-200'}`} />
                       ))}
                     </div>
-                    <span className="font-medium text-gray-900">{doctor.rating.toFixed(1)}</span>
+                    <span className="font-medium text-gray-900">{doctor.rating.toFixed(2)}</span>
                     <span className="text-gray-500 text-sm">({placeholderDoctor.totalReviews} reviews)</span>
                   </div>
                   
