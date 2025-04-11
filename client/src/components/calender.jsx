@@ -315,10 +315,7 @@ const CalendarPopup = ({ isOpen, onClose, doctorName, doctorFees }) => {
       >
         {/* Celebration animations */}
         {showConfetti && <ConfettiAnimation />}
-<<<<<<< HEAD
         
-=======
->>>>>>> dc197e21bdb8a76584833eb9a835ccddfa1de816
         
         {/* Close button (hidden during success animation) */}
         {currentView !== 'success' && (

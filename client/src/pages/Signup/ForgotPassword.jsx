@@ -3,29 +3,9 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import person from "../../assets/person.png";
 import rainbow from "../../assets/rainbow.png";
+import CustomInput from "../../components/CustomInput";
 
 
-const CustomInput = ({ 
-    type,placeholder,name,onChange,error,value
-  }) => {
-    return (
-      <div className="mb-6 w-full">
-        <input
-          type={type}
-          placeholder={placeholder}
-          name={name}
-          onChange={onChange}
-          value={value}
-          className={`p-2 border rounded-md w-full ${
-            error ? 'border-red-500' : 'border-gray-300 focus:outline-gray-400'
-          }`}
-        />
-        {error && (
-          <p className="mt-1 text-sm text-red-500">{error}</p>
-        )}
-      </div>
-    );
-  };
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState("");

@@ -181,6 +181,7 @@ const DoctorSearch = () => {
     <option 
       key={spec} 
       value={spec.toLowerCase()}
+      className="text-gray-900 font-medium"
     >
       {spec === "all" ? "All" : spec.charAt(0).toUpperCase() + spec.slice(1)}
     </option>
@@ -198,6 +199,8 @@ const DoctorSearch = () => {
               placeholder="Distance in km"
             />
           </div>
+          
+          
 
           <div className="space-y-3">
             <label className="block text-sm font-semibold text-gray-700">Minimum Rating</label>
@@ -216,7 +219,7 @@ const DoctorSearch = () => {
                 </button>
               ))}
             </div>
-          </div>
+         </div>
         </div>
         
         <button

@@ -5,7 +5,7 @@ import { FaStar, FaMapMarkerAlt, FaPhone, FaEnvelope, FaStethoscope, FaUserMd, F
 import { MdVerified, MdHealthAndSafety } from 'react-icons/md';
 import pic from '../assets/pic.png';
 import { useParams } from 'react-router-dom';
-import CalendarPopup from './calender';
+import CalendarPopup from '../components/calender';
 
 const PublicProfile = () => {
   const navigate = useNavigate();
@@ -191,7 +191,7 @@ const PublicProfile = () => {
                 {[
                   { label: "Experience", value: `${doctorData.experience} years`, icon: FaUserMd, gradient: "from-blue-500 to-blue-400" },
                   { label: "Patients", value: `${placeholderDoctor.totalPatients}+`, icon: FaHospital, gradient: "from-green-500 to-emerald-400" },
-                  { label: "Response Time", value: "Less than 2 hours", icon: FaClock, gradient: "from-purple-500 to-pink-400" },
+                  { label: "Response Time", value: "Less than 2 hours", icon: FaClock, gradient: "from-sky-500 to-cyan-400" },
                    { label: "Languages", value: placeholderDoctor.languages.join(", "), icon: FaAward, gradient: "from-indigo-500 to-blue-400" }
                 ].map((stat, index) => (
                   <div key={index} 
