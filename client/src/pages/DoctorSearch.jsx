@@ -22,20 +22,16 @@ const DoctorSearch = () => {
   const [specialization, setSpecialization] = useState("all");
   const [results, setResults] = useState(true);
   const [filtersChanged, setFiltersChanged] = useState(false);
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(500);
+  const maxPrice= 500;
   const [priceRange, setPriceRange] = useState([0, 500]);
 
   const getUniqueSpecializations = (doctors) => {
     const uniqueSpecs = new Set(["all"]);
     doctors.forEach(doctor => {
-      if (doctor.profile.specialization && Array.isArray(doctor.profile.specialization)) {
         doctor.profile.specialization.forEach(spec => {
-         
              uniqueSpecs.add(spec.toLowerCase());
-         
         });
-      }
+      
     });
     return ["all", ...Array.from(uniqueSpecs).filter(spec => spec !== "all").sort()];
   };
@@ -45,26 +41,16 @@ const DoctorSearch = () => {
   useEffect(() => {
     if (allDoctors.length > 0) {
       setAvailableSpecializations(getUniqueSpecializations(allDoctors));
-      console.log("Available Specializations:", availableSpecializations);
     }
   }, [allDoctors]);
 
   useEffect(() => {
-    if (searchQuery) {
       fetchDoctors({
-        search: searchQuery,
+        search: searchQuery? searchQuery : "all",
         maxDistance: "",
         minReviewRating: 0,
         specialization: "all"
       });
-    } if (loading === "initial" && searchQuery === "") {
-      fetchDoctors({
-        search: "General Physicians",
-        maxDistance: "",
-        minReviewRating: 0,
-        specialization: "default"
-      });
-    }
   }, []);
 
   useEffect(() => {
@@ -137,7 +123,6 @@ const DoctorSearch = () => {
     setLoading(true);
     setError("");
     setResults(false); 
-
     try {
 
         const params = new URLSearchParams({
@@ -146,11 +131,6 @@ const DoctorSearch = () => {
             minReviewRating: (searchParams.minReviewRating != null ? searchParams.minReviewRating : minReviewRating).toString(),
             specialization: searchParams.specialization === "all" ? "" : (searchParams.specialization || specialization),
         });
-
-        if (!params.get('maxDistance')) params.delete('maxDistance');
-        if (params.get('minReviewRating') === '0') params.delete('minReviewRating');
-        if (!params.get('specialization')) params.delete('specialization');
-
 
         const { data } = await axios.get(
             `http://localhost:5000/api/doctor/search?${params.toString()}`,
@@ -195,8 +175,8 @@ const DoctorSearch = () => {
     setFiltersChanged(false);
   };
 
-  const minPercent = maxPrice > 0 ? (priceRange[0] / maxPrice) * 100 : 0;
-  const maxPercent = maxPrice > 0 ? (priceRange[1] / maxPrice) * 100 : 0;
+  const minPercent=maxPrice>0?(priceRange[0]/maxPrice)*100:0;
+  const maxPercent=maxPrice>0?(priceRange[1]/maxPrice)*100:0;
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">

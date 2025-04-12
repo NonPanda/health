@@ -20,7 +20,6 @@ export default function HomePage() {
   const [animationClass, setAnimationClass] = useState('animate-slide-in');
   const [query, setQuery] = useState('');
   const [displayText, setDisplayText] = useState('');
-  const fullText = "DoctorWho";
   const [typingComplete, setTypingComplete] = useState(false);
   const [isImageInView, setIsImageInView] = useState(false);
   const imageRef = useRef(null); 
@@ -52,7 +51,7 @@ export default function HomePage() {
 
   useEffect(() => {
     let currentIndex = 0;
-    const text = fullText;
+    const text = "DoctorWho";
 
     const typingInterval = setInterval(() => {
       if (currentIndex <= text.length) {

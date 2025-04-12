@@ -20,12 +20,14 @@ export default function ForgotPassword() {
     }
 
     try {
-      await axios.post("http://localhost:5000/forgot-password", { email });
+      console.log(email);
+      await axios.post("http://localhost:5000/api/user/forgot-password", { email });
       setErrors({});
         setSuccess(true);
     } catch (err) {
         if(err.status === 404) {
             setErrors({ email: "User not found" });
+            console.log(err);
         
     }
     }

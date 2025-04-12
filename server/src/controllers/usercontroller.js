@@ -2,6 +2,10 @@ const User = require('../models/userModel.js');
 const { compare } = require('bcrypt');
 const {TryCatch, ErrorHandler,cookieOptions,sendToken} =require('../constants/config.js');
 const {getcoordinates}=require('../middlewares/geo.js');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const bcrypt = require('bcrypt');
+
 
 const register = TryCatch(async (req, res, next) => {
     const { name, email, password} = req.body;
@@ -24,11 +28,6 @@ const login = TryCatch(async (req, res, next) => {
     
     const isMatch = await compare(password, user.password);
     if (!isMatch) return next(new ErrorHandler("Invalid email or password", 404));
-
-    // const doctor= await Doctor.findOne({user: user._id});
-    // if(doctor){
-    //     user.role="doctor";
-    // }
 
     sendToken(res, user, 200, `Welcome back ${user.name}!`);
 
@@ -131,8 +130,59 @@ const userlocate = TryCatch(async (req, res, next) => {
     });
   });
 
+const reset = TryCatch(async (req, res, next) => {
+    const { id, token } = req.params;
+    const { password } = req.body;
 
+    const user = await User.findById(id);
+    if (!user) return next(new ErrorHandler("User not found", 404));
 
+    const isMatch = await compare(token, user.resetPasswordToken);
+    if (!isMatch) return next(new ErrorHandler("Invalid or expired token", 400));
+
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.status(200).json({ Status: "Success" });
+}
+);
+
+const forgot = TryCatch(async (req, res, next) => {
+  
+  const { email } = req.body;
+
+  if (!email) {
+    return next(new ErrorHandler("Email is required", 400));
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  const resetToken = crypto.randomBytes(20).toString('hex');
+  const hash = await bcrypt.hash(resetToken, 10);
+  user.resetPasswordToken = hash;
+  user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+  await user.save();
+
+  const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${user._id}/${resetToken}`;
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+      <h2 style="color: #333;">Password Reset Request</h2>
+      <p>Hi ${user.name},</p>
+      <p>You requested to reset your password. Click the link below to reset it:</p>
+      <a href="${resetUrl}" style="display: inline-block; padding: 10px 20px; margin: 10px 0; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px;">Reset Password</a>
+      <p>If you did not request a password reset, please ignore this email.</p>
+      <p>Thanks,<br/>The Doctor Who Team</p>
+    </div>
+  `;
+  await sendEmail(user.email, 'Password Reset', htmlContent);
+
+  res.send('Password reset email sent.');
+});
 
 async function sendEmail(to, subject, html) {
     try {
@@ -157,4 +207,6 @@ async function sendEmail(to, subject, html) {
     }
 }
 
-module.exports = { register, login,logout,getProfile, updateProfile, userlocate, uploadProfilePicture};
+
+
+module.exports = { register, login,logout,getProfile, updateProfile, userlocate, uploadProfilePicture,reset,forgot };

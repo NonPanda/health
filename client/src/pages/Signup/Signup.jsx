@@ -103,13 +103,10 @@ export default function Signup({ setUser }) {
 
           } catch (error) {
             if (error.response) {
-              if (error.response.status === 401) {
+              if (error.response.status === 404) {
                 setErrors({password: "Invalid email or password."});
-              } else if (error.response.status === 404) {
-                setErrors({
-                  password: "User does not exist.",
-                  email: "User does not exist.",
-                });
+              } else if (error.response.status === 401) {
+                setErrors({general: "Unauthorized access."});
               }
             } else {
               setErrors({ general: "Please try again later." });

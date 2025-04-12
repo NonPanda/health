@@ -8,23 +8,13 @@ import { useEffect } from "react";
 import CustomInput from "../../components/CustomInput";
 
 
-
-
-
 export default function ResetPassword() {
     const { id, token } = useParams();
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
-
-
     const [success, setSuccess] = useState(false);
-
-    // useEffect (() => {
-    //      setErrors({});
-    // }, [password, confirmPassword]);
-
 
     const validateForm = () => {
         const newErrors = {};
@@ -51,9 +41,6 @@ export default function ResetPassword() {
         return Object.keys(newErrors).length === 0;
     };
 
-
-  
-
     const handlePasswordUpdate = async (e) => {
         e.preventDefault();
 
@@ -63,7 +50,7 @@ export default function ResetPassword() {
 
         
         try {
-            await axios.post(`http://localhost:5000/reset-password/${id}/${token}`, { password });
+            await axios.post(`http://localhost:5000/api/user/reset-password/${id}/${token}`, { password });
             setErrors({});
             setSuccess(true);
             navigate("/signup");
@@ -73,7 +60,6 @@ export default function ResetPassword() {
             setErrors(err.response?.data?.error || "Something went wrong");
         }
     }
-
 
   return (
      <div className="flex flex-col md:flex-row justify-center items-center">

@@ -25,17 +25,18 @@ export default function DoctorProfile({ user, setUser }) {
 
   useEffect(() => {
     if (user) {
+      const { profile={} } = user;
       setUpdatedProfile({
         name: user?.name || "",
-        avatar: user?.profile?.avatar || "",
+        avatar: profile.avatar || "",
         email: user?.email || "",
-        phone: user?.profile?.phone || "",
-        specialization: Array.isArray(user?.profile?.specialization) ? user?.profile?.specialization : [],
-        workingHours: user?.profile?.workingHours || "", 
-        experience: user?.profile?.experience || "",
-        fees: user?.profile?.fees || "",
-        education: Array.isArray(user?.profile?.education) ? user?.profile?.education : [],
-        certifications: Array.isArray(user?.profile?.certifications) ? user?.profile?.certifications : [],
+        phone: profile.phone || "",
+        specialization: Array.isArray(profile.specialization) ? profile.specialization : [],
+        workingHours: profile.workingHours || "", 
+        experience: profile.experience || "",
+        fees: profile.fees || "",
+        education: Array.isArray(profile.education) ? profile.education : [],
+        certifications: Array.isArray(profile.certifications) ? profile.certifications : [],
       });
     }
   }, [user]);
