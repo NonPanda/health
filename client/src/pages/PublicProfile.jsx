@@ -77,17 +77,16 @@ const PublicProfile = () => {
     avatar: null
   };
 
-   // Function to open calendar popup
    const handleOpenCalendar = () => {
     setIsCalendarOpen(true);
   };
 
-  // Function to close calendar popup
   const handleCloseCalendar = () => {
     setIsCalendarOpen(false);
   };
 
   const doctorData = doctor || placeholderDoctor;
+  console.log(doctorData);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -183,7 +182,7 @@ const PublicProfile = () => {
                 <h2 className="text-3xl font-bold text-gray-900">About</h2>
               </div>
               <p className="text-gray-600 leading-relaxed text-lg">
-                {placeholderDoctor.about}
+                {doctorData.about}
               </p>
               
               {/* Stats Grid */}
@@ -192,7 +191,7 @@ const PublicProfile = () => {
                   { label: "Experience", value: `${doctorData.experience} years`, icon: FaUserMd, gradient: "from-blue-500 to-blue-400" },
                   { label: "Patients", value: `${placeholderDoctor.totalPatients}+`, icon: FaHospital, gradient: "from-green-500 to-emerald-400" },
                   { label: "Response Time", value: "Less than 2 hours", icon: FaClock, gradient: "from-sky-500 to-cyan-400" },
-                   { label: "Languages", value: placeholderDoctor.languages.join(", "), icon: FaAward, gradient: "from-indigo-500 to-blue-400" }
+                   { label: "Languages", value: doctorData.languages.join(", "), icon: FaAward, gradient: "from-indigo-500 to-blue-400" }
                 ].map((stat, index) => (
                   <div key={index} 
                     className="group relative transform hover:-translate-y-1 transition-all duration-300 cursor-pointer">
@@ -218,7 +217,7 @@ const PublicProfile = () => {
               </div>
               
               <div className="grid gap-6">
-              {(placeholderDoctor.education).map((edu, index) => (
+              {(doctorData.education).map((edu, index) => (
                 <div key={index} 
                   className="group bg-gradient-to-r from-white to-blue-50/30 rounded-xl p-6 hover:shadow-lg transition-all duration-300 border border-blue-100/20 hover:border-blue-200/50 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-300"></div>
@@ -227,19 +226,19 @@ const PublicProfile = () => {
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-xl font-bold text-gray-900">{edu.degree}</h3>
                       <span className="px-4 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-semibold group-hover:bg-blue-100 transition-colors duration-300">
-                        {edu.year}
+                        {edu.year||"N/A"}
                       </span>
                     </div>
                     
                     <div className="flex items-center gap-2 mb-4">
                       <FaHospital className="w-5 h-5 text-blue-500" />
-                      <span className="text-lg font-medium text-gray-700">{edu.institution}</span>
+                      <span className="text-lg font-medium text-gray-700">{edu.institution||"N/A"}</span>
                     </div>
                     
                     <div className="flex items-center gap-4 text-sm text-gray-600">
                       <div className="flex items-center gap-1.5">
                         <FaClock className="w-4 h-4 text-blue-500" />
-                        <span>Program Duration: 2 years</span>
+                        <span>Program Duration: {edu.duration||"N/A"}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <FaAward className="w-4 h-4 text-blue-500" />
@@ -253,9 +252,7 @@ const PublicProfile = () => {
             </div>
           </div>
 
-          {/* Right Column */}
           <div className="space-y-8">
-            {/* Contact Information */}
             <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden">
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
@@ -264,7 +261,7 @@ const PublicProfile = () => {
                 </div>
                 <div className="space-y-3">
                   {[
-                    { icon: FaMapMarkerAlt, value: doctorData.location, label: "Address" },
+                    { icon: FaMapMarkerAlt, value: doctorData.address, label: "Address" },
                     { icon: FaPhone, value: doctorData.phone, label: "Phone" },
                     { icon: FaEnvelope, value: doctorData.email, label: "Email" }
                   ].map((contact, index) => (

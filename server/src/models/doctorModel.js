@@ -24,17 +24,38 @@ const doctorSchema = new mongoose.Schema({
       avatar: String,
       phone: String,
       fees: Number,
-      education: [String],
+      education: [{
+        degree: String,
+        institution: String,
+        year: String,
+        duration: String,
+      }],
       certifications: [String],
       specialization: [String],
       experience: Number,
       workingHours: String,
+      about: String,
+      availability:[{
+        day: { type: String, enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] },
+        hours: String,
+      }],
+      consultDuration:{
+        type:Number,
+        default:30,
       },
-    //   location: {
-    //     type: { type: String, enum: ["Point"], required: true, default: "Point" },
-    //     coordinates: { type: [Number], required: true, default: [0, 0] },
-    //     formattedAddress: { type: String, default: "Unknown" }
-    // },
+      languages:[String],
+     
+    },
+      isVerified: {
+        type: Boolean,
+        default: false
+      },
+      totalPatients: {
+        type: Number,
+        default: 0
+      },
+     
+
     location: {
     type: { 
         type: String, 

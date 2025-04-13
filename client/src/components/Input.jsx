@@ -11,8 +11,8 @@ const Input = ({ name, placeholder, value: initialValue, onChange, inputClassNam
     onChange(value);
   };
   const handleChange = (e) => setValue(e.target.value);
-  const centered = ["location"].includes(name) ? "" : "text-center";
   const smallbox = ["weight", "height", "age", "experience", "fees"].includes(name) ? "ml-[15.8px]" : "ml-[17px]";
+  const centered = ["address","about"].includes(name) ? "ml-[0px]" : "text-center";
 
   return (
      <div className="relative group">

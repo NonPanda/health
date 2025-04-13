@@ -7,7 +7,7 @@ import { FaUserMd } from "react-icons/fa";
 import pic from "../assets/pic.png";
 import sethescope from "../assets/stethoscope.svg";
 
-export default function Navbar({ user, setUser, role }) {
+export default function Navbar({ user, setUser }) {
   const [open, setOpen] = useState(false);
   const [dropdown, setDropdown] = useState(false);
   const [scrolled, setScrolled] = useState(false);

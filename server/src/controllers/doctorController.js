@@ -168,15 +168,21 @@ const getDoctorInfo = TryCatch(async (req, res, next) => {
         totalReviews: doctor.totalReviews || 0,
         about: doctor.profile.about || "No information available",
         experience: doctor.profile.experience || 0,
-        totalPatients: doctor.profile.totalPatients || 0,
+        totalPatients: doctor.totalPatients || 0,
         languages: doctor.profile.languages || [],
         education: doctor.profile.education || [],
-        location: doctor.location.formattedAddress|| { formattedAddress: "Unknown" },
         phone: doctor.profile.phone || "Not available",
         email: doctor.email || "Not available",
         fees: doctor.profile.fees || 0,
-        isVerified: doctor.profile.isVerified || false,
+        isVerified: doctor.isVerified || false,
         avatar: doctor.profile.avatar || null,
+        workingHours: doctor.profile.workingHours || "Not available",
+        availability: doctor.profile.availability || [],
+        certifications: doctor.profile.certifications || [],
+        consultDuration: doctor.profile.consultDuration || 30,
+        address: doctor.location.formattedAddress || "Not available",
+        
+
     };
 
     res.status(200).json({
