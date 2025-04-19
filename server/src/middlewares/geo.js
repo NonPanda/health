@@ -44,17 +44,17 @@ const getcity = async (city) => {
   const getcoordinates = async (ip) => {
       if (ip === "127.0.0.1" || ip === "::1") {
         ip = await getPublicIP();
-         console.log("Using external IP:", ip);
+        //  console.log("Using external IP:", ip);
       }
 
       const response = await axios.get(
             `https://api.ip2location.io/?key=${process.env.IP2LOCATION_KEY}&ip=${ip}`
             );
-            console.log("IP2Location Response:", response.data);
+            // console.log("IP2Location Response:", response.data);
       if (!response.data.latitude || !response.data.longitude) {
         throw new Error("Invalid location data");
       }
-      console.log("User coordinates:", response.data.longitude, response.data.latitude);
+      // console.log("User coordinates:", response.data.longitude, response.data.latitude);
   
       return {
         type: "Point",
@@ -69,15 +69,15 @@ const geoMiddleware = TryCatch(async (req, res, next) => {
     try{
     if (req.query.city) {
         req.searchLocation = await getcity(req.query.city);
-        console.log("City coordinates:", req.searchLocation);
+        // console.log("City coordinates:", req.searchLocation);
     } else {
         const ip = req.headers["x-forwarded-for"] || req.ip;
-        console.log("Fetching coordinates for IP:", ip);
+        // console.log("Fetching coordinates for IP:", ip);
         if (!ip) {
             throw new ErrorHandler("No IP address detected", 400);
         }
         req.searchLocation = await getcoordinates(ip);
-        console.log("IP coordinates received:", req.searchLocation);
+        // console.log("IP coordinates received:", req.searchLocation);
     }
 
     if (!req.searchLocation?.coordinates || 
@@ -88,7 +88,7 @@ const geoMiddleware = TryCatch(async (req, res, next) => {
     }
 
     // req.searchLocation = location;
-    console.log("Search location set:", req.searchLocation);
+    // console.log("Search location set:", req.searchLocation);
     next();
 } catch (error) {
     next(error);

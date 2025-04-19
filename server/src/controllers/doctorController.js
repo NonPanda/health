@@ -12,7 +12,7 @@ const search = TryCatch(async(req, res, next) => {
 
     const maxDistance = req.query.maxDistance || 999999999999;
     const review = req.query.minReviewRating || 0;
-    console.log(req.query.specialization);
+    // console.log(req.query.specialization);
     const specializationfilter = req.query.specialization || "All";
 
     const model = genAI.getGenerativeModel({model:'gemini-1.5-flash'});
@@ -20,14 +20,14 @@ const search = TryCatch(async(req, res, next) => {
 
     const result = await model.generateContent(prompt);
     const specialization = (await result.response.text()).replace(/\n/g, ',').split(',').map(data => data.trim().toLowerCase());
-    console.log("specialization", specialization);
+    // console.log("specialization", specialization);
     
     
     if (!req.searchLocation || !req.searchLocation.coordinates) {
         return next(new ErrorHandler("Location coordinates not available", 400));
     }
 
-    console.log("search and max dist", search, maxDistance);
+    // console.log("search and max dist", search, maxDistance);
     const specializationPriority = {};
     specialization.forEach((s, i) => {
         specializationPriority[s] = i+1;
