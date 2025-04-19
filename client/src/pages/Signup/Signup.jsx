@@ -95,7 +95,8 @@ export default function Signup({ setUser }) {
           );
             console.log('Response received:', response);
             if (response.status === 200) { 
-               setUser(response.data.user);   
+               setUser(response.data.user);
+                localStorage.setItem('userId', response.data.user._id);   
                localStorage.setItem('userType', 'user');          
                 navigate('/profile');
                           
@@ -124,6 +125,7 @@ export default function Signup({ setUser }) {
           
             if (response.status === 200) {
               setUser(response.data.user);
+              localStorage.setItem('userId', response.data.user._id);
               localStorage.setItem('userType', 'doctor');
               navigate('/doctor-profile');
             }
@@ -149,13 +151,18 @@ export default function Signup({ setUser }) {
             return;
           }
         
-          try {
-            const response = await axios.post('http://localhost:5000/api/user/register', {
+            try {
+              const response = await axios.post('http://localhost:5000/api/user/register', {
               name: formData.username,
               email: formData.email,
               password: formData.password,
               role: isDoctor ? "doctor" : "patient",
-            });
+              });
+              if (isDoctor) {
+              localStorage.setItem('doctorId', response.data.user._id);
+              } else {
+              localStorage.setItem('userId', response.data.user._id);
+              }
         
             console.log('Response received:', response);
         

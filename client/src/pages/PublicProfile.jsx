@@ -42,6 +42,7 @@ const PublicProfile = () => {
   }
 
   const placeholderDoctor = {
+    _id: "placeholder-doctor-id", // Add this line
     name: "Dr. Sarah Wilson",
     specialization: ["Cardiologist", "Internal Medicine"],
     rating: 4.8,
@@ -92,11 +93,12 @@ const PublicProfile = () => {
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       {/* Calendar Popup Component */}
       <CalendarPopup 
-        isOpen={isCalendarOpen}
-        onClose={handleCloseCalendar}
-        doctorName={doctorData.name}
-        doctorFees={doctorData.fees}
-      />
+  isOpen={isCalendarOpen}
+  onClose={handleCloseCalendar}
+  doctorName={doctorData.name}
+  doctorFees={doctorData.fees}
+  doctorId={doctorData._id}  // Pass the doctor ID for appointment booking
+/>
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="relative bg-white rounded-3xl shadow-lg overflow-hidden mb-12">

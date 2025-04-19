@@ -18,5 +18,6 @@ const router = express.Router();
   router.put('/uploadpfp', upload.single('profilePicture'), uploadProfilePicture);
 
   router.get('/update-location',userlocate);
+  
 
 module.exports = router;
