@@ -20,8 +20,8 @@ function App() {
 
   useEffect(() => {
     const role=localStorage.getItem('userType');
-    console.log(role);
-    console.log("user",user);
+    // console.log(role);
+    // console.log("user",user);
 
     if (user!=="loading"&&user==null) {
       if(role==="user"){
