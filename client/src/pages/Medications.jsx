@@ -1,82 +1,38 @@
 import { useState, useEffect } from 'react';
 import { 
-    X, Plus, Bell, Calendar, Edit, Trash2, AlertCircle, Clock, ChevronRight, 
-    Activity, Pill, RefreshCw, Search, CheckCircle, XCircle, Moon, Sun, MoreHorizontal 
+    X, Plus, Bell, Calendar, Edit, Trash2, AlertCircle, Clock, ChevronRight,
+    Activity, Pill, RefreshCw, Search, CheckCircle, XCircle, Moon, Sun, MoreHorizontal
 } from 'lucide-react';
 
 export default function MedicationsDashboard() {
     // State for medications list
-    const [medications, setMedications] = useState([
-        {
-            id: 1,
-            name: "Lisinopril",
-            dosage: "10mg",
-            frequency: "Once daily",
-            time: "8:00 AM",
-            instructions: "Take with food",
-            refillDate: "May 15, 2025",
-            doctor: "Dr. Sarah Johnson",
-            purpose: "Blood pressure management",
-            color: "#4F46E5",
-            adherence: 95,
-            taken: true,
-            category: "Heart"
-        },
-        {
-            id: 2,
-            name: "Metformin",
-            dosage: "500mg",
-            frequency: "Twice daily",
-            time: "9:00 AM, 9:00 PM",
-            instructions: "Take with meals",
-            refillDate: "May 3, 2025",
-            doctor: "Dr. Michael Chen",
-            purpose: "Blood sugar control",
-            color: "#10B981",
-            adherence: 88,
-            taken: false,
-            category: "Diabetes"
-        },
-        {
-            id: 3,
-            name: "Atorvastatin",
-            dosage: "20mg",
-            frequency: "Once daily",
-            time: "8:00 PM",
-            instructions: "Take in the evening",
-            refillDate: "June 10, 2025",
-            doctor: "Dr. Sarah",
-            adherence: 90,
-            taken: false,
-            category: "Heart"
-        },
-        {
-            id: 4,
-            name: "Sertraline",
-            dosage: "50mg",
-            frequency: "Once daily",
-            time: "10:00 AM",
-            instructions: "Take in the morning",
-            refillDate: "May 28, 2025",
-            doctor: "Dr. Jessica Williams",
-            purpose: "Mood stabilizer",
-            color: "#8B5CF6",
-            adherence: 97,
-            taken: true,
-            category: "Mental Health"
-        }
-    ]);
+    const [medications, setMedications] = useState([]);
 
-    // State for theme
+    useEffect(() => {
+        const fetchMedications = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/medications', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    setMedications(data.medications);
+                } else {
+                    console.error('Error fetching medications:', data.error);
+                }
+            } catch (error) {
+                console.error('Error while fetching medications:', error);
+            }
+        };
+
+        fetchMedications();
+    }, []);
+
+    // State for theme, view, tabs, modals, form input, detail view and animation
     const [isDarkMode, setIsDarkMode] = useState(false);
-    
-    // State for view mode
     const [viewMode, setViewMode] = useState("grid");
-    
-    // State for active tab
     const [activeTab, setActiveTab] = useState("all");
-    
-    // State for new medication form
     const [showAddForm, setShowAddForm] = useState(false);
     const [newMed, setNewMed] = useState({
         name: "",
@@ -90,105 +46,103 @@ export default function MedicationsDashboard() {
         color: "#4F46E5",
         category: "Heart"
     });
-
-    // State for medication detail view
     const [selectedMed, setSelectedMed] = useState(null);
-    
-    // State for animation effects
     const [animateCard, setAnimateCard] = useState(null);
-
-    // Search state
     const [searchTerm, setSearchTerm] = useState("");
 
-    // Filter medications based on active tab and search
     const filteredMedications = medications.filter(med => {
         const matchesSearch = med.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                                                    (med.purpose && med.purpose.toLowerCase().includes(searchTerm.toLowerCase()));
-        
+            (med.purpose && med.purpose.toLowerCase().includes(searchTerm.toLowerCase()));
+
         if (activeTab === "all") return matchesSearch;
         if (activeTab === "morning") return matchesSearch && med.time.includes("AM");
         if (activeTab === "evening") return matchesSearch && med.time.includes("PM");
         if (activeTab === "taken") return matchesSearch && med.taken;
         if (activeTab === "pending") return matchesSearch && !med.taken;
-        
+
         return matchesSearch;
     });
 
-    // Handle form input changes
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setNewMed(prev => ({ ...prev, [name]: value }));
     };
 
-    // Add new medication
-    const handleAddMedication = () => {
-        if (newMed.name && newMed.dosage) {
-            const newMedication = {
-                id: medications.length + 1,
-                ...newMed,
-                adherence: 100,
-                taken: false
-            };
-            
-            setMedications([...medications, newMedication]);
-            
-            // Reset form
-            setNewMed({
-                name: "",
-                dosage: "",
-                frequency: "",
-                time: "",
-                instructions: "",
-                refillDate: "",
-                doctor: "",
-                purpose: "",
-                color: "#4F46E5",
-                category: "Heart"
+    const handleAddMedication = async () => {
+        if (!newMed.name || !newMed.dosage) {
+            alert("Medication name and dosage are required");
+            return;
+        }
+        try {
+            const response = await fetch('http://localhost:5000/api/medications', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(newMed)
             });
-            setShowAddForm(false);
+            const data = await response.json();
+            if (response.ok && data.success) {
+                setMedications(prev => [...prev, data.medication]);
+                setNewMed({
+                    name: "",
+                    dosage: "",
+                    frequency: "",
+                    time: "",
+                    instructions: "",
+                    refillDate: "",
+                    doctor: "",
+                    purpose: "",
+                    color: "#4F46E5",
+                    category: "Heart"
+                });
+                setShowAddForm(false);
+            } else {
+                console.error(data.error);
+                alert(data.error || "Failed to add medication.");
+            }
+        } catch (error) {
+            console.error("Error while adding medication:", error);
+            alert("An unexpected error occurred. Please try again.");
         }
     };
 
-    // Delete medication
-    const handleDeleteMedication = (id) => {
+    const handleDeleteMedication = async (id) => {
         setAnimateCard(id);
-        setTimeout(() => {
-            setMedications(medications.filter(med => med.id !== id));
-            if (selectedMed && selectedMed.id === id) {
-                setSelectedMed(null);
+        try {
+            const response = await fetch(`http://localhost:5000/api/medications/${id}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+            const data = await response.json();
+            if (response.ok && data.success) {
+                setMedications(prev => prev.filter(med => med._id !== id));
+                if (selectedMed && selectedMed._id === id) setSelectedMed(null);
+            } else {
+                alert(data.error || 'Failed to delete medication.');
             }
+        } catch (error) {
+            console.error('Error while deleting medication:', error);
+            alert('An unexpected error occurred. Please try again.');
+        } finally {
             setAnimateCard(null);
-        }, 300);
+        }
     };
 
-    // View medication details
-    const handleViewDetails = (med) => {
-        setSelectedMed(med);
-    };
+    const handleViewDetails = (med) => setSelectedMed(med);
+    const handleCloseDetails = () => setSelectedMed(null);
 
-    // Close detail view
-    const handleCloseDetails = () => {
-        setSelectedMed(null);
-    };
-
-    // Toggle medication taken status
     const handleToggleTaken = (id) => {
         setMedications(medications.map(med => 
             med.id === id ? { ...med, taken: !med.taken } : med
         ));
     };
 
-    // Toggle dark mode
-    const toggleDarkMode = () => {
-        setIsDarkMode(!isDarkMode);
-    };
+    const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
-    // Background gradient classes based on theme
     const bgGradient = isDarkMode 
         ? "bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900" 
         : "bg-gradient-to-br from-blue-50 via-white to-blue-100";
 
-    // Card background based on theme
     const cardBg = isDarkMode ? "bg-gray-800" : "bg-white";
     const textColor = isDarkMode ? "text-white" : "text-gray-800";
     const textMuted = isDarkMode ? "text-gray-400" : "text-gray-500";
@@ -198,8 +152,8 @@ export default function MedicationsDashboard() {
         <div className={`min-h-screen ${bgGradient} transition-all duration-300`}>
             {/* Header */}
             <header className={`sticky top-0 z-10 backdrop-blur-md ${isDarkMode ? 'bg-gray-900/80' : 'bg-white/80'} border-b ${borderColor} shadow-sm`}>
-                <div className="container mx-auto p-4">
-                    <div className="flex justify-between items-center">
+                <div className="container mx-auto p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                         <div className="flex items-center space-x-2">
                             <div className={`p-2 rounded-full ${isDarkMode ? 'bg-blue-900' : 'bg-blue-100'}`}>
                                 <Pill size={24} className={`${isDarkMode ? 'text-blue-300' : 'text-blue-600'}`} />
@@ -230,8 +184,8 @@ export default function MedicationsDashboard() {
                     </div>
                     
                     {/* Search and filters */}
-                    <div className="mt-4 flex flex-col sm:flex-row justify-between items-center">
-                        <div className={`relative w-full sm:w-64 mb-3 sm:mb-0 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                    <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <div className={`relative w-full sm:w-64`}>
                             <input
                                 type="text"
                                 placeholder="Search medications..."
@@ -246,12 +200,12 @@ export default function MedicationsDashboard() {
                             <Search size={16} className="absolute left-3 top-2.5 text-gray-400" />
                         </div>
                         
-                        <div className="flex space-x-1 overflow-x-auto w-full sm:w-auto pb-1">
+                        <div className="flex space-x-1 overflow-x-auto pb-1">
                             <button 
                                 onClick={() => setActiveTab("all")}
                                 className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                                     activeTab === "all" 
-                                    ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white') 
+                                    ? 'bg-blue-600 text-white'
                                     : (isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-100')
                                 }`}
                             >
@@ -261,7 +215,7 @@ export default function MedicationsDashboard() {
                                 onClick={() => setActiveTab("morning")}
                                 className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                                     activeTab === "morning" 
-                                    ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white') 
+                                    ? 'bg-blue-600 text-white'
                                     : (isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-100')
                                 }`}
                             >
@@ -272,7 +226,7 @@ export default function MedicationsDashboard() {
                                 onClick={() => setActiveTab("evening")}
                                 className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                                     activeTab === "evening" 
-                                    ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white') 
+                                    ? 'bg-blue-600 text-white'
                                     : (isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-100')
                                 }`}
                             >
@@ -283,7 +237,7 @@ export default function MedicationsDashboard() {
                                 onClick={() => setActiveTab("taken")}
                                 className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                                     activeTab === "taken" 
-                                    ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white') 
+                                    ? 'bg-blue-600 text-white'
                                     : (isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-100')
                                 }`}
                             >
@@ -294,7 +248,7 @@ export default function MedicationsDashboard() {
                                 onClick={() => setActiveTab("pending")}
                                 className={`px-3 py-1.5 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                                     activeTab === "pending" 
-                                    ? (isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white') 
+                                    ? 'bg-blue-600 text-white'
                                     : (isDarkMode ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-600 hover:bg-gray-100')
                                 }`}
                             >
@@ -303,7 +257,7 @@ export default function MedicationsDashboard() {
                             </button>
                         </div>
                         
-                        <div className="hidden sm:flex space-x-1 ml-2">
+                        <div className="flex space-x-1 ml-2">
                             <button 
                                 onClick={() => setViewMode("grid")}
                                 className={`p-2 rounded-md ${
@@ -342,7 +296,7 @@ export default function MedicationsDashboard() {
             </header>
 
             {/* Main Content */}
-            <main className="container mx-auto p-4 pb-24">
+            <main className="container mx-auto p-4 sm:p-6 pb-24">
                 {/* Dashboard Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div className={`${cardBg} rounded-2xl shadow-lg border ${borderColor} p-4 transform transition-all hover:scale-105 cursor-pointer`}>
@@ -404,7 +358,7 @@ export default function MedicationsDashboard() {
                     <div className="flex items-end space-x-4 h-32">
                         {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, index) => {
                             const randomHeight = 40 + Math.floor(Math.random() * 60);
-                            const today = index === 3; // Thursday as example
+                            const today = index === 3;
                             
                             return (
                                 <div key={day} className="flex flex-col items-center flex-1">
@@ -424,9 +378,11 @@ export default function MedicationsDashboard() {
                 </div>
 
                 {/* Medications Grid/List */}
-                <div className="mb-4 flex justify-between items-center">
+                <div className="mb-4 flex flex-col sm:flex-row justify-between items-center gap-2">
                     <h2 className={`text-xl font-bold ${textColor}`}>Your Medications</h2>
-                    <span className={`text-sm ${textMuted}`}>{filteredMedications.length} medication{filteredMedications.length !== 1 ? 's' : ''}</span>
+                    <span className={`text-sm ${textMuted}`}>
+                        {filteredMedications.length} medication{filteredMedications.length !== 1 ? 's' : ''}
+                    </span>
                 </div>
 
                 {filteredMedications.length === 0 ? (
@@ -449,16 +405,15 @@ export default function MedicationsDashboard() {
                     <div className={viewMode === "grid" ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" : "space-y-4"}>
                         {filteredMedications.map(med => (
                             <div 
-                                key={med.id}
+                                key={med._id}
                                 onClick={() => handleViewDetails(med)}
                                 className={`
                                     ${cardBg} rounded-2xl shadow-lg border ${borderColor} overflow-hidden
-                                    ${animateCard === med.id ? 'animate-wobble opacity-50' : ''} 
+                                    ${animateCard === med._id ? 'animate-wobble opacity-50' : ''} 
                                     transition-all duration-300 transform hover:scale-102 hover:shadow-xl cursor-pointer
                                 `}
                             >
                                 {viewMode === "grid" ? (
-                                    // Grid view
                                     <div>
                                         <div 
                                             className="h-3" 
@@ -509,7 +464,7 @@ export default function MedicationsDashboard() {
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        handleDeleteMedication(med.id);
+                                                        handleDeleteMedication(med._id);
                                                     }}
                                                     className={`p-1.5 rounded-full text-gray-400 transition-colors hover:${isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-600'}`}
                                                 >
@@ -519,7 +474,6 @@ export default function MedicationsDashboard() {
                                         </div>
                                     </div>
                                 ) : (
-                                    // List view
                                     <div className="flex p-0">
                                         <div 
                                             className="w-2" 
@@ -562,7 +516,7 @@ export default function MedicationsDashboard() {
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            handleDeleteMedication(med.id);
+                                                            handleDeleteMedication(med._id);
                                                         }}
                                                         className={`p-1.5 rounded-full text-gray-400 transition-colors hover:${isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-600'}`}
                                                     >
@@ -583,14 +537,8 @@ export default function MedicationsDashboard() {
             {/* Medication Detail Modal */}
             {selectedMed && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div 
-                        className={`${cardBg} rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transition-all transform duration-300 animate-scaleIn`}
-                    >
-                        <div 
-                            className="h-2" 
-                            style={{ backgroundColor: selectedMed.color }}
-                        ></div>
-                        
+                    <div className={`${cardBg} rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transition-all transform duration-300 animate-scaleIn`}>
+                        <div className="h-2" style={{ backgroundColor: selectedMed.color }}></div>
                         <div className="p-6">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex items-center">
@@ -605,10 +553,7 @@ export default function MedicationsDashboard() {
                                         <p className={`font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>{selectedMed.dosage}</p>
                                     </div>
                                 </div>
-                                <button 
-                                    onClick={handleCloseDetails}
-                                    className="text-gray-400 hover:text-gray-600 transition-colors"
-                                >
+                                <button onClick={handleCloseDetails} className="text-gray-400 hover:text-gray-600 transition-colors">
                                     <X size={24} />
                                 </button>
                             </div>
@@ -646,7 +591,7 @@ export default function MedicationsDashboard() {
                 </div>
             )}
 
-            {/* New Medication Form Modal (optional) */}
+            {/* New Medication Form Modal */}
             {showAddForm && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
                     <div className={`${cardBg} rounded-xl shadow-xl w-full max-w-md p-6 transition-all transform duration-300`}>
