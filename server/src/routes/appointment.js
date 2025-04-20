@@ -30,20 +30,24 @@ const createGoogleCalendarLink = ({ title, start, end, details, location }) => {
 // Book an appointment
 router.post('/book', isAuthenticated, async (req, res) => {
   try {
-    console.log('Received data:', req.body);
-    const { user, doctor, appointmentDate, appointmentTime } = req.body;
+    const { user, doctor, appointmentDate, appointmentTime, consultationType } = req.body;
     
-    // Append "T00:00:00Z" (note the "Z") if appointmentDate does not already have a time.
-    const adjustedAppointmentDate = appointmentDate.includes("T") 
+    // If appointmentDate already has a time component, use it; otherwise assume UTC midnight.
+    const adjustedAppointmentDate = appointmentDate.includes("T")
       ? new Date(appointmentDate)
       : new Date(appointmentDate + "T00:00:00Z");
-    
-    const appointment = await Appointment.create({
+
+    // Create the appointment first.
+    let appointment = await Appointment.create({
       doctor,
       user,
       appointmentDate: adjustedAppointmentDate,
-      appointmentTime
+      appointmentTime,
+      consultationType  // "online" or "offline"
     });
+
+    // Do NOT generate and send the online meeting link at booking.
+    // (We'll create/send the link when the doctor approves the appointment)
 
     // Get user's email from database
     const dbUser = await User.findById(req.user);
@@ -51,9 +55,8 @@ router.post('/book', isAuthenticated, async (req, res) => {
       return res.status(400).json({ success: false, error: "User email not found" });
     }
     const userEmail = dbUser.email;
-
     // Use Canadian date format
-    const formattedDate = adjustedAppointmentDate.toLocaleDateString('en-CA'); // e.g. "2025-04-23"
+    const formattedDate = adjustedAppointmentDate.toLocaleDateString('en-CA');
 
     // Generate Google Calendar link (assume a 30-minute appointment)
     const eventTitle = 'Doctor Appointment';
@@ -69,7 +72,7 @@ router.post('/book', isAuthenticated, async (req, res) => {
       location: eventLocation
     });
 
-    // Email text now uses formattedDate with en-CA format
+    // Build email HTML for the user without the join meeting link.
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: userEmail,
@@ -77,22 +80,25 @@ router.post('/book', isAuthenticated, async (req, res) => {
       html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
         <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
-        <h2 style="color: #3b82f6; margin: 0;">Appointment Confirmation</h2>
+          <h2 style="color: #3b82f6; margin: 0;">Appointment Confirmation</h2>
         </div>
-        
         <div style="padding: 20px 0;">
-        <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">Hello,</p>
-        <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">Your appointment on <strong>${formattedDate}</strong> at <strong>${appointmentTime}</strong> has been submitted.</p>
-        <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">Please note that your booking is awaiting the doctor's approval. We will notify you once it's confirmed.</p>
-        
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${googleCalendarUrl}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Add to Google Calendar</a>
+          <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">Hello,</p>
+          <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">
+            Your appointment on <strong>${formattedDate}</strong> at <strong>${appointmentTime}</strong> has been submitted.
+          </p>
+          <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">
+            Please note that your booking is awaiting the doctor's approval. We will notify you once it's confirmed.
+          </p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${googleCalendarUrl}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">
+              Add to Google Calendar
+            </a>
+          </div>
         </div>
-        </div>
-        
         <div style="padding-top: 20px; border-top: 1px solid #eaeaea; color: #666; font-size: 14px;">
-        <p>Thank you for choosing our services.</p>
-        <p style="margin: 0;">Your Health Team</p>
+          <p>Thank you for choosing our services.</p>
+          <p style="margin: 0;">Your Health Team</p>
         </div>
       </div>
       `
@@ -101,21 +107,10 @@ router.post('/book', isAuthenticated, async (req, res) => {
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
         console.error('Error sending email to user:', err);
-      } else {
-        console.log('User email sent:', info.response);
       }
     });
 
-    // Generate a calendar link for the doctor as well
-    const doctorGoogleCalendarUrl = createGoogleCalendarLink({
-      title: eventTitle,
-      start: startTime,
-      end: endTime,
-      details: eventDetails,
-      location: eventLocation
-    });
-
-    // Query the database for the doctor's email using the doctor ID
+    // Similarly, send email to doctor (without join meeting link) if needed.
     const dbDoctor = await Doctor.findById(doctor);
     if (dbDoctor && dbDoctor.email) {
       const doctorMailOptions = {
@@ -125,24 +120,31 @@ router.post('/book', isAuthenticated, async (req, res) => {
         html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 5px;">
           <div style="text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eaeaea;">
-        <h2 style="color: #3b82f6; margin: 0;">New Appointment Request</h2>
+            <h2 style="color: #3b82f6; margin: 0;">New Appointment Request</h2>
           </div>
-          
           <div style="padding: 20px 0;">
-        <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">Hello Dr. ${dbDoctor.name || ''},</p>
-        <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">A new appointment has been booked for <strong>${formattedDate}</strong> at <strong>${appointmentTime}</strong>.</p>
-        <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">Please review and approve this appointment request.</p>
-        
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${doctorGoogleCalendarUrl}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block; margin-bottom: 15px;">Add to Google Calendar</a>
-          <br>
-          <a href="http://localhost:5173/appointments" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Approve Appointment</a>
-        </div>
+            <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">
+              Hello Dr. ${dbDoctor.name || ''},
+            </p>
+            <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">
+              A new appointment has been booked for <strong>${formattedDate}</strong> at <strong>${appointmentTime}</strong>.
+            </p>
+            <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">
+              Please review and approve this appointment request.
+            </p>
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${googleCalendarUrl}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block; margin-bottom: 15px;">
+                Add to Google Calendar
+              </a>
+              <br>
+              <a href="http://localhost:5173/appointments" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">
+                Approve Appointment
+              </a>
+            </div>
           </div>
-          
           <div style="padding-top: 20px; border-top: 1px solid #eaeaea; color: #666; font-size: 14px;">
-        <p>Thank you for your attention.</p>
-        <p style="margin: 0;">Your Health Team</p>
+            <p>Thank you for your attention.</p>
+            <p style="margin: 0;">Your Health Team</p>
           </div>
         </div>
         `
@@ -151,8 +153,6 @@ router.post('/book', isAuthenticated, async (req, res) => {
       transporter.sendMail(doctorMailOptions, (err, info) => {
         if (err) {
           console.error('Error sending email to doctor:', err);
-        } else {
-          console.log('Doctor email sent:', info.response);
         }
       });
     } else {
@@ -205,9 +205,17 @@ router.put('/:id/approve', isAuthenticated, async (req, res) => {
     }
     // Update the status to 'confirmed'
     appointment.status = 'confirmed';
+
+    // If the consultation is online, generate the meeting link at approval time.
+    // This link will be sent to both the patient and the doctor.
+    let meetingLink = null;
+    if (appointment.consultationType === 'online') {
+      meetingLink = `https://meet.jit.si/${appointment._id}`;
+      appointment.meetingLink = meetingLink;
+    }
     await appointment.save();
 
-    // Get both the doctor and the patient from the database
+    // Get both the doctor and the patient
     const dbDoctor = await Doctor.findById(appointment.doctor);
     const dbUser = await User.findById(appointment.user);
     if (!dbDoctor || !dbDoctor.email || !dbUser || !dbUser.email) {
@@ -216,7 +224,7 @@ router.put('/:id/approve', isAuthenticated, async (req, res) => {
     
     // Format appointment date using Canadian format
     const adjustedAppointmentDate = new Date(appointment.appointmentDate);
-    const formattedDate = adjustedAppointmentDate.toLocaleDateString('en-CA'); // e.g., "2025-04-23"
+    const formattedDate = adjustedAppointmentDate.toLocaleDateString('en-CA');
 
     // Generate Google Calendar link (assume 30-minute duration)
     const eventTitle = 'Doctor Appointment';
@@ -232,7 +240,19 @@ router.put('/:id/approve', isAuthenticated, async (req, res) => {
       location: eventLocation
     });
     
-    // Email to the patient (user)
+    // Build email HTML for the patient
+    // If consultation is online, include a "Join Online Meeting" button that instructs them to join at the appointment time.
+    let userOnlineButton = '';
+    if (appointment.consultationType === 'online' && meetingLink) {
+      userOnlineButton = `
+       <div style="text-align: center; margin: 20px 0;">
+         <a href="${meetingLink}" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">
+           Join Online Meeting at Appointment Time
+         </a>
+       </div>
+      `;
+    }
+    
     const userMailOptions = {
       from: process.env.EMAIL_USER,
       to: dbUser.email,
@@ -244,10 +264,15 @@ router.put('/:id/approve', isAuthenticated, async (req, res) => {
           </div>
           <div style="padding: 20px 0;">
             <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">Hello,</p>
-            <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">Your appointment on <strong>${formattedDate}</strong> at <strong>${appointment.appointmentTime}</strong> has been confirmed.</p>
+            <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">
+              Your appointment on <strong>${formattedDate}</strong> at <strong>${appointment.appointmentTime}</strong> has been confirmed.
+            </p>
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${googleCalendarUrl}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Add to Google Calendar</a>
+              <a href="${googleCalendarUrl}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">
+                Add to Google Calendar
+              </a>
             </div>
+            ${userOnlineButton}
           </div>
           <div style="padding-top: 20px; border-top: 1px solid #eaeaea; color: #666; font-size: 14px;">
             <p>Thank you for choosing our services.</p>
@@ -261,11 +286,22 @@ router.put('/:id/approve', isAuthenticated, async (req, res) => {
       if (err) {
         console.error('Error sending email to user:', err);
       } else {
-        console.log('User email sent:', info.response);
+        // console.log('User email sent:', info.response);
       }
     });
 
-    // Email to the doctor
+    // Build email HTML for the doctor
+    let doctorOnlineButton = '';
+    if (appointment.consultationType === 'online' && meetingLink) {
+      doctorOnlineButton = `
+        <div style="text-align: center; margin: 20px 0;">
+          <a href="${meetingLink}" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">
+            Join Online Meeting at Appointment Time
+          </a>
+        </div>
+      `;
+    }
+    
     const doctorMailOptions = {
       from: process.env.EMAIL_USER,
       to: dbDoctor.email,
@@ -276,11 +312,18 @@ router.put('/:id/approve', isAuthenticated, async (req, res) => {
             <h2 style="color: #3b82f6; margin: 0;">Appointment Confirmed</h2>
           </div>
           <div style="padding: 20px 0;">
-            <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">Hello Dr. ${dbDoctor.name || ''},</p>
-            <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">The appointment for <strong>${formattedDate}</strong> at <strong>${appointment.appointmentTime}</strong> has been confirmed.</p>
+            <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">
+              Hello Dr. ${dbDoctor.name || ''},
+            </p>
+            <p style="margin-bottom: 20px; color: #333; line-height: 1.6;">
+              The appointment for <strong>${formattedDate}</strong> at <strong>${appointment.appointmentTime}</strong> has been confirmed.
+            </p>
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${googleCalendarUrl}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">Add to Google Calendar</a>
+              <a href="${googleCalendarUrl}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">
+                Add to Google Calendar
+              </a>
             </div>
+            ${doctorOnlineButton}
           </div>
           <div style="padding-top: 20px; border-top: 1px solid #eaeaea; color: #666; font-size: 14px;">
             <p>Thank you for your attention.</p>
@@ -294,13 +337,42 @@ router.put('/:id/approve', isAuthenticated, async (req, res) => {
       if (err) {
         console.error('Error sending email to doctor:', err);
       } else {
-        console.log('Doctor email sent:', info.response);
+        // console.log('Doctor email sent:', info.response);
       }
     });
 
     res.json({ success: true, appointment });
   } catch (error) {
     console.error('Error updating appointment:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Cancel appointment (for doctors)
+router.put('/:id/cancel', isAuthenticated, async (req, res) => {
+  try {
+    const appointment = await Appointment.findById(req.params.id);
+    if (!appointment) {
+      return res.status(404).json({ success: false, error: 'Appointment not found' });
+    }
+    // Ensure the logged-in doctor is the one assigned to the appointment
+    if (appointment.doctor.toString() !== req.user.toString()) {
+      return res.status(403).json({ success: false, error: 'Not authorized to cancel this appointment' });
+    }
+    
+    // Update the status to 'cancelled'
+    appointment.status = 'cancelled';
+    // Optionally, clear any meeting link if one exists
+    appointment.meetingLink = null;
+    await appointment.save();
+
+    // (Optional) Send cancellation emails to both patient and doctor
+    // For example, you can create mailOptions similar to the approval endpoint.
+    // Here, we'll keep it simple and only return the updated appointment.
+
+    res.json({ success: true, appointment });
+  } catch (error) {
+    console.error('Error cancelling appointment:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });

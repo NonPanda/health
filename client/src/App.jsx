@@ -12,6 +12,7 @@ import DoctorProfile from './pages/DoctorProfile'
 import DoctorSearch from './pages/DoctorSearch'
 import PublicProfile from './pages/PublicProfile'
 import Appointment from './pages/Appointment'
+import Medications from './pages/Medications'
 
 
 function App() {
@@ -59,6 +60,7 @@ function App() {
           <Route path="find-doctors" element={<DoctorSearch user={user} />} />
           <Route path="doctor/:id" element={<PublicProfile />} />
           <Route path="appointments" element={<Appointment />} />
+          <Route path="medications" element={<Medications />} />
         </Routes>
       </Router>
     </>

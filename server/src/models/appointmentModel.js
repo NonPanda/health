@@ -19,6 +19,11 @@ const appointmentSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  consultationType: {
+    type: String,
+    enum: ['online', 'offline'],
+    required: false
+  },
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'cancelled', 'completed'],

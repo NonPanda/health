@@ -11,6 +11,7 @@ const CalendarPopup = ({ isOpen, onClose, doctorName, doctorFees, doctorId }) =>
   const [showConfetti, setShowConfetti] = useState(false);
   const [bookedSlots, setBookedSlots] = useState([]);
   const { id } = useParams();
+  const [consultationType, setConsultationType] = useState('offline'); // New state for consultation type
 
   const fetchBookedSlots = async (date) => {
     if (!date) return;
@@ -143,7 +144,8 @@ const CalendarPopup = ({ isOpen, onClose, doctorName, doctorFees, doctorId }) =>
       user: localStorage.getItem('userId'),
       doctor: doctorId || id,
       appointmentDate: selectedDate,
-      appointmentTime: selectedTime
+      appointmentTime: selectedTime,
+      consultationType // Include consultation type in appointment data
     };
 
     try {
@@ -426,6 +428,33 @@ const CalendarPopup = ({ isOpen, onClose, doctorName, doctorFees, doctorId }) =>
                 </div>
                 <div className="font-medium mt-2">
                   Consultation Fee: ${doctorFees || '150'}
+                </div>
+                <div className="mt-4">
+                  <p className="font-medium mb-2">Consultation Type:</p>
+                  <div className="flex items-center space-x-4">
+                    <label className="flex items-center">
+                      <input 
+                        type="radio" 
+                        name="consultationType" 
+                        value="offline" 
+                        checked={consultationType === 'offline'} 
+                        onChange={(e) => setConsultationType(e.target.value)}
+                        className="mr-2" 
+                      />
+                      Offline
+                    </label>
+                    <label className="flex items-center">
+                      <input 
+                        type="radio" 
+                        name="consultationType" 
+                        value="online" 
+                        checked={consultationType === 'online'} 
+                        onChange={(e) => setConsultationType(e.target.value)}
+                        className="mr-2" 
+                      />
+                      Online
+                    </label>
+                  </div>
                 </div>
               </div>
               

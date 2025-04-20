@@ -64,11 +64,11 @@ export default function Navbar({ user, setUser }) {
               <span>Find Doctors</span>
             </Link>
             <Link 
-              to="/specialties" 
+              to="/medications" 
               className="group flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-[#3A8EF6] transition-all duration-200"
             >
               <RiHospitalLine className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" />
-              <span>Specialties</span>
+              <span>Medications</span>
             </Link>
             <Link 
               to="/appointments" 
@@ -165,7 +165,7 @@ export default function Navbar({ user, setUser }) {
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-50 hover:text-[#3A8EF6] transition-all duration-200"
           >
             <RiHospitalLine className="w-4 h-4" />
-            <span>Specialties</span>
+            <span>Medications</span>
           </Link>
           <Link
             to="/appointments"

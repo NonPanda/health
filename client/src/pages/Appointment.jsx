@@ -10,8 +10,8 @@ const Appointment = () => {
     const role = localStorage.getItem('userType'); // "doctor" or "user"
     const loggedInUserId = localStorage.getItem('userId');
 
-    console.log('Role:', role);
-    console.log('Logged-in User ID:', loggedInUserId);
+    // console.log('Role:', role);
+    // console.log('Logged-in User ID:', loggedInUserId);
 
     const fetchAppointments = async () => {
         try {
@@ -24,7 +24,7 @@ const Appointment = () => {
                 throw new Error('Failed to fetch appointments.');
             }
             const data = await response.json();
-            console.log('Fetched appointments:', data);
+            // console.log('Fetched appointments:', data);
             setAppointments(data.appointments);
         } catch (err) {
             setError(err.message);
@@ -42,7 +42,7 @@ const Appointment = () => {
         return new Date(isoDate).toLocaleDateString();
     };
 
-    // Fix the filter: format the appointment date as "YYYY-MM-DD" using local values
+    // Filter appointments by date (formatted as "YYYY-MM-DD")
     const filteredAppointments = filterDate
         ? appointments.filter((appointment) => {
               const appointmentDate = new Date(appointment.appointmentDate);
@@ -63,6 +63,27 @@ const Appointment = () => {
             });
             if (!response.ok) {
                 throw new Error('Failed to update appointment.');
+            }
+            const updated = await response.json();
+            setAppointments((prev) =>
+                prev.map((appt) =>
+                    appt._id === appointmentId ? { ...appt, status: updated.appointment.status } : appt
+                )
+            );
+        } catch (err) {
+            alert(err.message);
+        }
+    };
+
+    // Cancel appointment (for doctors)
+    const cancelAppointment = async (appointmentId) => {
+        try {
+            const response = await fetch(`http://localhost:5000/api/appointment/${appointmentId}/cancel`, {
+                method: 'PUT',
+                credentials: 'include'
+            });
+            if (!response.ok) {
+                throw new Error('Failed to cancel appointment.');
             }
             const updated = await response.json();
             setAppointments((prev) =>
@@ -235,105 +256,105 @@ const Appointment = () => {
                     </h1>
                 </div>
 
-                                <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <label htmlFor="dateFilter" style={{ fontWeight: '600' }}>
-                                        Filter by Date:
-                                    </label>
-                                    <input
-                                        type="date"
-                                        id="dateFilter"
-                                        value={filterDate}
-                                        onChange={(e) => setFilterDate(e.target.value)}
-                                        style={{
-                                            padding: '0.5rem',
-                                            borderRadius: '4px',
-                                            border: '1px solid #dee2e6'
-                                        }}
-                                    />
-                                    {filterDate && (
-                                        <button
-                                            onClick={() => setFilterDate('')}
-                                            style={{
-                                                padding: '0.5rem 1rem',
-                                                backgroundColor: '#dc3545',
-                                                color: '#fff',
-                                                border: 'none',
-                                                borderRadius: '4px',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            Clear
-                                        </button>
-                                    )}
-                                </div>
+                <div style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <label htmlFor="dateFilter" style={{ fontWeight: '600' }}>
+                        Filter by Date:
+                    </label>
+                    <input
+                        type="date"
+                        id="dateFilter"
+                        value={filterDate}
+                        onChange={(e) => setFilterDate(e.target.value)}
+                        style={{
+                            padding: '0.5rem',
+                            borderRadius: '4px',
+                            border: '1px solid #dee2e6'
+                        }}
+                    />
+                    {filterDate && (
+                        <button
+                            onClick={() => setFilterDate('')}
+                            style={{
+                                padding: '0.5rem 1rem',
+                                backgroundColor: '#dc3545',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Clear
+                        </button>
+                    )}
+                </div>
 
-                                {filteredAppointments.length === 0 ? (
-                                    <div
-                                        style={{
-                                            textAlign: 'center',
-                                            padding: '4rem 2rem',
-                                            color: '#6c757d',
-                                            backgroundColor: '#f8f9fa',
-                                            borderRadius: '12px',
-                                            border: '1px dashed #dee2e6'
-                                        }}
-                                    >
-                                        <svg
-                                            style={{ width: '80px', height: '80px', marginBottom: '1.5rem', color: '#0d6efd' }}
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                            />
-                                        </svg>
-                                        <h2
-                                            style={{
-                                                fontSize: '1.75rem',
-                                                fontWeight: '600',
-                                                color: '#2d3748',
-                                                marginBottom: '1rem'
-                                            }}
-                                        >
-                                            No appointments to display
-                                        </h2>
-                                        <p style={{ fontSize: '1.1rem', marginBottom: '2rem' }}>
-                                            Your schedule is clear. Ready to book your next appointment?
-                                        </p>
-                                        <button
-                                            style={{
-                                                padding: '0.8rem 2rem',
-                                                backgroundColor: '#0d6efd',
-                                                color: '#fff',
-                                                border: 'none',
-                                                borderRadius: '8px',
-                                                fontWeight: '600',
-                                                fontSize: '1rem',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.2s',
-                                                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.08)'
-                                            }}
-                                            onClick={() => (window.location.href = '/find-doctors')}
-                                            onMouseEnter={(e) => (e.target.style.backgroundColor = '#0b5ed7')}
-                                            onMouseLeave={(e) => (e.target.style.backgroundColor = '#0d6efd')}
-                                        >
-                                            Schedule Appointment
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <div
-                                        style={{
-                                            display: 'grid',
-                                            gap: '1.5rem',
-                                            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))'
-                                        }}
-                                    >
-                                        {filteredAppointments.map((appointment) => {
+                {filteredAppointments.length === 0 ? (
+                    <div
+                        style={{
+                            textAlign: 'center',
+                            padding: '4rem 2rem',
+                            color: '#6c757d',
+                            backgroundColor: '#f8f9fa',
+                            borderRadius: '12px',
+                            border: '1px dashed #dee2e6'
+                        }}
+                    >
+                        <svg
+                            style={{ width: '80px', height: '80px', marginBottom: '1.5rem', color: '#0d6efd' }}
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            />
+                        </svg>
+                        <h2
+                            style={{
+                                fontSize: '1.75rem',
+                                fontWeight: '600',
+                                color: '#2d3748',
+                                marginBottom: '1rem'
+                            }}
+                        >
+                            No appointments to display
+                        </h2>
+                        <p style={{ fontSize: '1.1rem', marginBottom: '2rem' }}>
+                            Your schedule is clear. Ready to book your next appointment?
+                        </p>
+                        <button
+                            style={{
+                                padding: '0.8rem 2rem',
+                                backgroundColor: '#0d6efd',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontWeight: '600',
+                                fontSize: '1rem',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.08)'
+                            }}
+                            onClick={() => (window.location.href = '/find-doctors')}
+                            onMouseEnter={(e) => (e.target.style.backgroundColor = '#0b5ed7')}
+                            onMouseLeave={(e) => (e.target.style.backgroundColor = '#0d6efd')}
+                        >
+                            Schedule Appointment
+                        </button>
+                    </div>
+                ) : (
+                    <div
+                        style={{
+                            display: 'grid',
+                            gap: '1.5rem',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))'
+                        }}
+                    >
+                        {filteredAppointments.map((appointment) => {
                             const isUserAppointment =
                                 role === 'user' && appointment.user && appointment.user._id === loggedInUserId;
                             const isDoctorAppointment =
@@ -642,34 +663,61 @@ const Appointment = () => {
                                         </div>
                                     )}
 
-                                    {role === 'doctor' && appointment.status === 'pending' && (
-                                        <button
-                                            style={{
-                                                marginTop: '1.25rem',
-                                                padding: '0.8rem 1.5rem',
-                                                backgroundColor: '#0d6efd',
-                                                color: '#fff',
-                                                border: 'none',
-                                                borderRadius: '8px',
-                                                cursor: 'pointer',
-                                                fontWeight: '600',
-                                                transition: 'all 0.2s',
-                                                width: '100%',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                gap: '0.5rem',
-                                                boxShadow: '0 4px 6px rgba(13,110,253,0.1)'
-                                            }}
-                                            onClick={() => approveAppointment(appointment._id)}
-                                            onMouseEnter={(e) => (e.target.style.backgroundColor = '#0b5ed7')}
-                                            onMouseLeave={(e) => (e.target.style.backgroundColor = '#0d6efd')}
-                                        >
-                                            <svg style={{ width: '18px', height: '18px' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                            </svg>
-                                            Approve Appointment
-                                        </button>
+                                    {role === 'doctor' && appointment.status.toLowerCase() === 'pending' && (
+                                        <div style={{ display: 'flex', gap: '1rem', marginTop: '1.25rem' }}>
+                                            <button
+                                                style={{
+                                                    padding: '0.8rem 1.5rem',
+                                                    backgroundColor: '#0d6efd',
+                                                    color: '#fff',
+                                                    border: 'none',
+                                                    borderRadius: '8px',
+                                                    cursor: 'pointer',
+                                                    fontWeight: '600',
+                                                    transition: 'all 0.2s',
+                                                    flex: '1',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '0.5rem',
+                                                    boxShadow: '0 4px 6px rgba(13,110,253,0.1)'
+                                                }}
+                                                onClick={() => approveAppointment(appointment._id)}
+                                                onMouseEnter={(e) => (e.target.style.backgroundColor = '#0b5ed7')}
+                                                onMouseLeave={(e) => (e.target.style.backgroundColor = '#0d6efd')}
+                                            >
+                                                <svg style={{ width: '18px', height: '18px' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                Approve Appointment
+                                            </button>
+                                            <button
+                                                style={{
+                                                    padding: '0.8rem 1.5rem',
+                                                    backgroundColor: '#ef4444',
+                                                    color: '#fff',
+                                                    border: 'none',
+                                                    borderRadius: '8px',
+                                                    cursor: 'pointer',
+                                                    fontWeight: '600',
+                                                    transition: 'all 0.2s',
+                                                    flex: '1',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '0.5rem',
+                                                    boxShadow: '0 4px 6px rgba(239,68,68,0.1)'
+                                                }}
+                                                onClick={() => cancelAppointment(appointment._id)}
+                                                onMouseEnter={(e) => (e.target.style.backgroundColor = '#dc2626')}
+                                                onMouseLeave={(e) => (e.target.style.backgroundColor = '#ef4444')}
+                                            >
+                                                <svg style={{ width: '18px', height: '18px' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                                Cancel Appointment
+                                            </button>
+                                        </div>
                                     )}
                                 </div>
                             );
