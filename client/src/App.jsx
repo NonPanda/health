@@ -58,7 +58,7 @@ function App() {
           <Route path="doctor-profile" element={<DoctorProfile user={user} setUser={setUser} />} />
           <Route path="find-doctors" element={<DoctorSearch user={user} />} />
           <Route path="doctor/:id" element={<PublicProfile />} />
-          <Route path="appointments" element={<Appointment setUser={setUser} />} />
+          <Route path="appointments" element={<Appointment />} />
         </Routes>
       </Router>
     </>

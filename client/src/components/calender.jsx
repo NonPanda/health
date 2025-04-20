@@ -9,10 +9,44 @@ const CalendarPopup = ({ isOpen, onClose, doctorName, doctorFees, doctorId }) =>
   const [selectedTime, setSelectedTime] = useState(null);
   const [currentView, setCurrentView] = useState('calendar'); // 'calendar', 'times', 'confirmation', 'success'
   const [showConfetti, setShowConfetti] = useState(false);
+  const [bookedSlots, setBookedSlots] = useState([]);
   const { id } = useParams();
 
+  const fetchBookedSlots = async (date) => {
+    if (!date) return;
+    const dateStr = date.toLocaleDateString('en-CA');
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/appointment/doctor/${doctorId || id}/availability`,
+        { params: { date: dateStr }, withCredentials: true }
+      );
+      setBookedSlots(res.data.bookedTimes);
+    } catch (err) {
+      console.error('Error fetching booked slots:', err);
+      setBookedSlots([]);
+    }
+  };
 
-  // Generate calendar days
+  const isSameDay = (d1, d2) => {
+    return (
+      d1.getFullYear() === d2.getFullYear() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getDate() === d2.getDate()
+    );
+  };
+
+  const isPastTimeSlot = (timeStr, date) => {
+    if (!isSameDay(date, new Date())) return false;
+    const [timePart, period] = timeStr.split(' ');
+    const [hrs, mins] = timePart.split(':');
+    let hours = parseInt(hrs, 10);
+    if (period === 'PM' && hours !== 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+    const slotTime = new Date();
+    slotTime.setHours(hours, parseInt(mins, 10), 0, 0);
+    return slotTime < new Date();
+  };
+
   const generateCalendarDays = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -36,7 +70,6 @@ const CalendarPopup = ({ isOpen, onClose, doctorName, doctorFees, doctorId }) =>
     return days;
   };
 
-  // Generate time slots
   const generateTimeSlots = () => {
     const slots = [];
     let startHour = 9;
@@ -68,6 +101,7 @@ const CalendarPopup = ({ isOpen, onClose, doctorName, doctorFees, doctorId }) =>
   };
 
   const handleDateSelect = (date) => {
+    fetchBookedSlots(date);
     setSelectedDate(date);
     setCurrentView('times');
   };
@@ -85,11 +119,29 @@ const CalendarPopup = ({ isOpen, onClose, doctorName, doctorFees, doctorId }) =>
     setCurrentView('times');
   };
 
-  // Confirm appointment: post to backend endpoint and show celebration on success
   const confirmAppointment = async () => {
+    const dateStr = selectedDate.toLocaleDateString('en-CA');
+    try {
+      const checkRes = await axios.get(
+        `http://localhost:5000/api/appointment/doctor/${doctorId || id}/availability-check`,
+        {
+          params: { date: dateStr, time: selectedTime },
+          withCredentials: true
+        }
+      );
+      if (!checkRes.data.available) {
+        alert('The selected time is no longer available. Please choose another time.');
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking availability:', error);
+      alert('Error checking availability. Please try again.');
+      return;
+    }
+
     const appointmentData = {
-      user: localStorage.getItem('userId'), 
-      doctor: id,
+      user: localStorage.getItem('userId'),
+      doctor: doctorId || id,
       appointmentDate: selectedDate,
       appointmentTime: selectedTime
     };
@@ -100,7 +152,7 @@ const CalendarPopup = ({ isOpen, onClose, doctorName, doctorFees, doctorId }) =>
       showCelebration();
     } catch (error) {
       console.error('Error booking appointment:', error);
-      // You may add UI feedback for errors here
+      alert('Error booking appointment. Please try again.');
     }
   };
 
@@ -152,30 +204,6 @@ const CalendarPopup = ({ isOpen, onClose, doctorName, doctorFees, doctorId }) =>
       </div>
     );
   };
-
-  // const ChampagneAnimation = () => {
-  //   return (
-  //     <div className="champagne-container">
-  //       <div className="bottle">
-  //         <div className="bottle-top"></div>
-  //         <div className="bottle-body"></div>
-  //       </div>
-  //       {Array(20).fill().map((_, i) => (
-  //         <div 
-  //           key={i} 
-  //           className="bubble"
-  //           style={{
-  //             left: `${40 + Math.random() * 20}%`, 
-  //             animationDuration: `${0.5 + Math.random() * 2}s`,
-  //             animationDelay: `${Math.random() * 0.5}s`,
-  //             width: `${5 + Math.random() * 10}px`,
-  //             height: `${5 + Math.random() * 10}px`,
-  //           }}
-  //         ></div>
-  //       ))}
-  //     </div>
-  //   );
-  // };
 
   if (!isOpen) return null;
 
@@ -352,18 +380,27 @@ const CalendarPopup = ({ isOpen, onClose, doctorName, doctorFees, doctorId }) =>
               </h3>
               
               <div className="grid grid-cols-2 gap-3">
-                {generateTimeSlots().map((time, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleTimeSelect(time)}
-                    className="px-4 py-3 border border-gray-200 rounded-lg text-center hover:bg-blue-50 hover:border-blue-300 transition duration-200"
-                  >
-                    <div className="flex items-center justify-center">
-                      <FaClock className="mr-2 text-blue-500" />
-                      {time}
-                    </div>
-                  </button>
-                ))}
+                {generateTimeSlots().map((time, index) => {
+                  const isBooked = bookedSlots.includes(time);
+                  const isPast = selectedDate && isSameDay(selectedDate, new Date()) && isPastTimeSlot(time, selectedDate);
+                  return (
+                    <button
+                      key={index}
+                      disabled={isBooked || isPast}
+                      onClick={() => !(isBooked || isPast) && handleTimeSelect(time)}
+                      className={`px-4 py-3 border border-gray-200 rounded-lg text-center transition duration-200 ${
+                        isBooked || isPast
+                          ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                          : 'hover:bg-blue-50 hover:border-blue-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-center">
+                        <FaClock className={`mr-2 ${isBooked || isPast ? 'text-gray-400' : 'text-blue-500'}`} />
+                        {time}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </>
           )}
@@ -418,7 +455,7 @@ const CalendarPopup = ({ isOpen, onClose, doctorName, doctorFees, doctorId }) =>
                 <div className="font-medium">{selectedTime}</div>
               </div>
               <p className="text-gray-600 mt-4">
-                A confirmation has been sent to your email.
+                An email has been sent.
               </p>
             </div>
           )}
